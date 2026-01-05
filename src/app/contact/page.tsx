@@ -8,7 +8,8 @@ export default function Home() {
           JS Mart
         </h1>
         <p className="max-w-[700px] text-zinc-500 md:text-xl dark:text-zinc-400">
-          Home Page        </p>
+            contact us        
+        </p>
       </div>
     </div>
   );
