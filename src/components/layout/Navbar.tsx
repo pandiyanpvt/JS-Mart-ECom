@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Search, ShoppingBag, Bell, Menu, ChevronDown, User } from "lucide-react";
@@ -10,8 +12,25 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+// import {
+//     Bars3Icon,
+// } from "@heroicons/react/16/solid";
+import { usePathname } from "next/navigation";
+
 
 export function Navbar() {
+    const pathname = usePathname();
+
+
+    const navLinks = [
+        { name: "Home", href: "/" },
+        { name: "Shop", href: "/shop" },
+        { name: "Offers", href: "/offers" },
+        { name: "About Us", href: "/about" },
+        { name: "Contact Us", href: "/contact" },
+    ];
+
+
     return (
         <div className="w-full flex flex-col font-sans">
             {/* Top Bar - Green */}
@@ -71,33 +90,53 @@ export function Navbar() {
                     </div>
 
                     {/* Navigation Links */}
-                    <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger className="flex items-center gap-1 hover:text-white transition-colors outline-none">
-                                Home <ChevronDown className="h-3 w-3" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem>Home 1</DropdownMenuItem>
-                                <DropdownMenuItem>Home 2</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                    <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={`transition-colors ${pathname === link.href
+                                    ? "text-white font-bold" 
+                                    : "text-gray-300 hover:text-white" 
+                                    }`}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
 
-                        <Link href="/shop" className="hover:text-white transition-colors">Shop</Link>
-
+                        {/* Membership Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger className="flex items-center gap-1 hover:text-white transition-colors outline-none">
                                 Membership <ChevronDown className="h-3 w-3" />
                             </DropdownMenuTrigger>
+
                             <DropdownMenuContent>
-                                <DropdownMenuItem>Silver</DropdownMenuItem>
-                                <DropdownMenuItem>Gold</DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href="/membership/silver"
+                                        className={`${pathname === "/membership/silver"
+                                                ? "text-gray-600 font-bold"
+                                                : "text-gray-700 hover:text-white"
+                                            }`}
+                                    >
+                                        Silver
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href="/membership/gold"
+                                        className={`${pathname === "/membership/gold"
+                                                ? "text-gray-600 font-bold"
+                                                : "text-gray-700 hover:text-white"
+                                            }`}
+                                    >
+                                        Gold
+                                    </Link>
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-
-                        <Link href="/offers" className="hover:text-white transition-colors">Offers</Link>
-                        <Link href="/about" className="hover:text-white transition-colors">About Us</Link>
-                        <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
                     </nav>
+
                 </div>
 
                 {/* Right Icons */}
