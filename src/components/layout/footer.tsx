@@ -132,6 +132,7 @@ const navigation = {
   useful: [
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
+    { name: "Offers", href: "/offers" },
     { name: "FAQ", href: "/faq" },
   ],
   policies: [
@@ -299,16 +300,16 @@ export default function Footer() {
 
               <h3 className="font-semibold text-gray-900 mb-4">Follow Us</h3>
               <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
+                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
                   <Facebook className="w-5 h-5 text-gray-600" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
+                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
                   <Twitter className="w-5 h-5 text-gray-600" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
+                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
                   <Instagram className="w-5 h-5 text-gray-600" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
+                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
                   <Youtube className="w-5 h-5 text-gray-600" />
                 </a>
               </div>
