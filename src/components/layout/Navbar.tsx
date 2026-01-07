@@ -34,7 +34,7 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans">
             {/* Top Bar - Green */}
-            <div className="bg-lime-500 h-16 px-4 md:px-8 flex items-center justify-between gap-4">
+            <div className="bg-[#5DC440] h-16 px-4 md:px-8 flex items-center justify-between gap-4">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center gap-2 group py-1">
                     <div className="relative h-14 w-14 md:h-16 md:w-16 flex items-center justify-center">
@@ -68,7 +68,7 @@ export function Navbar() {
                 <div className="flex items-center gap-3">
                     <Link href="/signin" className="flex items-center gap-2">
                         <Avatar className="h-9 w-9 border-2 border-white cursor-pointer">
-                            <AvatarFallback className="bg-white text-lime-600 flex items-center justify-center">
+                            <AvatarFallback className="bg-white text-[#5DC440] flex items-center justify-center">
                                 <User className="h-5 w-5" />
                             </AvatarFallback>
                         </Avatar>
@@ -88,7 +88,7 @@ export function Navbar() {
 
                 <div className="flex items-center h-full">
                     {/* Hamburger Menu - Categories? */}
-                    <div className="bg-lime-500 h-full w-12 flex items-center justify-center cursor-pointer hover:brightness-110 mr-6 -ml-4 md:-ml-8 pl-4 md:pl-8 pr-4">
+                    <div className="bg-[#5DC440] h-full w-12 flex items-center justify-center cursor-pointer hover:brightness-110 mr-6 -ml-4 md:-ml-8 pl-4 md:pl-8 pr-4">
                         <Menu className="h-6 w-6 text-white" />
                     </div>
 
