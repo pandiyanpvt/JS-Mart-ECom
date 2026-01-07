@@ -36,14 +36,15 @@ export function Navbar() {
             {/* Top Bar - Green */}
             <div className="bg-lime-500 h-16 px-4 md:px-8 flex items-center justify-between gap-4">
                 {/* Logo Section */}
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative flex items-center justify-center p-1">
-                        {/* Approximate logo icon */}
-                        <div className="relative h-10 w-10 flex items-center justify-center">
-                            <ShoppingBag className="h-8 w-8 text-white fill-white absolute" />
-                            <span className="relative z-10 text-[10px] font-bold text-[#5DC440] pt-2">JS</span>
-                        </div>
-                        <span className="text-2xl font-bold text-white tracking-tight">mart</span>
+                <Link href="/" className="flex items-center gap-2 group py-1">
+                    <div className="relative h-14 w-14 md:h-16 md:w-16 flex items-center justify-center">
+                        <Image
+                            src="/logo.png"
+                            alt="JS Mart Australia Logo"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
                     </div>
                 </Link>
 

@@ -46,6 +46,8 @@ export default function ShopPage() {
                 src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2574&auto=format&fit=crop"
                 alt="Basket of vegetables"
                 fill
+                priority
+                sizes="50vw"
                 className="object-cover object-center translate-x-12 translate-y-4 scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#0B4635]/20 to-[#0B4635]" />

@@ -33,7 +33,7 @@
 //       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 hidden sm:block">
 //         <div className="py-20 xl:grid xl:grid-cols-3 xl:gap-8">
 //           <div className="grid grid-cols-2 gap-8 xl:col-span-2">
-            
+
 //             {/* Shop */}
 //             <div>
 //               <h3 className="text-sm font-medium text-white">Shop</h3>
@@ -92,6 +92,7 @@
 
 
 import React from "react";
+import Image from "next/image";
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 
 const navigation = {
@@ -145,9 +146,17 @@ export default function Footer() {
     <footer className="bg-gray-50 border-t border-gray-200">
       {/* Top Section - Features */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
+        <div className="flex flex-col items-center text-center mb-12">
+          <div className="relative h-24 w-24 mb-6">
+            <Image
+              src="/logo.png"
+              alt="JS Mart Australia Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
           <p className="text-gray-600 text-sm leading-relaxed max-w-4xl mx-auto">
-            Enter Sri Lanka's freshest online grocery store for all your grocery needs- fresh to frozen and everything in between! Now, you can order ALL your daily necessities from the comfort of your home or anywhere you want! Choose from same-day, next-day & saver to ensure you get what you need when you need it.
+            Enter Australia's freshest online grocery store for all your grocery needs- fresh to frozen and everything in between! Now, you can order ALL your daily necessities from the comfort of your home or anywhere you want! Choose from same-day, next-day & saver to ensure you get what you need when you need it.
           </p>
         </div>
 
