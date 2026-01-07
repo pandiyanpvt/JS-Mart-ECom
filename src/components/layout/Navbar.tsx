@@ -34,7 +34,7 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans">
             {/* Top Bar - Green */}
-            <div className="bg-[#5DC440] h-16 px-4 md:px-8 flex items-center justify-between gap-4">
+            <div className="bg-lime-500 h-16 px-4 md:px-8 flex items-center justify-between gap-4">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="relative flex items-center justify-center p-1">
@@ -64,19 +64,21 @@ export function Navbar() {
                 </Button>
 
                 {/* User Profile */}
-                <div className="flex items-center gap-4">
-                    <Avatar className="h-10 w-10 border-2 border-white cursor-pointer">
-                        <AvatarImage src="/profile-placeholder.jpg" />
-                        <AvatarFallback className="bg-zinc-200 text-zinc-900 border-2 border-white">
-                            <Image
-                                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Ph1L2j9z5sQ6x75v4b0n3m1.png"
-                                alt="User"
-                                fill
-                                className="object-cover"
-                            />
-                            <User className="h-5 w-5" />
-                        </AvatarFallback>
-                    </Avatar>
+                <div className="flex items-center gap-3">
+                    <Link href="/signin" className="flex items-center gap-2">
+                        <Avatar className="h-9 w-9 border-2 border-white cursor-pointer">
+                            <AvatarFallback className="bg-white text-lime-600 flex items-center justify-center">
+                                <User className="h-5 w-5" />
+                            </AvatarFallback>
+                        </Avatar>
+
+                        <Button
+                            variant="ghost"
+                            className="text-white font-semibold hover:bg-white/20"
+                        >
+                            Sign In
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
@@ -85,7 +87,7 @@ export function Navbar() {
 
                 <div className="flex items-center h-full">
                     {/* Hamburger Menu - Categories? */}
-                    <div className="bg-[#5DC440] h-full w-12 flex items-center justify-center cursor-pointer hover:brightness-110 mr-6 -ml-4 md:-ml-8 pl-4 md:pl-8 pr-4">
+                    <div className="bg-lime-500 h-full w-12 flex items-center justify-center cursor-pointer hover:brightness-110 mr-6 -ml-4 md:-ml-8 pl-4 md:pl-8 pr-4">
                         <Menu className="h-6 w-6 text-white" />
                     </div>
 
