@@ -96,8 +96,8 @@ export function Navbar() {
                                 key={link.href}
                                 href={link.href}
                                 className={`transition-colors ${pathname === link.href
-                                    ? "text-white font-bold" 
-                                    : "text-gray-300 hover:text-white" 
+                                    ? "text-white font-bold"
+                                    : "text-gray-300 hover:text-white"
                                     }`}
                             >
                                 {link.name}
@@ -115,8 +115,8 @@ export function Navbar() {
                                     <Link
                                         href="/membership/silver"
                                         className={`${pathname === "/membership/silver"
-                                                ? "text-gray-600 font-bold"
-                                                : "text-gray-700 hover:text-white"
+                                            ? "text-gray-600 font-bold"
+                                            : "text-gray-700 hover:text-white"
                                             }`}
                                     >
                                         Silver
@@ -126,8 +126,8 @@ export function Navbar() {
                                     <Link
                                         href="/membership/gold"
                                         className={`${pathname === "/membership/gold"
-                                                ? "text-gray-600 font-bold"
-                                                : "text-gray-700 hover:text-white"
+                                            ? "text-gray-600 font-bold"
+                                            : "text-gray-700 hover:text-white"
                                             }`}
                                     >
                                         Gold
