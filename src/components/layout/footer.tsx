@@ -278,7 +278,7 @@ export default function Footer() {
 
             {/* Download App & Social */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Download App</h3>
+              {/* <h3 className="font-semibold text-gray-900 mb-4">Download App</h3>
               <div className="space-y-3 mb-6">
                 <a href="#" className="block">
                   <img src="/images/footer/google.png" alt="Google Play" className="h-10" />
@@ -286,7 +286,7 @@ export default function Footer() {
                 <a href="#" className="block">
                   <img src="/images/footer/appstore.png" alt="App Store" className="h-10" />
                 </a>
-              </div>
+              </div> */}
 
               <h3 className="font-semibold text-gray-900 mb-4">Follow Us</h3>
               <div className="flex gap-3">
