@@ -19,14 +19,14 @@ export default function PasswordResetSuccessPage() {
     }, [router]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-lime-50 via-emerald-50 to-green-50">
+        <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-emerald-50 via-emerald-50 to-green-50">
             <div className="w-full max-w-md">
                 <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
                     {/* Success Icon */}
                     <div className="flex justify-center">
                         <div className="relative">
-                            <div className="absolute inset-0 bg-lime-500/20 rounded-full blur-2xl animate-pulse"></div>
-                            <div className="relative w-20 h-20 bg-lime-500 rounded-full flex items-center justify-center">
+                            <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl animate-pulse"></div>
+                            <div className="relative w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center">
                                 <CheckCircle className="h-12 w-12 text-white" />
                             </div>
                         </div>
@@ -37,7 +37,7 @@ export default function PasswordResetSuccessPage() {
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="relative flex items-center justify-center p-1">
                                 <div className="relative h-10 w-10 flex items-center justify-center">
-                                    <ShoppingBag className="h-8 w-8 text-lime-500 fill-lime-500 absolute" />
+                                    <ShoppingBag className="h-8 w-8 text-emerald-500 fill-lime-500 absolute" />
                                     <span className="relative z-10 text-[10px] font-bold text-white pt-2">JS</span>
                                 </div>
                                 <span className="text-2xl font-bold text-gray-900 tracking-tight">mart</span>
@@ -58,7 +58,7 @@ export default function PasswordResetSuccessPage() {
                     <div className="space-y-3">
                         <Button
                             onClick={() => router.push("/signin")}
-                            className="w-full h-12 bg-lime-500 hover:bg-lime-600 text-white font-semibold text-base"
+                            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base"
                         >
                             Continue to Sign In
                         </Button>
