@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { Heading } from "@/components/ui/heading";
+import Image from "next/image";
 
 type Item = {
   id: number;
@@ -67,10 +68,17 @@ export default function ShopGridSection({
             <div
               className={`${imageSize} rounded-full overflow-hidden border border-gray-200`}
             >
-              <img
+              {/* <img
                 src={item.image}
                 alt={item.name}
                 className="w-full h-full object-cover"
+              /> */}
+               <Image
+                src={item.image}
+                alt={item.name}
+                width={200}
+                height={200}
+                className="object-cover"
               />
             </div>
             <span className="mt-2 text-center text-sm font-medium">
