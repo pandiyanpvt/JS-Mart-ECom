@@ -25,7 +25,7 @@ export default function CategorySection() {
     { id: 14, name: "Snacks & Confectionery", category_image: "images/category-section/snacks.jpg" },
   ];
 
-  const displayedCategories = showAll ? categories : categories.slice(0, 7);
+  const displayedCategories = showAll ? categories : categories.slice(0, 14);
 
   return (
     <section aria-labelledby="category-heading" className="pt-8 sm:pt-24 xl:mx-auto xl:max-w-7xl xl:px-8">
