@@ -18,11 +18,11 @@ export default function HomePage() {
       <AdvertisementSection />
       {/* Category Section */}
       <CategorySection />
-      {/* Advertisemnent Section 1 */}
+      {/* Advertisement Section 1 */}
       <AdvertisementSection1/>
       {/* Product Card */}
       <BestOfFruitVeg />
-      {/* Advertisemnent Section 2 */}
+      {/* Advertisement Section 2 */}
       <AdvertisementSection2/>
       {/* Brand Section */}
       <BrandSection />

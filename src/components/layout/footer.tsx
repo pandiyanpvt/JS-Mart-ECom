@@ -1,100 +1,6 @@
-// "use client";
-
-// const navigation = {
-//   footer_navigation: {
-//     shop: [
-//       { name: "All Products", href: "/products" },
-//       { name: "Christmas Donation", href: "/products?category=donation" },
-//       { name: "Fresh Vegetables", href: "/products?category=vegetables" },
-//       { name: "Fruits", href: "/products?category=fruits" },
-//     ],
-//     account: [
-//       { name: "My Account", href: "/account" },
-//       { name: "Orders", href: "/orders" },
-//       { name: "Wishlist", href: "/wishlist" },
-//       { name: "Track Order", href: "/track-order" },
-//     ],
-//     company: [
-//       { name: "About Us", href: "/about" },
-//       { name: "Contact Us", href: "/contact" },
-//       { name: "Privacy Policy", href: "/privacy-policy" },
-//       { name: "Terms & Conditions", href: "/terms" },
-//     ],
-//   },
-// };
-
-// export default function Footer() {
-//   return (
-//     <footer aria-labelledby="footer-heading" className="mt-8 bg-gray-900">
-//       <h2 id="footer-heading" className="sr-only">
-//         Footer
-//       </h2>
-
-//       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 hidden sm:block">
-//         <div className="py-20 xl:grid xl:grid-cols-3 xl:gap-8">
-//           <div className="grid grid-cols-2 gap-8 xl:col-span-2">
-
-//             {/* Shop */}
-//             <div>
-//               <h3 className="text-sm font-medium text-white">Shop</h3>
-//               <ul role="list" className="mt-6 space-y-4">
-//                 {navigation.footer_navigation.shop.map((item) => (
-//                   <li key={item.name} className="text-sm">
-//                     <a href={item.href} className="text-gray-300 hover:text-white">
-//                       {item.name}
-//                     </a>
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-
-//             {/* Account */}
-//             <div>
-//               <h3 className="text-sm font-medium text-white">Account</h3>
-//               <ul role="list" className="mt-6 space-y-4">
-//                 {navigation.footer_navigation.account.map((item) => (
-//                   <li key={item.name} className="text-sm">
-//                     <a href={item.href} className="text-gray-300 hover:text-white">
-//                       {item.name}
-//                     </a>
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-
-//             {/* Company */}
-//             <div>
-//               <h3 className="text-sm font-medium text-white">Company</h3>
-//               <ul role="list" className="mt-6 space-y-4">
-//                 {navigation.footer_navigation.company.map((item) => (
-//                   <li key={item.name} className="text-sm">
-//                     <a href={item.href} className="text-gray-300 hover:text-white">
-//                       {item.name}
-//                     </a>
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-
-//           </div>
-//         </div>
-
-//         {/* Bottom bar */}
-//         <div className="border-t border-gray-800 py-10">
-//           <p className="text-sm text-gray-400">
-//             &copy; {new Date().getFullYear()} JS Mart. All rights reserved.
-//           </p>
-//         </div>
-//       </div>
-//     </footer>
-//   );
-// }
-
-
 import React from "react";
+import { Facebook, Instagram, Youtube } from "lucide-react";
 import Image from "next/image";
-import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
-
 const navigation = {
   categories: [
     { name: "Christmas Donation", href: "/products?category=donation" },
@@ -132,7 +38,6 @@ const navigation = {
   useful: [
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
-    { name: "Offers", href: "/offers" },
     { name: "FAQ", href: "/faq" },
   ],
   policies: [
@@ -157,7 +62,7 @@ export default function Footer() {
             />
           </div>
           <p className="text-gray-600 text-sm leading-relaxed max-w-4xl mx-auto">
-            Enter Australia's freshest online grocery store for all your grocery needs- fresh to frozen and everything in between! Now, you can order ALL your daily necessities from the comfort of your home or anywhere you want! Choose from same-day, next-day & saver to ensure you get what you need when you need it.
+            Enter Sri Lanka&apos;s freshest online grocery store for all your grocery needs- fresh to frozen and everything in between! Now, you can order ALL your daily necessities from the comfort of your home or anywhere you want! Choose from same-day, next-day & saver to ensure you get what you need when you need it.
           </p>
         </div>
 
@@ -277,39 +182,15 @@ export default function Footer() {
                 ))}
               </ul>
 
-              {/* <div className="mt-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Payment Methods</h4>
-                <div className="flex gap-2">
-                  <img src="/api/placeholder/60/40" alt="Visa" className="h-8 border border-gray-200 rounded" />
-                  <img src="/api/placeholder/60/40" alt="Mastercard" className="h-8 border border-gray-200 rounded" />
-                </div>
-              </div> */}
-            </div>
-
-            {/* Download App & Social */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Download App</h3>
-              <div className="space-y-3 mb-6">
-                <a href="#" className="block">
-                  <img src="/images/footer/google.png" alt="Google Play" className="h-10" />
-                </a>
-                <a href="#" className="block">
-                  <img src="/images/footer/appstore.png" alt="App Store" className="h-10" />
-                </a>
-              </div>
-
               <h3 className="font-semibold text-gray-900 mb-4">Follow Us</h3>
               <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
+                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
                   <Facebook className="w-5 h-5 text-gray-600" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
-                  <Twitter className="w-5 h-5 text-gray-600" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
+                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
                   <Instagram className="w-5 h-5 text-gray-600" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-[#5DC440] transition-colors">
+                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
                   <Youtube className="w-5 h-5 text-gray-600" />
                 </a>
               </div>

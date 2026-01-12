@@ -58,7 +58,7 @@ export default function AboutPage() {
             <span className="text-[#5DC440] font-bold">To Your Doorstep</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md">
-            We're on a mission to provide the freshest groceries and a seamless shopping
+            We&apos;re on a mission to provide the freshest groceries and a seamless shopping
             experience for every household.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

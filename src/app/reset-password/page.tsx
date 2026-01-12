@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
         router.push("/password-reset-success");
     };
 
-    const strengthColors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-lime-500"];
+    const strengthColors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-emerald-500"];
     const strengthLabels = ["Weak", "Fair", "Good", "Strong"];
 
     return (
@@ -86,7 +86,7 @@ export default function ResetPasswordPage() {
                                     placeholder="Create a strong password"
                                     value={formData.password}
                                     onChange={(e) => handlePasswordChange(e.target.value)}
-                                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-lime-500 focus:ring-lime-500"
+                                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-emerald-500 focus:ring-lime-500"
                                     required
                                 />
                                 <button
@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
                                             Password strength:{" "}
                                             <span
                                                 className={`font-semibold ${passwordStrength === 4
-                                                    ? "text-lime-600"
+                                                    ? "text-emerald-600"
                                                     : passwordStrength === 3
                                                         ? "text-yellow-600"
                                                         : passwordStrength === 2
@@ -144,7 +144,7 @@ export default function ResetPasswordPage() {
                                     placeholder="Confirm your password"
                                     value={formData.confirmPassword}
                                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-lime-500 focus:ring-lime-500"
+                                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-emerald-500 focus:ring-lime-500"
                                     required
                                 />
                                 <button
@@ -167,7 +167,7 @@ export default function ResetPasswordPage() {
                             <div className="space-y-1.5">
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
-                                        className={`h-4 w-4 ${formData.password.length >= 8 ? "text-lime-600" : "text-gray-300"
+                                        className={`h-4 w-4 ${formData.password.length >= 8 ? "text-emerald-600" : "text-gray-300"
                                             }`}
                                     />
                                     <span className={formData.password.length >= 8 ? "text-gray-700" : "text-gray-500"}>
@@ -177,7 +177,7 @@ export default function ResetPasswordPage() {
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
                                         className={`h-4 w-4 ${/[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password)
-                                            ? "text-lime-600"
+                                            ? "text-emerald-600"
                                             : "text-gray-300"
                                             }`}
                                     />
@@ -193,7 +193,7 @@ export default function ResetPasswordPage() {
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
-                                        className={`h-4 w-4 ${/\d/.test(formData.password) ? "text-lime-600" : "text-gray-300"}`}
+                                        className={`h-4 w-4 ${/\d/.test(formData.password) ? "text-emerald-600" : "text-gray-300"}`}
                                     />
                                     <span className={/\d/.test(formData.password) ? "text-gray-700" : "text-gray-500"}>
                                         At least one number
@@ -202,7 +202,7 @@ export default function ResetPasswordPage() {
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
                                         className={`h-4 w-4 ${/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
-                                            ? "text-lime-600"
+                                            ? "text-emerald-600"
                                             : "text-gray-300"
                                             }`}
                                     />
@@ -222,7 +222,7 @@ export default function ResetPasswordPage() {
                         {/* Reset Button */}
                         <Button
                             type="submit"
-                            className="w-full h-12 bg-lime-500 hover:bg-lime-600 text-white font-semibold text-base"
+                            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base"
                         >
                             Reset Password
                         </Button>
