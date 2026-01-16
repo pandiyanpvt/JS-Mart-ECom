@@ -25,6 +25,19 @@ export default function SignUpPage() {
         e.preventDefault();
         // Handle sign up logic here
         console.log("Sign up with:", formData);
+
+        // Store user session (in a real app, this would come from your backend)
+        localStorage.setItem(
+            "user",
+            JSON.stringify({
+                email: formData.email,
+                name: formData.fullName,
+                phone: formData.phone,
+            })
+        );
+
+        // Redirect to account dashboard
+        router.push("/account");
     };
 
     return (
