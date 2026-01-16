@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, ShoppingBag, Bell, Menu, ChevronDown, User } from "lucide-react";
+import { Search, ShoppingBag, Bell, Menu, ChevronDown, User, LogOut, Package, MapPin, CreditCard, LayoutDashboard } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,15 +10,54 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuSeparator,
+    DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 // import {
 //     Bars3Icon,
 // } from "@heroicons/react/16/solid";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 export function Navbar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userName, setUserName] = useState("");
+
+    // Check login status on component mount and when pathname changes
+    useEffect(() => {
+        const checkLoginStatus = () => {
+            const user = localStorage.getItem("user");
+            if (user) {
+                try {
+                    const userData = JSON.parse(user);
+                    setIsLoggedIn(true);
+                    setUserName(userData.name || "User");
+                } catch (error) {
+                    setIsLoggedIn(false);
+                }
+            } else {
+                setIsLoggedIn(false);
+            }
+        };
+
+        checkLoginStatus();
+        // Add event listener for storage changes (when user logs in/out in another tab)
+        window.addEventListener("storage", checkLoginStatus);
+
+        return () => {
+            window.removeEventListener("storage", checkLoginStatus);
+        };
+    }, [pathname]);
+
+    const handleLogout = () => {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        setIsLoggedIn(false);
+        router.push("/");
+    };
 
 
     const navLinks = [
@@ -33,10 +72,10 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans">
             {/* Top Bar - Green */}
-            <div className="bg-emerald-600 h-16 px-4 md:px-8 flex items-center justify-between gap-4">
+            <div className="bg-emerald-600 h-20 px-4 md:px-8 flex items-center justify-between gap-4">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center gap-2 group py-1">
-                    <div className="relative h-14 w-14 md:h-16 md:w-16 flex items-center justify-center">
+                    <div className="relative h-16 w-16 md:h-20 md:w-20 flex items-center justify-center transition-transform hover:scale-105">
                         <Image
                             src="/logo.png"
                             alt="JS Mart Australia Logo"
@@ -50,35 +89,82 @@ export function Navbar() {
                 {/* Search Bar */}
                 <div className="flex-1 max-w-2xl hidden md:flex relative">
                     <Input
-                        className="w-full h-10 bg-white border-0 rounded-r-none focus-visible:ring-0 text-black placeholder:text-gray-400"
+                        className="w-full h-11 bg-white border-0 rounded-r-none focus-visible:ring-2 focus-visible:ring-emerald-300 text-black placeholder:text-gray-500 px-4 text-base"
                         placeholder="Search for products..."
                     />
-                    <Button className="h-10 rounded-l-none bg-black text-white hover:bg-zinc-800 px-8 font-bold text-base">
+                    <Button className="h-11 rounded-l-none bg-emerald-700 text-white hover:bg-emerald-800 px-8 font-semibold text-base shadow-md transition-all">
+                        <Search className="h-5 w-5 mr-2" />
                         Search
                     </Button>
                 </div>
 
                 {/* Mobile Search Icon (visible only on small screens) */}
-                <Button size="icon" variant="ghost" className="md:hidden text-white">
+                <Button size="icon" variant="ghost" className="md:hidden text-white hover:bg-white/20">
                     <Search className="h-6 w-6" />
                 </Button>
 
-                {/* User Profile */}
-                <div className="flex items-center gap-3">
-                    <Link href="/signin" className="flex items-center gap-2">
-                        <Avatar className="h-9 w-9 border-2 border-white cursor-pointer">
-                            <AvatarFallback className="bg-white text-emerald-600 flex items-center justify-center">
-                                <User className="h-5 w-5" />
-                            </AvatarFallback>
-                        </Avatar>
+                {/* User Profile - Conditional based on login status */}
+                <div className="flex items-center gap-2">
+                    {isLoggedIn ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border-2 border-white/30 transition-all hover:border-white/50 outline-none">
+                                <Avatar className="h-8 w-8 border-2 border-white">
+                                    <AvatarFallback className="bg-white text-emerald-600 flex items-center justify-center font-bold">
+                                        {userName.charAt(0).toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <span className="text-white font-semibold text-sm hidden lg:inline">
+                                    {userName}
+                                </span>
+                                <ChevronDown className="h-4 w-4 text-white hidden lg:inline" />
+                            </DropdownMenuTrigger>
 
-                        <Button
-                            variant="ghost"
-                            className="text-white font-semibold hover:bg-white/20"
-                        >
-                            Sign In
-                        </Button>
-                    </Link>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/account/profile" className="cursor-pointer">
+                                        <User className="h-4 w-4 mr-2" />
+                                        My Profile
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/account/orders" className="cursor-pointer">
+                                        <Package className="h-4 w-4 mr-2" />
+                                        My Orders
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/account/addresses" className="cursor-pointer">
+                                        <MapPin className="h-4 w-4 mr-2" />
+                                        Saved Addresses
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/account/cards" className="cursor-pointer">
+                                        <CreditCard className="h-4 w-4 mr-2" />
+                                        Saved Cards
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
+                                    <LogOut className="h-4 w-4 mr-2" />
+                                    Logout
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <Link href="/signin" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border-2 border-white/30 transition-all hover:border-white/50">
+                            <Avatar className="h-8 w-8 border-2 border-white">
+                                <AvatarFallback className="bg-white text-emerald-600 flex items-center justify-center">
+                                    <User className="h-4 w-4" />
+                                </AvatarFallback>
+                            </Avatar>
+                            <span className="text-white font-semibold text-sm hidden lg:inline">
+                                Sign In
+                            </span>
+                        </Link>
+                    )}
                 </div>
             </div>
 

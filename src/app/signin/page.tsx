@@ -21,6 +21,26 @@ export default function SignInPage() {
         e.preventDefault();
         // Handle sign in logic here
         console.log("Sign in with:", formData);
+
+        // Store user session (in a real app, this would come from your backend)
+        // Try to get existing user data, otherwise create new entry
+        const existingUser = localStorage.getItem("user");
+        let userData;
+        if (existingUser) {
+            try {
+                userData = JSON.parse(existingUser);
+                // Update email if changed
+                userData.email = formData.email;
+            } catch (error) {
+                userData = { email: formData.email, name: "User" };
+            }
+        } else {
+            userData = { email: formData.email, name: "User" };
+        }
+        localStorage.setItem("user", JSON.stringify(userData));
+
+        // Redirect to account dashboard
+        router.push("/account");
     };
 
     return (
