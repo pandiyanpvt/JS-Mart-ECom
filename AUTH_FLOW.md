@@ -138,7 +138,7 @@ The authentication flow is already integrated with the Navbar. Click the "Sign I
 Edit the gradient classes in each page file:
 ```tsx
 // Example: Change sign in gradient
-className="bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600"
+className="bg-gradient-to-br from-green-400 via-emerald-500 to-green-600"
 ```
 
 ### Update Social Providers
