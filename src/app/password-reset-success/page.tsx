@@ -58,7 +58,7 @@ export default function PasswordResetSuccessPage() {
                     <div className="space-y-3">
                         <Button
                             onClick={() => router.push("/signin")}
-                            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base"
+                            className="w-full h-12 bg-green-500 hover:bg-green-600 text-white font-semibold text-base"
                         >
                             Continue to Sign In
                         </Button>

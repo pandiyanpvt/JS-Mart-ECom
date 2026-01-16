@@ -72,7 +72,7 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans">
             {/* Top Bar - Green */}
-            <div className="bg-emerald-600 h-20 px-4 md:px-8 flex items-center justify-between gap-4">
+            <div className="bg-green-600 h-16 px-4 md:px-8 flex items-center justify-between gap-4">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center gap-2 group py-1">
                     <div className="relative h-16 w-16 md:h-20 md:w-20 flex items-center justify-center transition-transform hover:scale-105">
@@ -103,22 +103,19 @@ export function Navbar() {
                     <Search className="h-6 w-6" />
                 </Button>
 
-                {/* User Profile - Conditional based on login status */}
-                <div className="flex items-center gap-2">
+                {/* User Profile */}
+                <div className="flex items-center gap-3">
                     {isLoggedIn ? (
                         <DropdownMenu>
-                            <DropdownMenuTrigger className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border-2 border-white/30 transition-all hover:border-white/50 outline-none">
-                                <Avatar className="h-8 w-8 border-2 border-white">
-                                    <AvatarFallback className="bg-white text-emerald-600 flex items-center justify-center font-bold">
-                                        {userName.charAt(0).toUpperCase()}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <span className="text-white font-semibold text-sm hidden lg:inline">
-                                    {userName}
-                                </span>
-                                <ChevronDown className="h-4 w-4 text-white hidden lg:inline" />
+                            <DropdownMenuTrigger asChild>
+                                <button className="flex items-center gap-2 outline-none">
+                                    <Avatar className="h-9 w-9 border-2 border-white cursor-pointer">
+                                        <AvatarFallback className="bg-white text-green-600 flex items-center justify-center">
+                                            <User className="h-5 w-5" />
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </button>
                             </DropdownMenuTrigger>
-
                             <DropdownMenuContent align="end" className="w-56">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
@@ -173,7 +170,7 @@ export function Navbar() {
 
                 <div className="flex items-center h-full">
                     {/* Hamburger Menu - Categories? */}
-                    <div className="bg-emerald-600 h-full w-12 flex items-center justify-center cursor-pointer hover:brightness-110 mr-6 -ml-4 md:-ml-8 pl-4 md:pl-8 pr-4">
+                    <div className="bg-green-600 h-full w-12 flex items-center justify-center cursor-pointer hover:brightness-110 mr-6 -ml-4 md:-ml-8 pl-4 md:pl-8 pr-4">
                         <Menu className="h-6 w-6 text-white" />
                     </div>
 
