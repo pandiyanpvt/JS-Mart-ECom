@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
                                             Password strength:{" "}
                                             <span
                                                 className={`font-semibold ${passwordStrength === 4
-                                                    ? "text-emerald-600"
+                                                    ? "text-green-600"
                                                     : passwordStrength === 3
                                                         ? "text-yellow-600"
                                                         : passwordStrength === 2
@@ -167,7 +167,7 @@ export default function ResetPasswordPage() {
                             <div className="space-y-1.5">
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
-                                        className={`h-4 w-4 ${formData.password.length >= 8 ? "text-emerald-600" : "text-gray-300"
+                                        className={`h-4 w-4 ${formData.password.length >= 8 ? "text-green-600" : "text-gray-300"
                                             }`}
                                     />
                                     <span className={formData.password.length >= 8 ? "text-gray-700" : "text-gray-500"}>
@@ -177,7 +177,7 @@ export default function ResetPasswordPage() {
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
                                         className={`h-4 w-4 ${/[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password)
-                                            ? "text-emerald-600"
+                                            ? "text-green-600"
                                             : "text-gray-300"
                                             }`}
                                     />
@@ -193,7 +193,7 @@ export default function ResetPasswordPage() {
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
-                                        className={`h-4 w-4 ${/\d/.test(formData.password) ? "text-emerald-600" : "text-gray-300"}`}
+                                        className={`h-4 w-4 ${/\d/.test(formData.password) ? "text-green-600" : "text-gray-300"}`}
                                     />
                                     <span className={/\d/.test(formData.password) ? "text-gray-700" : "text-gray-500"}>
                                         At least one number
@@ -202,7 +202,7 @@ export default function ResetPasswordPage() {
                                 <div className="flex items-center gap-2 text-sm">
                                     <CheckCircle2
                                         className={`h-4 w-4 ${/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
-                                            ? "text-emerald-600"
+                                            ? "text-green-600"
                                             : "text-gray-300"
                                             }`}
                                     />
@@ -222,7 +222,7 @@ export default function ResetPasswordPage() {
                         {/* Reset Button */}
                         <Button
                             type="submit"
-                            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base"
+                            className="w-full h-12 bg-emerald-500 hover:bg-green-600 text-white font-semibold text-base"
                         >
                             Reset Password
                         </Button>
