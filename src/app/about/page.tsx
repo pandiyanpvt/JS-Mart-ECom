@@ -68,7 +68,7 @@ export default function AboutPage() {
               </Button>
             </Link>
             <Link href="/contact" className="no-underline">
-              <Button variant="outline" className="h-12 px-8 border-white text-white hover:bg-[#5DC440] hover:border-[#5DC440] font-semibold text-lg backdrop-blur-sm transition-all shadow-md">
+              <Button className="h-12 px-8 bg-[#5DC440] hover:bg-[#4eb335] text-white font-semibold text-lg transition-all shadow-lg">
                 Contact Us
               </Button>
             </Link>
