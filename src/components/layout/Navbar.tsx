@@ -1,5 +1,5 @@
 "use client";
-
+import { ReactNode } from "react";
 import Link from "next/link";
 import { Search, ShoppingBag, Bell, Menu, ChevronDown, User, LogOut, Package, MapPin, CreditCard, LayoutDashboard } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -19,12 +19,16 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useCart } from "@/context/CartContext";
+import CartModal  from "@/components/layout/add-cart-modal";
 
 export function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
+    const { cart } = useCart(); // get current cart items
+    const [isOpen, setIsOpen] = useState(false);
 
     // Check login status on component mount and when pathname changes
     useEffect(() => {
@@ -59,6 +63,7 @@ export function Navbar() {
         router.push("/");
     };
 
+    const toggleModal = () => setIsOpen(!isOpen);
 
     const navLinks = [
         { name: "Home", href: "/" },
@@ -228,11 +233,21 @@ export function Navbar() {
                 <div className="flex items-center gap-6 text-white">
                     {/* Shopping Bag */}
                     <div className="relative cursor-pointer hover:text-gray-300 transition-colors">
-                        <ShoppingBag className="h-6 w-6" />
-                        {/* Optional badge */}
-                        {/* <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span> */}
-                    </div>
+                        <button
+                            onClick={toggleModal}
+                            className="relative p-2 rounded hover:bg-gray-100 transition"
+                        >
+                            <ShoppingBag className="h-6 w-6" />
+                            {cart.length > 0 && (
+                                <span className="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center">
+              {cart.length}
+          </span>
+                            )}
+                        </button>
 
+                        {/* Render CartModal */}
+                        <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+                    </div>
                     {/* Notification Bell */}
                     <div className="relative cursor-pointer hover:text-gray-300 transition-colors">
                         <Bell className="h-6 w-6" />

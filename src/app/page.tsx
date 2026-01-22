@@ -6,10 +6,10 @@
 import React from "react";
 import CategorySection from "@/components/category-section";
 import AdvertisementSection from "@/components/advertisement-section";
-import BestOfFruitVeg from "@/components/product-card";
 import BrandSection from "@/components/brand-section";
 import AdvertisementSection1 from "@/components/advertisement-section-one"
 import AdvertisementSection2 from "@/components/advertisement-section-two";
+import BestOfFruitVeg from "@/components/best-of-fruit-veg";
 
 export default function HomePage() {
   return (

@@ -11,6 +11,7 @@ export interface Product {
     rating: number;
     reviews: number;
     badges?: string[];
+    tag?: string;
 }
 
 export const categories = [
@@ -42,6 +43,9 @@ export const products: Product[] = [
         weight: "1kg",
         rating: 4.5,
         reviews: 120,
+        tag: "Fresh Potatoes",
+
+
     },
     {
         id: "veg_2",
@@ -53,6 +57,7 @@ export const products: Product[] = [
         weight: "500g",
         rating: 4.6,
         reviews: 85,
+        tag:"RED ONIONS"
     },
     {
         id: "veg_3",
@@ -64,6 +69,8 @@ export const products: Product[] = [
         weight: "500g",
         rating: 4.7,
         reviews: 95,
+        tag:"CRUNCHY CARROTS"
+
     },
     {
         id: "veg_4",
@@ -75,6 +82,8 @@ export const products: Product[] = [
         weight: "1 Unit",
         rating: 4.4,
         reviews: 40,
+        tag:"GREEN CABBAGE"
+
     },
     {
         id: "veg_5",
@@ -86,6 +95,8 @@ export const products: Product[] = [
         weight: "250g",
         rating: 4.5,
         reviews: 30,
+        tag:"GREEN BEANS"
+
     },
 
     // 🍎 Fruits
@@ -99,6 +110,7 @@ export const products: Product[] = [
         weight: "1kg",
         rating: 4.8,
         reviews: 210,
+
     },
     {
         id: "fruit_2",
