@@ -1,10 +1,6 @@
 "use client";
 import { ReactNode } from "react";
 import Link from "next/link";
-import { Search, ShoppingBag, Bell, Menu, ChevronDown, User, LogOut, Package, MapPin, CreditCard, LayoutDashboard } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,6 +9,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Percent, Heart } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 // import {
 //     Bars3Icon,
 // } from "@heroicons/react/16/solid";
@@ -20,7 +19,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
-import CartModal  from "@/components/layout/add-cart-modal";
+import CartModal from "@/components/layout/add-cart-modal";
 
 export function Navbar() {
     const pathname = usePathname();
@@ -75,15 +74,15 @@ export function Navbar() {
 
 
     return (
-        <div className="w-full flex flex-col font-sans">
-            {/* Top Bar - Green */}
-            <div className="bg-green-600 h-16 px-4 md:px-8 flex items-center justify-between gap-4">
-                {/* Logo Section */}
-                <Link href="/" className="flex items-center gap-2 group py-1">
-                    <div className="relative h-16 w-16 md:h-20 md:w-20 flex items-center justify-center transition-transform hover:scale-105">
+        <div className="w-full flex flex-col font-sans bg-white">
+            {/* Main Bar */}
+            <div className="py-5 px-4 md:px-8 flex items-center justify-between gap-8">
+                {/* Logo */}
+                <Link href="/" className="flex-shrink-0">
+                    <div className="relative h-12 w-40 md:h-16 md:w-56">
                         <Image
                             src="/logo.png"
-                            alt="JS Mart Australia Logo"
+                            alt="JS Mart Logo"
                             fill
                             className="object-contain"
                             priority
@@ -92,33 +91,42 @@ export function Navbar() {
                 </Link>
 
                 {/* Search Bar */}
-                <div className="flex-1 max-w-2xl hidden md:flex relative">
-                    <Input
-                        className="w-full h-11 bg-white border-0 rounded-r-none focus-visible:ring-2 focus-visible:ring-emerald-300 text-black placeholder:text-gray-500 px-4 text-base"
-                        placeholder="Search for products..."
-                    />
-                    <Button className="h-11 rounded-l-none bg-emerald-700 text-white hover:bg-emerald-800 px-8 font-semibold text-base shadow-md transition-all">
-                        <Search className="h-5 w-5 mr-2" />
+                <div className="flex-1 max-w-3xl hidden md:flex items-center border-2 border-gray-100 rounded-lg overflow-hidden focus-within:border-blue-600 transition-colors">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="px-5 py-2 flex items-center gap-2 text-sm font-semibold border-r border-gray-100 hover:bg-gray-50 outline-none whitespace-nowrap">
+                            All Categories <ChevronDown className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                            <DropdownMenuItem>Fruits & Vegetables</DropdownMenuItem>
+                            <DropdownMenuItem>Dairy & Eggs</DropdownMenuItem>
+                            <DropdownMenuItem>Bakery</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="flex-1 relative">
+                        <Input
+                            className="w-full h-11 border-0 focus-visible:ring-0 text-gray-900 placeholder:text-gray-400 px-4 text-sm"
+                            placeholder="Search for products..."
+                        />
+                    </div>
+                    <Button className="h-11 rounded-none bg-blue-600 hover:bg-blue-700 text-white px-8 font-bold text-sm transition-all">
                         Search
                     </Button>
                 </div>
 
-                {/* Mobile Search Icon (visible only on small screens) */}
-                <Button size="icon" variant="ghost" className="md:hidden text-white hover:bg-white/20">
-                    <Search className="h-6 w-6" />
-                </Button>
-
-                {/* User Profile */}
-                <div className="flex items-center gap-3">
+                {/* Right Actions */}
+                <div className="flex items-center gap-6">
+                    {/* Account */}
                     {isLoggedIn ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-2 outline-none">
-                                    <Avatar className="h-9 w-9 border-2 border-white cursor-pointer">
-                                        <AvatarFallback className="bg-white text-green-600 flex items-center justify-center">
-                                            <User className="h-5 w-5" />
-                                        </AvatarFallback>
-                                    </Avatar>
+                                <button className="flex items-center gap-3 group outline-none">
+                                    <div className="p-2 rounded-full group-hover:bg-gray-100 transition-colors">
+                                        <User className="h-6 w-6 text-gray-700" />
+                                    </div>
+                                    <div className="hidden lg:flex flex-col items-start text-left">
+                                        <span className="text-[11px] text-gray-500 font-medium">Welcome</span>
+                                        <span className="text-sm font-bold text-gray-900">{userName}</span>
+                                    </div>
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56">
@@ -136,18 +144,6 @@ export function Navbar() {
                                         My Orders
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link href="/account/addresses" className="cursor-pointer">
-                                        <MapPin className="h-4 w-4 mr-2" />
-                                        Saved Addresses
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link href="/account/cards" className="cursor-pointer">
-                                        <CreditCard className="h-4 w-4 mr-2" />
-                                        Saved Cards
-                                    </Link>
-                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
                                     <LogOut className="h-4 w-4 mr-2" />
@@ -156,104 +152,97 @@ export function Navbar() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ) : (
-                        <Link href="/signin" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border-2 border-white/30 transition-all hover:border-white/50">
-                            <Avatar className="h-8 w-8 border-2 border-white">
-                                <AvatarFallback className="bg-white text-emerald-600 flex items-center justify-center">
-                                    <User className="h-4 w-4" />
-                                </AvatarFallback>
-                            </Avatar>
-                            <span className="text-white font-semibold text-sm hidden lg:inline">
-                                Sign In
-                            </span>
+                        <Link href="/signin" className="flex items-center gap-3 group">
+                            <div className="p-2 rounded-full group-hover:bg-gray-100 transition-colors">
+                                <User className="h-6 w-6 text-gray-700" />
+                            </div>
+                            <div className="hidden lg:flex flex-col items-start">
+                                <span className="text-[11px] text-gray-500 font-medium leading-none">Login</span>
+                                <span className="text-sm font-bold text-gray-900">Account</span>
+                            </div>
                         </Link>
                     )}
+
+                    {/* Wishlist */}
+                    <Link href="/wishlist" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors group">
+                        <Heart className="h-6 w-6 text-gray-700" />
+                        <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                            0
+                        </span>
+                    </Link>
+
+                    {/* Cart */}
+                    <div className="relative">
+                        <button
+                            onClick={toggleModal}
+                            className="flex items-center gap-3 group outline-none"
+                        >
+                            <div className="relative p-2 rounded-full group-hover:bg-gray-100 transition-colors">
+                                <ShoppingBag className="h-6 w-6 text-gray-700" />
+                                {cart.length > 0 && (
+                                    <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                        {cart.length}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="hidden lg:flex flex-col items-start">
+                                <span className="text-[11px] text-gray-500 font-medium leading-none">Your Cart</span>
+                                <span className="text-sm font-bold text-gray-900">
+                                    ${cart.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2)}
+                                </span>
+                            </div>
+                        </button>
+                        <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+                    </div>
                 </div>
             </div>
 
-            {/* Bottom Bar - Black */}
-            <div className="bg-black text-white h-12 flex items-center px-4 md:px-8 justify-between">
+            {/* Bottom Bar - Navigation */}
+            <div className="border-y border-gray-100 py-3 px-4 md:px-8 flex items-center justify-between">
+                <div className="flex items-center gap-8">
+                    {/* Categories Trigger */}
+                    <button className="flex items-center gap-3 font-bold text-sm text-gray-900 hover:text-blue-600 transition-colors group">
+                        <Menu className="h-5 w-5" />
+                        Browse All Categories
+                    </button>
 
-                <div className="flex items-center h-full">
-                    {/* Hamburger Menu - Categories? */}
-                    <div className="bg-green-600 h-full w-12 flex items-center justify-center cursor-pointer hover:brightness-110 mr-6 -ml-4 md:-ml-8 pl-4 md:pl-8 pr-4">
-                        <Menu className="h-6 w-6 text-white" />
-                    </div>
+                    <div className="h-6 w-px bg-gray-200 hidden lg:block" />
 
-                    {/* Navigation Links */}
-                    <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+                    {/* Nav Links */}
+                    <nav className="hidden lg:flex items-center gap-8">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`transition-colors ${pathname === link.href
-                                    ? "text-white font-bold"
-                                    : "text-gray-300 hover:text-white"
+                                className={`text-sm font-bold flex items-center gap-1 transition-colors ${pathname === link.href
+                                    ? "text-blue-600"
+                                    : "text-gray-900 hover:text-blue-600"
                                     }`}
                             >
                                 {link.name}
+                                {["Home", "Shop", "Offers"].includes(link.name) && (
+                                    <ChevronDown className="h-3 w-3 opacity-50" />
+                                )}
                             </Link>
                         ))}
-
-                        {/* Membership Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger className="flex items-center gap-1 hover:text-white transition-colors outline-none">
-                                Membership <ChevronDown className="h-3 w-3" />
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent>
-                                <DropdownMenuItem asChild>
-                                    <Link
-                                        href="/membership/silver"
-                                        className={`${pathname === "/membership/silver"
-                                            ? "text-gray-600 font-bold"
-                                            : "text-gray-700 hover:text-white"
-                                            }`}
-                                    >
-                                        Silver
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link
-                                        href="/membership/gold"
-                                        className={`${pathname === "/membership/gold"
-                                            ? "text-gray-600 font-bold"
-                                            : "text-gray-700 hover:text-white"
-                                            }`}
-                                    >
-                                        Gold
-                                    </Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Link href="/blog" className="text-sm font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1">
+                            Blog <ChevronDown className="h-3 w-3 opacity-50" />
+                        </Link>
+                        <Link href="/pages" className="text-sm font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1">
+                            Pages <ChevronDown className="h-3 w-3 opacity-50" />
+                        </Link>
+                        <Link href="/shop" className="text-sm font-bold text-red-500 hover:text-red-600 transition-colors">
+                            Buy JS Mart!
+                        </Link>
                     </nav>
-
                 </div>
 
-                {/* Right Icons */}
-                <div className="flex items-center gap-6 text-white">
-                    {/* Shopping Bag */}
-                    <div className="relative cursor-pointer hover:text-gray-300 transition-colors">
-                        <button
-                            onClick={toggleModal}
-                            className="relative p-2 rounded hover:bg-gray-100 transition"
-                        >
-                            <ShoppingBag className="h-6 w-6" />
-                            {cart.length > 0 && (
-                                <span className="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center">
-              {cart.length}
-          </span>
-                            )}
-                        </button>
-
-                        {/* Render CartModal */}
-                        <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+                {/* Promo Badge */}
+                <div className="hidden xl:flex items-center gap-2 text-sm">
+                    <div className="h-6 w-6 bg-red-100 rounded-full flex items-center justify-center">
+                        <Percent className="h-3 w-3 text-red-600" />
                     </div>
-                    {/* Notification Bell */}
-                    <div className="relative cursor-pointer hover:text-gray-300 transition-colors">
-                        <Bell className="h-6 w-6" />
-                        {/* Optional badge */}
-                        {/* <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span> */}
-                    </div>
+                    <span className="font-bold text-gray-900">Sale $20 Off Your First Order.</span>
                 </div>
             </div>
         </div>

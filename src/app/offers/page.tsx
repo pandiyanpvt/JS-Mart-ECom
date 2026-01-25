@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { products } from "@/lib/data";
-// import { ProductCard } from "@/components/product-card";
+import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Tag, Sparkles, Percent } from "lucide-react";
 
