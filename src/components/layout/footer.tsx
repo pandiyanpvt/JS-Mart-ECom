@@ -1,210 +1,136 @@
 import React from "react";
-import { Facebook, Instagram, Youtube } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Youtube,
+  Twitter,
+  MapPin,
+  Phone,
+  Mail,
+  Linkedin,
+  Dribbble
+} from "lucide-react";
 import Image from "next/image";
-const navigation = {
-  categories: [
-    { name: "Christmas Donation", href: "/products?category=donation" },
-    { name: "Baby Products", href: "/products?category=baby" },
-    { name: "Food Cupboard", href: "/products?category=food" },
-    { name: "Bakery", href: "/products?category=bakery" },
-    { name: "Seafood", href: "/products?category=seafood" },
-    { name: "Pet Products", href: "/products?category=pets" },
-    { name: "Party Shop", href: "/products?category=party" },
-    { name: "Health & Beauty", href: "/products?category=health" },
-  ],
-  categories2: [
-    { name: "Vegetables", href: "/products?category=vegetables" },
-    { name: "Dairy", href: "/products?category=dairy" },
-    { name: "Household", href: "/products?category=household" },
-    { name: "Frozen Food", href: "/products?category=frozen" },
-    { name: "Seeds & Spices", href: "/products?category=seeds" },
-    { name: "Christmas Treats", href: "/products?category=treats" },
-    { name: "Gifting", href: "/products?category=gifts" },
-    { name: "Fashion", href: "/products?category=fashion" },
-  ],
-  categories3: [
-    { name: "Fruits", href: "/products?category=fruits" },
-    { name: "Beverages", href: "/products?category=beverages" },
-    { name: "Cooking Essentials", href: "/products?category=cooking" },
-    { name: "Meats", href: "/products?category=meats" },
-    { name: "Snacks & Confectionery", href: "/products?category=snacks" },
-    { name: "Desserts & Ingredients", href: "/products?category=desserts" },
-    { name: "Rice", href: "/products?category=rice" },
-    { name: "Tea & Coffee", href: "/products?category=tea" },
-    { name: "Christmas Hampers", href: "/products?category=hampers" },
-    { name: "Auto Care", href: "/products?category=auto" },
-    { name: "Stationery", href: "/products?category=stationery" },
-  ],
-  useful: [
-    { name: "About Us", href: "/about" },
-    { name: "Contact Us", href: "/contact" },
-    { name: "FAQ", href: "/faq" },
-  ],
-  policies: [
-    { name: "Terms & Conditions", href: "/terms" },
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Return Policy", href: "/return-policy" },
-  ],
-};
+import Link from "next/link";
+// The following imports are no longer needed for the new Footer component
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import {
+//   Clock,
+//   Send,
+//   Truck,
+//   RefreshCw,
+//   ShieldCheck,
+//   Tag
+// } from "lucide-react";
+
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200">
-      {/* Top Section - Features */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col items-center text-center mb-12">
-          <div className="relative h-24 w-24 mb-6">
-            <Image
-              src="/logo.png"
-              alt="JS Mart Australia Logo"
-              fill
-              className="object-contain"
-            />
-          </div>
-          <p className="text-gray-600 text-sm leading-relaxed max-w-4xl mx-auto">
-            Enter Sri Lanka&apos;s freshest online grocery store for all your grocery needs- fresh to frozen and everything in between! Now, you can order ALL your daily necessities from the comfort of your home or anywhere you want! Choose from same-day, next-day & saver to ensure you get what you need when you need it.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {/* Best Prices */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-1">Best Prices & Offers</h3>
-              <p className="text-sm text-gray-600">Enjoy the same lowest prices as your local Cargills Food City, Express & Food Hall store!</p>
-            </div>
-          </div>
-
-          {/* Wide Assortment */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-1">Wide Assortment</h3>
-              <p className="text-sm text-gray-600">Choose from a variety of products from branded, chilled, fresh & frozen. New products added weekly!</p>
-            </div>
-          </div>
-
-          {/* Easy Returns */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-1">Easy Returns</h3>
-              <p className="text-sm text-gray-600">Not satisfied with a product? Return it at the doorstep & get a refund within hours.</p>
-            </div>
-          </div>
-        </div>
+    <footer className="bg-[#1a1e24] text-gray-400 pt-16 pb-8 relative overflow-hidden">
+      {/* Background Decoration */}
+      <div className="absolute bottom-0 left-0 w-full h-full opacity-15 pointer-events-none z-0">
+        <Image
+          src="/images/category-section/footer_bg.png"
+          alt="Fruits and Vegetables"
+          fill
+          className="object-cover object-bottom"
+        />
       </div>
 
-      {/* Main Footer Content */}
-      <div className="bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-            {/* Categories Column 1 */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Categories</h3>
-              <ul className="space-y-3">
-                {navigation.categories.map((item) => (
-                  <li key={item.name}>
-                    <a href={item.href} className="text-sm text-gray-600 hover:text-gray-900">
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Categories Column 2 */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4 invisible">Categories</h3>
-              <ul className="space-y-3">
-                {navigation.categories2.map((item) => (
-                  <li key={item.name}>
-                    <a href={item.href} className="text-sm text-gray-600 hover:text-gray-900">
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Categories Column 3 */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4 invisible">Categories</h3>
-              <ul className="space-y-3">
-                {navigation.categories3.map((item) => (
-                  <li key={item.name}>
-                    <a href={item.href} className="text-sm text-gray-600 hover:text-gray-900">
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Useful Links */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Useful Links</h3>
-              <ul className="space-y-3 mb-6">
-                {navigation.useful.map((item) => (
-                  <li key={item.name}>
-                    <a href={item.href} className="text-sm text-gray-600 hover:text-gray-900">
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              <ul className="space-y-3">
-                {navigation.policies.map((item) => (
-                  <li key={item.name}>
-                    <a href={item.href} className="text-sm text-gray-600 hover:text-gray-900">
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-
-              <h3 className="font-semibold text-gray-900 mb-4">Follow Us</h3>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
-                  <Facebook className="w-5 h-5 text-gray-600" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
-                  <Instagram className="w-5 h-5 text-gray-600" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-lime-600 transition-colors">
-                  <Youtube className="w-5 h-5 text-gray-600" />
-                </a>
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {/* Column 1: Company Info */}
+          <div>
+            <Link href="/" className="inline-block mb-8">
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/logo.png"
+                  alt="JS Mart Logo"
+                  fill
+                  className="object-contain"
+                />
               </div>
+            </Link>
+
+            <ul className="space-y-6 text-sm">
+              <li className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span className="border-b border-gray-700 pb-4 w-full">
+                  ABC Town Luton Street, New York 226688
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Phone className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span className="border-b border-gray-700 pb-4 w-full">
+                  + 0800 567 345
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Mail className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span>
+                  abc@example.com
+                </span>
+              </li>
+            </ul>
+
+            <div className="flex gap-2 mt-8">
+              {[Facebook, Twitter, Dribbble, Youtube, Linkedin].map((Icon, idx) => (
+                <a
+                  key={idx}
+                  href="#"
+                  className="w-8 h-8 bg-[#84CC16] rounded-full flex items-center justify-center text-white hover:bg-[#65a30d] transition-colors"
+                >
+                  <Icon className="w-4 h-4 fill-current" />
+                </a>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Copyright */}
-      <div className="bg-gray-50 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-sm text-gray-600">
-            ©JS Mart Online 2026
-          </p>
+          {/* Column 2: Quick Links */}
+          <div>
+            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Quick Links</h3>
+            <ul className="space-y-3 text-sm">
+              {["Blog", "FAQs", "Payment", "Shipment", "Where is my order?", "Return policy"].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 3: Style Advisor */}
+          <div>
+            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Style Advisor</h3>
+            <ul className="space-y-3 text-sm">
+              {["Your Account", "Information", "Addresses", "Discount", "Order History", "Additional Information"].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Information */}
+          <div>
+            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Information</h3>
+            <ul className="space-y-3 text-sm">
+              {["Site Map", "Search Terms", "Advanced Search", "About Us", "Contact Us", "Suppliers"].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </footer>

@@ -19,63 +19,67 @@ type Product = {
 
 const products: Product[] = [
     {
-        id: 101,
-        name: "Fresh Red Apple",
+        id: 1,
+        name: "Fresh Apple",
         image: "/images/products/apple.png",
         price: 250.00,
         originalPrice: 350.00,
         rating: 5,
         discount: 29,
+        unit: "5kg"
+    },
+    {
+        id: 2,
+        name: "Fresh Litchi 100% Organic",
+        image: "/images/products/litchi.png",
+        price: 75.00,
+        originalPrice: 80.00,
+        rating: 5,
+        discount: 17,
         unit: "1kg"
     },
     {
-        id: 102,
-        name: "Organic Cabbage",
-        image: "/images/products/cabbage.png",
-        price: 80.00,
-        originalPrice: 100.00,
-        rating: 4,
-        discount: 20,
-        unit: "1pc"
-    },
-    {
-        id: 103,
-        name: "Fresh Tomato",
+        id: 3,
+        name: "Vegetable Tomato Fresh",
         image: "/images/products/tomato.png",
         price: 150.00,
-        rating: 5,
-        isNew: true,
+        originalPrice: 170.00,
+        rating: 4,
+        discount: 7,
         unit: "1kg"
     },
     {
-        id: 104,
-        name: "Sweet Litchi",
-        image: "/images/products/litchi.png",
-        price: 450.00,
-        originalPrice: 500.00,
-        rating: 4,
-        discount: 10,
-        unit: "500g"
-    },
-    {
-        id: 105,
-        name: "Premium Almonds",
-        image: "/images/products/almond.png",
-        price: 1200.00,
+        id: 4,
+        name: "Natural Cabbage",
+        image: "/images/products/cabbage.png",
+        price: 50.00,
+        originalPrice: 80.00,
         rating: 5,
-        unit: "250g"
+        discount: 34,
+        unit: "1pc"
     },
     {
-        id: 106,
-        name: "Fresh Broccoli",
-        image: "/images/category-section/vegetables.png", // Reusing category image for variety
-        price: 300.00,
+        id: 5,
+        name: "Fresh Dried Almond",
+        image: "/images/products/almond.png",
+        price: 200.00,
         rating: 4,
-        unit: "1pc"
+        isNew: true,
+        unit: "50g"
+    },
+    {
+        id: 6,
+        name: "Fresh Apple",
+        image: "/images/products/apple.png",
+        price: 250.00,
+        originalPrice: 350.00,
+        rating: 5,
+        discount: 29,
+        unit: "5kg"
     },
 ];
 
-export default function BestOfFruitVeg() {
+export default function PopularProducts() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: "left" | "right") => {
@@ -110,7 +114,7 @@ export default function BestOfFruitVeg() {
         <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-bold text-[#253D4E]">Best Of Fruit & Veg</h2>
+                <h2 className="text-3xl font-bold text-[#253D4E]">Popular Products</h2>
 
                 {/* Navigation Arrows */}
                 <div className="flex items-center gap-2">
