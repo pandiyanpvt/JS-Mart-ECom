@@ -195,36 +195,36 @@ export function Navbar() {
                         ))}
 
                         {/* Membership Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger className="flex items-center gap-1 hover:text-white transition-colors outline-none">
-                                Membership <ChevronDown className="h-3 w-3" />
-                            </DropdownMenuTrigger>
+                        {/*<DropdownMenu>*/}
+                        {/*    <DropdownMenuTrigger className="flex items-center gap-1 hover:text-white transition-colors outline-none">*/}
+                        {/*        Membership <ChevronDown className="h-3 w-3" />*/}
+                        {/*    </DropdownMenuTrigger>*/}
 
-                            <DropdownMenuContent>
-                                <DropdownMenuItem asChild>
-                                    <Link
-                                        href="/membership/silver"
-                                        className={`${pathname === "/membership/silver"
-                                            ? "text-gray-600 font-bold"
-                                            : "text-gray-700 hover:text-white"
-                                            }`}
-                                    >
-                                        Silver
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link
-                                        href="/membership/gold"
-                                        className={`${pathname === "/membership/gold"
-                                            ? "text-gray-600 font-bold"
-                                            : "text-gray-700 hover:text-white"
-                                            }`}
-                                    >
-                                        Gold
-                                    </Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {/*    <DropdownMenuContent>*/}
+                        {/*        <DropdownMenuItem asChild>*/}
+                        {/*            <Link*/}
+                        {/*                href="/membership/silver"*/}
+                        {/*                className={`${pathname === "/membership/silver"*/}
+                        {/*                    ? "text-gray-600 font-bold"*/}
+                        {/*                    : "text-gray-700 hover:text-white"*/}
+                        {/*                    }`}*/}
+                        {/*            >*/}
+                        {/*                Silver*/}
+                        {/*            </Link>*/}
+                        {/*        </DropdownMenuItem>*/}
+                        {/*        <DropdownMenuItem asChild>*/}
+                        {/*            <Link*/}
+                        {/*                href="/membership/gold"*/}
+                        {/*                className={`${pathname === "/membership/gold"*/}
+                        {/*                    ? "text-gray-600 font-bold"*/}
+                        {/*                    : "text-gray-700 hover:text-white"*/}
+                        {/*                    }`}*/}
+                        {/*            >*/}
+                        {/*                Gold*/}
+                        {/*            </Link>*/}
+                        {/*        </DropdownMenuItem>*/}
+                        {/*    </DropdownMenuContent>*/}
+                        {/*</DropdownMenu>*/}
                     </nav>
 
                 </div>

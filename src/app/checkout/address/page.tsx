@@ -33,7 +33,7 @@ export default function AddressPage() {
                        value={address.zip} onChange={e => setAddress({...address, zip: e.target.value})} />
                 <input type="text" placeholder="Phone Number" required className="w-full border rounded px-3 py-2"
                        value={address.phone} onChange={e => setAddress({...address, phone: e.target.value})} />
-                <Button type="submit">Continue to Payment</Button>
+                <Button type="submit">Checkout</Button>
             </form>
         </div>
     );
