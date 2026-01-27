@@ -1,106 +1,145 @@
 "use client";
 
-import { useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { products, categories } from "@/lib/data";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 import Image from "next/image";
-import { ProductCard } from "@/components/product-card";
+import { ChevronDown } from "lucide-react";
+import {ProductCard} from "@/components/product-card";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortBy, setSortBy] = useState("Sort by");
+  const [sortBy, setSortBy] = useState("newest");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const filterOptions = ["Offer", "Brands"];
+  // Reset page when category changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
   const filteredProducts =
       selectedCategory === "all"
           ? products
           : products.filter((p) => p.category === selectedCategory);
 
-  const selectedCategoryName =
-      categories.find((c) => c.id === selectedCategory)?.name || "All Categories";
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
 
   return (
-      <div className="min-h-screen bg-white dark:bg-black/5 pb-20">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 py-8 space-y-8">
-
-          {/* Page Title */}
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              All Products
-            </h2>
-          </div>
+      <div className="min-h-screen bg-white pb-20">
+        <div className="container mx-auto px-6 py-8">
 
           {/* Breadcrumb */}
-          <nav className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <span className="hover:text-gray-900 dark:hover:text-gray-100 cursor-pointer">Home</span>
-            <span className="mx-2">&gt;</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">{selectedCategoryName}</span>
-          </nav>
-
-          {/* Filter Toolbar */}
-          <div className="flex flex-col lg:flex-row gap-4 lg:items-center justify-between">
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Category Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="default" className="bg-[#0B4635] text-white h-10 px-4">
-                    {selectedCategoryName}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  {categories.map((category) => (
-                      <DropdownMenuItem key={category.id} onClick={() => setSelectedCategory(category.id)}>
-                        {category.name}
-                      </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Other Filters */}
-              {filterOptions.map((filter) => (
-                  <DropdownMenu key={filter}>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="h-10 px-3 min-w-[5rem] justify-between">
-                        {filter} <ChevronDown className="ml-2 h-3 w-3 opacity-50" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem>Option 1</DropdownMenuItem>
-                      <DropdownMenuItem>Option 2</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-              ))}
-            </div>
-
-            {/* Sort By */}
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="h-10">
-                    {sortBy} <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setSortBy("Price: Low to High")}>Price: Low to High</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy("Price: High to Low")}>Price: High to Low</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy("Newest")}>Newest</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+          <div className="text-sm text-muted-foreground mb-6">
+            Home / Shop
           </div>
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-            ))}
+          {/* MAIN LAYOUT */}
+          <div className="grid grid-cols-11 gap-8">
+
+            {/* SIDEBAR */}
+            <aside className="col-span-11 lg:col-span-2 space-y-6">
+
+              {/* Categories */}
+              <div>
+                <h3 className="font-semibold mb-3">Product Categories</h3>
+                <ul className="space-y-2 text-sm">
+                  {categories.map(cat => (
+                      <li
+                          key={cat.id}
+                          onClick={() => setSelectedCategory(cat.id)}
+                          className="cursor-pointer hover:text-primary"
+                      >
+                        {cat.name}
+                      </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Price Filter */}
+              <div>
+                <h3 className="font-semibold mb-3">Filter by price</h3>
+                <input type="range" className="w-full" />
+                <Button size="sm" className="mt-2 w-full">
+                  Filter
+                </Button>
+              </div>
+            </aside>
+
+            {/* PRODUCTS */}
+            <main className="col-span-12 lg:col-span-9">
+
+              {/* Toolbar */}
+              <div className="flex justify-between items-center mb-6">
+                <p className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </p>
+
+                <select
+                    className="border px-3 py-2 rounded-md"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="newest">Newest</option>
+                  <option value="low">Price: Low to High</option>
+                  <option value="high">Price: High to Low</option>
+                </select>
+              </div>
+
+              {/* Product List */}
+              <div className="space-y-6">
+                {paginatedProducts.map(product => (
+                    <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              {/* PAGINATION */}
+              {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-10">
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(p => p - 1)}
+                    >
+                      Prev
+                    </Button>
+
+                    {Array.from({ length: totalPages }).map((_, i) => {
+                      const page = i + 1;
+                      return (
+                          <Button
+                              key={page}
+                              size="sm"
+                              variant={page === currentPage ? "default" : "outline"}
+                              onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </Button>
+                      );
+                    })}
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(p => p + 1)}
+                    >
+                      Next
+                    </Button>
+
+                  </div>
+              )}
+
+            </main>
           </div>
         </div>
       </div>
