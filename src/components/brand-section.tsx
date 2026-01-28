@@ -39,23 +39,23 @@ export default function BrandSection() {
     <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-[#253D4E]">Shop by Brand</h2>
+        <h2 className="text-4xl font-extrabold text-[#253D4E]">Shop by Brand</h2>
 
         {/* Navigation Arrows */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => scroll("left")}
-            className="w-8 h-8 rounded bg-[#F2F3F4] flex items-center justify-center hover:bg-[#3BB77E] hover:text-white transition-all shadow-sm group"
+            className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
             aria-label="Scroll left"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600 group-hover:text-white" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={() => scroll("right")}
-            className="w-8 h-8 rounded bg-[#F2F3F4] flex items-center justify-center hover:bg-[#3BB77E] hover:text-white transition-all shadow-sm group"
+            className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
             aria-label="Scroll right"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white" />
+            <ChevronRight className="w-5 h-5 text-white" />
           </button>
         </div>
       </div>
@@ -72,7 +72,7 @@ export default function BrandSection() {
             href={`/products?brand=${brand.id}`}
             className="flex-shrink-0 group"
           >
-            <div className="w-[180px] h-[100px] bg-white border border-gray-100 rounded-xl flex items-center justify-center p-4 transition-all duration-300 hover:shadow-lg hover:border-[#3BB77E]/30">
+            <div className="w-[240px] h-[140px] bg-white border border-gray-100 rounded-xl flex items-center justify-center p-4 transition-all duration-300 hover:shadow-lg hover:border-[#3BB77E]/30">
               <div className="relative w-full h-full">
                 <Image
                   src={brand.image}

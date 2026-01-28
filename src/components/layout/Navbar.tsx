@@ -1,5 +1,4 @@
 "use client";
-import { ReactNode } from "react";
 import Link from "next/link";
 import {
     DropdownMenu,
@@ -19,6 +18,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import CartModal from "@/components/layout/add-cart-modal";
 
 export function Navbar() {
@@ -27,6 +27,7 @@ export function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
     const { cart } = useCart(); // get current cart items
+    const { wishlist } = useWishlist(); // get current wishlist items
     const [isOpen, setIsOpen] = useState(false);
 
     // Check login status on component mount and when pathname changes
@@ -91,7 +92,7 @@ export function Navbar() {
                 </Link>
 
                 {/* Search Bar */}
-                <div className="flex-1 max-w-3xl hidden md:flex items-center border-2 border-gray-100 rounded-lg overflow-hidden focus-within:border-blue-600 transition-colors">
+                <div className="flex-1 max-w-3xl hidden md:flex items-center border-2 border-gray-100 rounded-lg overflow-hidden focus-within:border-[#3BB77E] transition-colors">
                     <DropdownMenu>
                         <DropdownMenuTrigger className="px-5 py-2 flex items-center gap-2 text-sm font-semibold border-r border-gray-100 hover:bg-gray-50 outline-none whitespace-nowrap">
                             All Categories <ChevronDown className="h-4 w-4" />
@@ -108,7 +109,7 @@ export function Navbar() {
                             placeholder="Search for products..."
                         />
                     </div>
-                    <Button className="h-11 rounded-none bg-blue-600 hover:bg-blue-700 text-white px-8 font-bold text-sm transition-all">
+                    <Button className="h-11 rounded-none bg-[#3BB77E] hover:bg-[#299E63] text-white px-8 font-bold text-sm transition-all">
                         Search
                     </Button>
                 </div>
@@ -165,10 +166,12 @@ export function Navbar() {
 
                     {/* Wishlist */}
                     <Link href="/wishlist" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors group">
-                        <Heart className="h-6 w-6 text-gray-700" />
-                        <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                            0
-                        </span>
+                        <Heart className={`h-6 w-6 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
+                        {wishlist.length > 0 && (
+                            <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                {wishlist.length}
+                            </span>
+                        )}
                     </Link>
 
                     {/* Cart */}
@@ -201,7 +204,7 @@ export function Navbar() {
             <div className="border-y border-gray-100 py-3 px-4 md:px-8 flex items-center justify-between">
                 <div className="flex items-center gap-8">
                     {/* Categories Trigger */}
-                    <button className="flex items-center gap-3 font-bold text-sm text-gray-900 hover:text-blue-600 transition-colors group">
+                    <button className="flex items-center gap-3 font-bold text-sm text-gray-900 hover:text-[#3BB77E] transition-colors group">
                         <Menu className="h-5 w-5" />
                         Browse All Categories
                     </button>
@@ -210,30 +213,31 @@ export function Navbar() {
 
                     {/* Nav Links */}
                     <nav className="hidden lg:flex items-center gap-8">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`text-sm font-bold flex items-center gap-1 transition-colors ${pathname === link.href
-                                    ? "text-blue-600"
-                                    : "text-gray-900 hover:text-blue-600"
+                        {navLinks.map((link) => {
+                            // Check if current path matches the link
+                            // For exact matches (like /about, /contact) use strict equality
+                            // For routes with nested paths (like /shop), check if pathname starts with the href
+                            const isActive = link.href === "/" 
+                                ? pathname === "/"
+                                : pathname === link.href || pathname.startsWith(link.href + "/");
+                            
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className={`text-sm font-bold flex items-center gap-1 transition-colors ${
+                                        isActive
+                                            ? "text-[#3BB77E]"
+                                            : "text-gray-900 hover:text-[#3BB77E]"
                                     }`}
-                            >
-                                {link.name}
-                                {["Home", "Shop", "Offers"].includes(link.name) && (
-                                    <ChevronDown className="h-3 w-3 opacity-50" />
-                                )}
-                            </Link>
-                        ))}
-                        <Link href="/blog" className="text-sm font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1">
-                            Blog <ChevronDown className="h-3 w-3 opacity-50" />
-                        </Link>
-                        <Link href="/pages" className="text-sm font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1">
-                            Pages <ChevronDown className="h-3 w-3 opacity-50" />
-                        </Link>
-                        <Link href="/shop" className="text-sm font-bold text-red-500 hover:text-red-600 transition-colors">
-                            Buy JS Mart!
-                        </Link>
+                                >
+                                    {link.name}
+                                    {link.name === "Shop" && (
+                                        <ChevronDown className="h-3 w-3 opacity-50" />
+                                    )}
+                                </Link>
+                            );
+                        })}
                     </nav>
                 </div>
 
