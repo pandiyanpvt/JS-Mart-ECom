@@ -57,15 +57,6 @@ export default function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white pb-20 pt-4">
-            {/* Breadcrumb Section */}
-            <div className="container mx-auto px-4 md:px-8 mb-4">
-                <nav className="flex items-center text-sm text-gray-500">
-                    <Link href="/" className="hover:text-lime-600 transition-colors">Home</Link>
-                    <span className="mx-2 text-gray-400 font-bold">&gt;</span>
-                    <Link href="/shop" className="font-medium text-gray-900 hover:text-lime-600 transition-colors">All Categories</Link>
-                </nav>
-            </div>
-
             {/* Header Section */}
             <section className="bg-lime-500 py-20 px-4">
                 <div className="container mx-auto max-w-4xl text-center">

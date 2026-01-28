@@ -35,15 +35,6 @@ export default function PrivacyPolicy() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-4">
-            {/* Breadcrumb Section */}
-            <div className="container mx-auto px-4 md:px-8 mb-4">
-                <nav className="flex items-center text-sm text-gray-500">
-                    <Link href="/" className="hover:text-lime-600 transition-colors">Home</Link>
-                    <span className="mx-2 text-gray-400 font-bold">&gt;</span>
-                    <Link href="/shop" className="font-medium text-gray-900 hover:text-lime-600 transition-colors">All Categories</Link>
-                </nav>
-            </div>
-
             {/* Header */}
             <section className="bg-white border-b border-gray-100 py-16">
                 <div className="container mx-auto px-4 text-center max-w-3xl">

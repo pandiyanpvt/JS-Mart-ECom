@@ -23,7 +23,7 @@ export default function AboutPage() {
       description: "Our efficient logistics ensure your groceries arrive fresh and on time."
     },
     {
-      icon: <Star className="h-6 w-6 text-[#5DC440]" />,
+      icon: <Star className="h-6 w-6 text-[#3BB77E]" />,
       title: "Community Focused",
       description: "We believe in supporting local suppliers and building strong community ties."
     }
@@ -55,7 +55,7 @@ export default function AboutPage() {
         <div className="relative z-10 text-center text-white px-4 max-w-4xl">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 drop-shadow-lg text-white">
             Freshness Delivered <br />
-            <span className="text-[#5DC440] font-bold">To Your Doorstep</span>
+            <span className="text-[#3BB77E] font-bold">To Your Doorstep</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md">
             We&apos;re on a mission to provide the freshest groceries and a seamless shopping
@@ -63,12 +63,12 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/shop" className="no-underline">
-              <Button className="h-12 px-8 bg-[#5DC440] hover:bg-[#4eb335] text-white font-semibold text-lg transition-all shadow-lg">
+              <Button className="h-12 px-8 bg-[#3BB77E] hover:bg-[#299E63] text-white font-semibold text-lg transition-all shadow-lg rounded-md">
                 Start Shopping <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="/contact" className="no-underline">
-              <Button className="h-12 px-8 bg-[#5DC440] hover:bg-[#4eb335] text-white font-semibold text-lg transition-all shadow-lg">
+              <Button className="h-12 px-8 bg-white hover:bg-gray-100 text-[#253D4E] font-semibold text-lg transition-all shadow-lg rounded-md border border-gray-200">
                 Contact Us
               </Button>
             </Link>
@@ -82,7 +82,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center group transition-transform hover:-translate-y-1">
-                <div className="text-3xl md:text-4xl font-bold text-gray-900 group-hover:text-[#5DC440] transition-colors">
+                <div className="text-3xl md:text-4xl font-bold text-[#253D4E] group-hover:text-[#3BB77E] transition-colors">
                   {stat.value}
                 </div>
                 <div className="text-sm md:text-base text-gray-500 font-medium uppercase tracking-wider mt-1">
@@ -99,11 +99,11 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             <div className="flex-1 space-y-6">
-              <div className="inline-block px-4 py-1.5 bg-[#5DC440]/10 text-[#5DC440] rounded-full text-sm font-bold uppercase tracking-wide">
+              <div className="inline-block px-4 py-1.5 bg-[#3BB77E]/10 text-[#3BB77E] rounded-full text-sm font-bold uppercase tracking-wide">
                 Our Story
               </div>
-              <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                From a Small Local Store to Your <span className="text-[#5DC440]">Digital Kitchen</span>
+              <h2 className="text-3xl lg:text-5xl font-bold text-[#253D4E] leading-tight">
+                From a Small Local Store to Your <span className="text-[#3BB77E]">Digital Kitchen</span>
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed">
                 Founded in 2020, JS Mart began with a simple idea: everyone deserves access
@@ -113,10 +113,10 @@ export default function AboutPage() {
               <p className="text-lg text-gray-600 leading-relaxed">
                 Today, we partner with local farmers and global suppliers to bring over 1,000
                 premium products directly to you. Our commitment to quality and speed has
-                helped us become the most trusted online grocery app in Australia.
+                helped us become the most trusted online grocery app in Sri Lanka.
               </p>
               <div className="pt-4">
-                <Link href="/shop" className="flex items-center gap-2 text-[#5DC440] hover:text-[#4eb335] font-bold text-lg group no-underline">
+                <Link href="/shop" className="flex items-center gap-2 text-[#3BB77E] hover:text-[#299E63] font-bold text-lg group no-underline">
                   Check out our products <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
@@ -131,7 +131,7 @@ export default function AboutPage() {
                 />
               </div>
               {/* Decorative background elements */}
-              <div className="absolute -top-12 -right-12 w-48 h-48 bg-lime-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
+              <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#3BB77E] rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
               <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
             </div>
           </div>
@@ -139,28 +139,28 @@ export default function AboutPage() {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 bg-gray-900 text-white relative overflow-hidden">
+      <section className="py-20 bg-[#253D4E] text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5DC440] rounded-full filter blur-[120px]" />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#3BB77E] rounded-full filter blur-[120px]" />
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-700 rounded-full filter blur-[120px]" />
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24">
             <h2 className="text-3xl lg:text-5xl font-bold mb-6">Our Core Values</h2>
-            <p className="text-lg text-gray-400">
+            <p className="text-lg text-gray-300">
               These principles guide every action we take to provide you with the best experience possible.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-[#5DC440]/50 transition-all duration-300 group">
-                <div className="mb-6 p-4 bg-white/10 rounded-xl inline-block group-hover:bg-[#5DC440]/20 transition-colors">
+              <div key={index} className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-[#3BB77E]/50 transition-all duration-300 group">
+                <div className="mb-6 p-4 bg-white/10 rounded-xl inline-block group-hover:bg-[#3BB77E]/20 transition-colors">
                   {value.icon}
                 </div>
                 <h3 className="text-xl font-bold mb-4">{value.title}</h3>
-                <p className="text-gray-400 leading-relaxed">
+                <p className="text-gray-300 leading-relaxed">
                   {value.description}
                 </p>
               </div>

@@ -49,24 +49,24 @@ export default function FeaturedCategories() {
     return (
         <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12">
             {/* Header */}
-            <div className="relative flex items-center justify-center mb-8">
-                <h2 className="text-3xl font-bold text-[#253D4E]">Featured Categories</h2>
+            <div className="flex items-center justify-between mb-8">
+                <h2 className="text-4xl font-extrabold text-[#253D4E]">Featured Categories</h2>
 
                 {/* Navigation Arrows */}
-                <div className="absolute right-0 flex items-center gap-2">
+                <div className="flex items-center gap-2">
                     <button
                         onClick={() => scroll("left")}
-                        className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-[#3BB77E] transition-all shadow-sm"
+                        className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
                         aria-label="Scroll left"
                     >
-                        <ChevronLeft className="w-5 h-5 text-gray-600" />
+                        <ChevronLeft className="w-5 h-5 text-white" />
                     </button>
                     <button
                         onClick={() => scroll("right")}
-                        className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-[#3BB77E] transition-all shadow-sm"
+                        className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
                         aria-label="Scroll right"
                     >
-                        <ChevronRight className="w-5 h-5 text-gray-600" />
+                        <ChevronRight className="w-5 h-5 text-white" />
                     </button>
                 </div>
             </div>
