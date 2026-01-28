@@ -1,97 +1,194 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import React, {useEffect, useState} from "react";
+import Link from "next/link";
+import {Button} from "@/components/ui/button";
+import {Heading} from "@/components/ui/heading";
+import {useRouter} from "next/navigation";
 
-export default function CartModal() {
-    const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
-    const [isOpen, setIsOpen] = useState(false);
-    const router = useRouter();
+interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string;
+}
 
-    const toggleModal = () => setIsOpen(!isOpen);
+export default function ShoppingCart() {
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const router = useRouter()
 
-    const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+    useEffect(() => {
+        const stored = localStorage.getItem("cartItems");
+        if (stored) {
+            try {
+                setCartItems(JSON.parse(stored));
+            } catch {
+                localStorage.removeItem("cartItems");
+            }
+        }
+    }, []);
+
+    const saveCart = (items: CartItem[]) => {
+        setCartItems(items);
+        localStorage.setItem("cartItems", JSON.stringify(items));
+    };
+
+
+    const handleRemoveItem = (id: string) => {
+        saveCart(cartItems.filter(i => i.id !== id));
+    };
+
+    const handleQuantityChange = (id: string, qty: number) => {
+        if (qty < 1) return;
+
+        saveCart(
+            cartItems.map(i =>
+                i.id === id ? {...i, quantity: qty} : i
+            )
+        );
+    };
+
+    const total = cartItems.reduce(
+        (sum, i) => sum + i.price * i.quantity,
+        0
+    );
 
     const handleCheckout = () => {
-        if (!cart.length) return;
-        router.push("/checkout/address");
-        setIsOpen(false);
+        if (!cartItems.length) return;
+        router.push("/checkout");
+    };
+    const handleReturn = () => {
+        if (!cartItems.length) return;
+        router.push("/shop");
     };
 
     return (
-        <>
-            {/* Cart Button */}
-            <button
-                onClick={toggleModal}
-                className="relative p-2 rounded hover:bg-gray-100 transition"
-            >
-                🛒
-                {cart.length > 0 && (
-                    <span className="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center">
-            {cart.length}
-          </span>
-                )}
-            </button>
+        <div className="bg-white">
+            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-2">
 
-            {/* Modal */}
-            {isOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex justify-end">
-                    <div className="bg-white w-full sm:w-96 p-6 h-full overflow-y-auto">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold">Your Cart</h2>
-                            <button onClick={toggleModal} className="text-gray-500 hover:text-gray-800">
-                                ✖
-                            </button>
+                {/* HEADER */}
+                <div className="flex justify-between">
+                    <div>
+                        <Heading className="tracking-tight">Shopping Cart</Heading>
+                        <p className="text-base text-gray-500">
+                            Items in your shopping cart
+                        </p>
+                    </div>
+
+
+                </div>
+
+                {/* EMPTY */}
+                {cartItems.length === 0 ? (
+                    <div className="mt-20 text-center text-gray-500 font-medium">
+                        Your cart is empty —{" "}
+                        <Link
+                            href="/shop"
+                            className="underline text-emerald-600"
+                        >
+                            Start Shopping
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="bg-white mt-6">
+
+                        <div
+                            className="mt-4 grid grid-cols-4 text-sm font-medium text-gray-500 gap-4 ">
+                            <div>Product</div>
+                            <div className="text-center">Price</div>
+                            <div className="text-center">Quantity</div>
+                            <div className="text-end">SubT total</div>
                         </div>
 
-                        {cart.length === 0 ? (
-                            <p className="text-center text-gray-500 mt-20">Your cart is empty 😢</p>
-                        ) : (
-                            <>
-                                <ul className="space-y-4">
-                                    {cart.map((item) => (
-                                        <li key={item.id} className="flex justify-between items-center">
-                                            <div>
-                                                <p className="font-semibold">{item.name}</p>
-                                                <input
-                                                    type="number"
-                                                    min={1}
-                                                    value={item.quantity || 1}
-                                                    onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
-                                                    className="w-16 border rounded px-2 py-1 mt-1"
-                                                />
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <p>Rs. {(item.price * (item.quantity || 1)).toFixed(2)}</p>
-                                                <button
-                                                    onClick={() => removeFromCart(item.id)}
-                                                    className="text-red-600 hover:underline text-sm"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                        <ul className="mt-2 divide-y border-t border-b">
 
-                                <div className="mt-6 flex justify-between items-center font-bold">
-                                    <p>Total: Rs. {total.toFixed(2)}</p>
-                                    <div className="flex gap-2">
-                                        <Button onClick={clearCart} variant="destructive" size="sm">
-                                            Clear
-                                        </Button>
-                                        <Button onClick={handleCheckout} size="sm">
-                                            Checkout
-                                        </Button>
+                            {cartItems.map(item => (
+                                <li
+                                    key={item.id}
+                                    className="grid grid-cols-[auto_1.3fr_1fr_1fr_1fr] gap-4 py-4 items-center px-2"
+                                >
+                                    {/* IMAGE */}
+                                    <img
+                                        src={
+                                            item.image?.startsWith("http")
+                                                ? item.image
+                                                : item.image
+                                                    ? `/${item.image}`
+                                                    : "/placeholder.png"
+                                        }
+                                        alt={item.name}
+                                        className="h-20 w-20 rounded object-cover"
+                                    />
+
+                                    {/* NAME */}
+                                    <p className="font-medium text-gray-700">
+                                        {item.name}
+                                    </p>
+                                    {/* PRICE */}
+                                    <p className="mt-2  font-medium">
+                                        {item.price}
+                                    </p>
+                                    {/* QUANTITY */}
+                                        <div className="flex flex-col items-center">
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            value={item.quantity}
+                                            onChange={e =>
+                                                handleQuantityChange(
+                                                    item.id,
+                                                    Number(e.target.value)
+                                                )
+                                            }
+                                            className="w-16 border rounded text-center"
+                                        />
+                                            <button
+                                                onClick={() =>
+                                                    handleRemoveItem(item.id)
+                                                }
+                                                className="mt-1 text-sm underline text-red-500"
+                                            >
+                                                Remove
+                                            </button>
+
                                     </div>
-                                </div>
-                            </>
-                        )}
+                                    {/* SUBTOTAL */}
+                                    <p className="mt-2 font-medium text-end">
+                                        ${(item.price * item.quantity).toFixed(2)}
+                                    </p>
+
+                                </li>
+                                ))}
+
+                        </ul>
+
+                        {/* SUMMARY */}
+                        <div className="mt-6 flex justify-between items-center gap-6">
+                            <span className="mt-6">
+                               {cartItems.length > 0 && (
+                                   <Button onClick={handleReturn} className="text-sm ">
+                                       Return To Shop
+                                   </Button>
+                               )}
+                            </span>
+
+                            <div className="flex flex-col items-end">
+                                <p className="text-lg font-bold">
+                                    Total: ${total.toFixed(2)}
+                                </p>
+                                <Button onClick={handleCheckout} className="bg-emerald-600">
+                                    Checkout
+                                </Button>
+                            </div>
+
+                        </div>
+
+
                     </div>
-                </div>
-            )}
-        </>
+                    )}
+
+            </div>
+        </div>
     );
 }

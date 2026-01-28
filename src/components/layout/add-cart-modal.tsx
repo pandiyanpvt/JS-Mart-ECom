@@ -1,24 +1,28 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import {useCart} from "@/context/CartContext";
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
 
 type CartModalProps = {
     isOpen: boolean;
     onClose: () => void;
 };
 
-export default function CartModal({ isOpen, onClose }: CartModalProps) {
-    const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+export default function CartModal({isOpen, onClose}: CartModalProps) {
+    const {cart, removeFromCart, updateQuantity, clearCart} = useCart();
     const router = useRouter();
 
     const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
     const handleCheckout = () => {
         if (!cart.length) return;
-        router.push("/checkout/address");
+
+        // Save cart to localStorage for Cart page
+        localStorage.setItem("cartItems", JSON.stringify(cart));
+
         onClose();
+        router.push("/cart");
     };
 
     if (!isOpen) return null; // Don't render anything if not open
@@ -40,15 +44,29 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         <ul className="space-y-4">
                             {cart.map((item) => (
                                 <li key={item.id} className="flex justify-between items-center">
-                                    <div>
-                                        <p className="font-semibold">{item.name}</p>
-                                        <input
-                                            type="number"
-                                            min={1}
-                                            value={item.quantity || 1}
-                                            onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
-                                            className="w-16 border rounded px-2 py-1 mt-1"
+                                    <div className="flex gap-3">
+
+                                        <img
+                                            src={
+                                                item.image?.startsWith("http")
+                                                    ? item.image
+                                                    : item.image
+                                                        ? `/${item.image}`
+                                                        : "/placeholder.png"
+                                            }
+                                            className="h-14 w-14 rounded object-cover"
+                                            alt={item.name}
                                         />
+                                        <div>
+                                            <p className="font-semibold">{item.name}</p>
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                value={item.quantity || 1}
+                                                onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
+                                                className="w-16 border rounded px-2 py-1 mt-1"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <p>Rs. {(item.price * (item.quantity || 1)).toFixed(2)}</p>
