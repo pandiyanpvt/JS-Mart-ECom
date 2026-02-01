@@ -12,7 +12,14 @@ export default function AppLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const isAuthPage = pathname === "/signin" || pathname === "/signup";
+    const isAuthPage = [
+        "/signin",
+        "/signup",
+        "/forgot-password",
+        "/verify-otp",
+        "/reset-password",
+        "/password-reset-success"
+    ].includes(pathname);
 
     return (
         <CartProvider>

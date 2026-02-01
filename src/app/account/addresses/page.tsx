@@ -124,7 +124,7 @@ export default function AddressesPage() {
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Saved Addresses</h2>
                         <p className="text-gray-600">Manage your delivery addresses</p>
                     </div>
-                    <Button onClick={handleAddAddress} className="bg-lime-500 hover:bg-lime-600">
+                    <Button onClick={handleAddAddress} className="bg-[#3BB77E] hover:bg-[#299E63]">
                         <Plus className="h-4 w-4 mr-2" />
                         Add New Address
                     </Button>
@@ -138,7 +138,7 @@ export default function AddressesPage() {
                     return (
                         <div
                             key={address.id}
-                            className={`bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow relative ${address.isDefault ? "ring-2 ring-lime-500" : ""
+                            className={`bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow relative ${address.isDefault ? "ring-2 ring-[#3BB77E]" : ""
                                 }`}
                         >
                             {/* Default Badge */}
@@ -154,7 +154,7 @@ export default function AddressesPage() {
                             {/* Address Type */}
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="bg-lime-100 p-2 rounded-lg">
-                                    <TypeIcon className="h-5 w-5 text-lime-600" />
+                                    <TypeIcon className="h-5 w-5 text-[#299E63]" />
                                 </div>
                                 <h3 className="font-bold text-gray-900">{address.type}</h3>
                             </div>
@@ -217,7 +217,7 @@ export default function AddressesPage() {
                     <p className="text-gray-600 mb-6">
                         Add your first delivery address to get started
                     </p>
-                    <Button onClick={handleAddAddress} className="bg-lime-500 hover:bg-lime-600">
+                    <Button onClick={handleAddAddress} className="bg-[#3BB77E] hover:bg-[#299E63]">
                         <Plus className="h-4 w-4 mr-2" />
                         Add Address
                     </Button>
@@ -305,7 +305,7 @@ export default function AddressesPage() {
                             <div className="flex gap-3 pt-4">
                                 <Button
                                     type="button"
-                                    className="flex-1 bg-lime-500 hover:bg-lime-600"
+                                    className="flex-1 bg-[#3BB77E] hover:bg-[#299E63]"
                                 >
                                     Save Address
                                 </Button>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -93,13 +94,15 @@ export default function HeroSection() {
                     </div>
 
                     {/* Shop Now Button */}
-                    <Button
-                        className="text-white font-bold text-lg px-10 py-6 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2"
-                        style={{ backgroundColor: "#3BB77E" }} // Consistent green button
-                    >
-                        Shop Now
-                        <ArrowRight className="w-5 h-5" />
-                    </Button>
+                    <Link href="/shop" passHref>
+                        <Button
+                            className="text-white font-bold text-lg px-10 py-6 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2"
+                            style={{ backgroundColor: "#3BB77E" }} // Consistent green button
+                        >
+                            Shop Now
+                            <ArrowRight className="w-5 h-5" />
+                        </Button>
+                    </Link>
                 </div>
 
                 {/* Pagination Dots */}

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Category = {
-    id: number;
+    id: string;
     name: string;
     image: string;
     itemCount: number;
@@ -14,17 +14,16 @@ type Category = {
 };
 
 const categories: Category[] = [
-    { id: 1, name: "Fresh Fruits", image: "/images/category-section/fruits.png", itemCount: 45, bgColor: "#FFF3E0" },
-    { id: 2, name: "Fresh Vegetables", image: "/images/category-section/vegetables.png", itemCount: 38, bgColor: "#E8F5E9" },
-    { id: 3, name: "Dairy & Eggs", image: "/images/category-section/dairy.png", itemCount: 28, bgColor: "#FFF8E1" },
-    { id: 4, name: "Meat & Seafood", image: "/images/category-section/meat.png", itemCount: 32, bgColor: "#FFEBEE" },
-    { id: 5, name: "Bakery & Bread", image: "/images/category-section/bakery.png", itemCount: 24, bgColor: "#FFF9C4" },
-    { id: 6, name: "Beverages", image: "/images/category-section/beverages.png", itemCount: 52, bgColor: "#E3F2FD" },
-    { id: 7, name: "Snacks & Chips", image: "/images/category-section/snacks.png", itemCount: 41, bgColor: "#FCE4EC" },
-    { id: 8, name: "Frozen Foods", image: "/images/category-section/frozen.png", itemCount: 29, bgColor: "#E0F2F1" },
-    { id: 9, name: "Pantry Staples", image: "/images/category-section/pantry.png", itemCount: 67, bgColor: "#F3E5F5" },
-    { id: 10, name: "Personal Care", image: "/images/category-section/personal_care.png", itemCount: 35, bgColor: "#FFF3E0" },
-    { id: 11, name: "Electronic Items", image: "/images/category-section/electronics.png", itemCount: 22, bgColor: "#E3F2FD" },
+    { id: "fruits", name: "Fresh Fruits", image: "/images/category-section/fruits.png", itemCount: 45, bgColor: "#FFF3E0" },
+    { id: "vegetables", name: "Fresh Vegetables", image: "/images/category-section/vegetables.png", itemCount: 38, bgColor: "#E8F5E9" },
+    { id: "dairy", name: "Dairy & Eggs", image: "/images/category-section/dairy.png", itemCount: 28, bgColor: "#FFF8E1" },
+    { id: "meats", name: "Meat & Seafood", image: "/images/category-section/meat.png", itemCount: 32, bgColor: "#FFEBEE" },
+    { id: "bakery", name: "Bakery & Bread", image: "/images/category-section/bakery.png", itemCount: 24, bgColor: "#FFF9C4" },
+    { id: "beverages", name: "Beverages", image: "/images/category-section/beverages.png", itemCount: 52, bgColor: "#E3F2FD" },
+    { id: "snacks_confectionery", name: "Snacks & Chips", image: "/images/category-section/snacks.png", itemCount: 41, bgColor: "#FCE4EC" },
+    { id: "frozen_food", name: "Frozen Foods", image: "/images/category-section/frozen.png", itemCount: 29, bgColor: "#E0F2F1" },
+    { id: "food_cupboard", name: "Pantry Staples", image: "/images/category-section/pantry.png", itemCount: 67, bgColor: "#F3E5F5" },
+    { id: "household", name: "Household", image: "/images/category-section/personal_care.png", itemCount: 35, bgColor: "#FFF3E0" },
 ];
 
 
@@ -80,7 +79,7 @@ export default function FeaturedCategories() {
                 {categories.map((category) => (
                     <Link
                         key={category.id}
-                        href={`/products?category=${category.id}`}
+                        href={`/shop?category=${category.id}`}
                         className="flex-shrink-0 group"
                     >
                         <div
