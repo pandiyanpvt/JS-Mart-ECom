@@ -38,31 +38,21 @@ export default function TermsConditions() {
     ];
 
     return (
-        <div className="min-h-screen bg-white pb-20 pt-4">
-            {/* Hero Section */}
-            <section className="bg-gray-900 text-white py-24 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-lime-500 rounded-full filter blur-[100px]" />
-                </div>
-
-                <div className="container mx-auto px-4 relative z-10">
-                    <div className="max-w-3xl mx-auto text-center">
-                        <Link href="/" className="inline-flex items-center gap-2 text-lime-400 font-bold mb-6 hover:text-lime-300 transition-colors">
-                            <ArrowLeft className="h-5 w-5" /> Back to Store
-                        </Link>
-                        <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-                            Terms & <span className="text-lime-500">Conditions</span>
-                        </h1>
-                        <p className="text-xl text-gray-400 leading-relaxed font-sans">
-                            Please read these terms carefully before using our platform.
-                            Last modified: Jan 07, 2026.
-                        </p>
-                    </div>
-                </div>
-            </section>
+        <div className="min-h-screen bg-gray-50 pb-20 pt-4">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
+                <Link href="/" className="inline-flex items-center gap-2 text-[#3BB77E] font-semibold mb-6 hover:text-[#299E63] transition-colors">
+                    <ArrowLeft className="h-5 w-5" /> Back to Store
+                </Link>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                    Terms & Conditions
+                </h1>
+                <p className="text-gray-600 mt-2">
+                    Last modified: Jan 07, 2026
+                </p>
+            </div>
 
             {/* Terms List Section */}
-            <section className="container mx-auto px-4 max-w-4xl py-20">
+            <section className="container mx-auto px-4 max-w-4xl py-12">
                 <div className="grid gap-12">
                     {terms.map((term, i) => (
                         <div key={i} className="flex flex-col md:flex-row gap-8 items-start group">

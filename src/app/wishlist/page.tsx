@@ -5,7 +5,6 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Trash2 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
 export default function WishlistPage() {
@@ -25,18 +24,12 @@ export default function WishlistPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Hero Banner Section */}
-            <section className="w-full bg-gradient-to-r from-[#3BB77E] to-[#299E63] py-16 px-4 md:px-8">
-                <div className="max-w-[1400px] mx-auto text-center text-white">
-                    <h1 className="text-4xl md:text-5xl font-extrabold mb-4 flex items-center justify-center gap-3">
-                        <Heart className="w-10 h-10 md:w-12 md:h-12 fill-white" />
-                        My Wishlist
-                    </h1>
-                    <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-                        Your favorite products saved for later
-                    </p>
-                </div>
-            </section>
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 flex items-center gap-3">
+                    <Heart className="w-8 h-8 md:w-10 md:h-10 text-red-500 fill-red-500" />
+                    My Wishlist
+                </h1>
+            </div>
 
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-12">
                 {wishlist.length === 0 ? (

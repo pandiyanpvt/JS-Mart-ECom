@@ -1,9 +1,11 @@
 "use client";
 
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 export default function ContactPage() {
     const contactInfo = [
@@ -36,14 +38,33 @@ export default function ContactPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="bg-gradient-to-br from-[#3BB77E] to-[#299E63] py-20 px-4">
-                <div className="container mx-auto max-w-4xl text-center">
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-                        Get in <span className="text-[#253D4E]">Touch</span>
-                    </h1>
-                    <p className="text-lg text-white/90 max-w-2xl mx-auto">
-                        Have a question or need assistance? We're here to help! Reach out to our friendly customer support team.
-                    </p>
+            <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8">
+                <div className="relative overflow-hidden min-h-[250px] md:min-h-[350px] flex items-center justify-center shadow-lg rounded-[2rem]">
+                    {/* Background Image */}
+                    <div className="absolute inset-0 z-0">
+                        <Image
+                            src="/images/headers/contact-header.png"
+                            alt="Contact Us"
+                            fill
+                            className="object-cover"
+                            priority
+                        />
+
+                    </div>
+
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl z-[1]" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl z-[1]" />
+
+                    {/* Content */}
+                    <div className="relative z-10 text-center px-4 max-w-3xl">
+                        <h1 className="text-4xl md:text-7xl font-black text-white mb-6 drop-shadow-lg">
+                            Get in <span className="text-[#253D4E]">Touch</span>
+                        </h1>
+                        <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+                            Have a question or need assistance? We're here to help! Reach out to our friendly customer support team.
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -130,7 +151,7 @@ export default function ContactPage() {
                                 />
                             </div>
 
-                            <Button className="w-full h-12 bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold text-lg rounded-md flex items-center justify-center gap-2">
+                            <Button className="w-full h-12 bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold text-lg rounded-full flex items-center justify-center gap-2">
                                 <Send className="h-5 w-5" />
                                 Send Message
                             </Button>
@@ -158,9 +179,11 @@ export default function ContactPage() {
                             <p className="text-gray-300 mb-6">
                                 Check out our FAQ section for instant answers to common questions about orders, delivery, and more.
                             </p>
-                            <Button className="bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold h-12 px-8 rounded-md">
-                                Visit FAQ
-                            </Button>
+                            <Link href="/faq">
+                                <Button className="bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold h-12 px-8 rounded-full">
+                                    Visit FAQ
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>

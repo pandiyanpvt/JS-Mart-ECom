@@ -35,21 +35,17 @@ export default function PrivacyPolicy() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-4">
-            {/* Header */}
-            <section className="bg-white border-b border-gray-100 py-16">
-                <div className="container mx-auto px-4 text-center max-w-3xl">
-                    <Link href="/" className="inline-flex items-center gap-2 text-lime-600 font-bold mb-8 hover:gap-3 transition-all">
-                        <ArrowLeft className="h-5 w-5" /> Back to Home
-                    </Link>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight font-sans">
-                        Privacy <span className="text-lime-500">Policy</span>
-                    </h1>
-                    <p className="text-lg text-gray-600 leading-relaxed font-sans">
-                        Last Updated: January 2026. Your privacy is our top priority.
-                        This policy outlines how we handle your personal information.
-                    </p>
-                </div>
-            </section>
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
+                <Link href="/" className="inline-flex items-center gap-2 text-[#3BB77E] font-semibold mb-6 hover:text-[#299E63] transition-colors">
+                    <ArrowLeft className="h-5 w-5" /> Back to Home
+                </Link>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                    Privacy Policy
+                </h1>
+                <p className="text-gray-600 mt-2">
+                    Last Updated: January 2026
+                </p>
+            </div>
 
             {/* Content Section */}
             <section className="container mx-auto px-4 max-w-4xl py-12">

@@ -23,38 +23,42 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-8 bg-gray-50">
-            <div className="w-full max-w-md space-y-8">
-                {/* Back Button */}
-                <Link
-                    href="/signin"
-                    className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                    <span className="font-medium">Back to Sign In</span>
-                </Link>
-
-                {/* Logo and Header */}
-                <div className="flex flex-col items-center">
-                    <Link href="/" className="flex items-center gap-2 group mb-2">
-                        <div className="relative h-20 w-24 flex items-center justify-center">
-                            <Image
-                                src="/logo.png"
-                                alt="JS Mart Australia Logo"
-                                fill
-                                className="object-contain"
-                                priority
-                            />
-                        </div>
-                    </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 mt-4">Forgot Password?</h1>
-                    <p className="text-gray-600 mt-2 text-center">
-                        No worries! Enter your email and we'll send you a reset code
-                    </p>
+        <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+            {/* Left Side - Image */}
+            <div className="relative hidden md:block w-full h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                        src="/auth-image.png"
+                        alt="Shopping Illustration"
+                        fill
+                        className="object-cover object-center hover:scale-105 transition-transform duration-700"
+                        priority
+                    />
                 </div>
+            </div>
 
-                {/* Content Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+            {/* Right Side - Form */}
+            <div className="flex flex-col justify-center px-8 md:px-24 py-12 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+                <Button
+                    variant="ghost"
+                    className="absolute top-8 left-8 md:top-12 md:left-12 hover:bg-gray-100/80 transition-all duration-300"
+                    asChild
+                >
+                    <Link href="/signin">
+                        <ArrowLeft />
+                        Back to Sign In
+                    </Link>
+                </Button>
+                <div className="w-full max-w-md mx-auto space-y-8">
+                    <div className="space-y-2">
+                        <h1 className="text-3xl md:text-4xl font-medium tracking-wide text-black">
+                            Forgot Password?
+                        </h1>
+                        <p className="text-black/60 text-base">
+                            No worries! Enter your email and we'll send you a reset code
+                        </p>
+                    </div>
+
                     {isSubmitted ? (
                         /* Success Message */
                         <div className="space-y-6">
@@ -76,7 +80,7 @@ export default function ForgotPasswordPage() {
 
                             <Button
                                 onClick={() => router.push(`/verify-otp?email=${encodeURIComponent(email)}`)}
-                                className="w-full h-12 bg-lime-500 hover:bg-lime-600 text-white font-semibold text-base"
+                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                             >
                                 Continue to Verification
                             </Button>
@@ -85,7 +89,7 @@ export default function ForgotPasswordPage() {
                                 Didn't receive the code?{" "}
                                 <button
                                     onClick={() => setIsSubmitted(false)}
-                                    className="font-medium text-lime-600 hover:text-lime-700"
+                                    className="font-medium text-[#DB4444] hover:underline"
                                 >
                                     Resend
                                 </button>
@@ -94,49 +98,31 @@ export default function ForgotPasswordPage() {
                     ) : (
                         /* Form */
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Email */}
-                            <div className="space-y-2">
-                                <Label htmlFor="email" className="text-gray-700 font-medium">
-                                    Email Address
-                                </Label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="pl-10 h-12 border-gray-300 focus:border-lime-500 focus:ring-lime-500"
-                                        required
-                                    />
-                                </div>
+                            <div className="space-y-6">
+                                <Input
+                                    type="email"
+                                    placeholder="Email Address"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-[#DB4444] placeholder:text-gray-400 h-auto text-base transition-colors duration-300"
+                                    required
+                                />
                             </div>
 
-                            {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="w-full h-12 bg-lime-500 hover:bg-lime-600 text-white font-semibold text-base"
+                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                             >
                                 Send Reset Code
                             </Button>
 
-                            {/* Alternative Options */}
-                            <div className="space-y-4">
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <div className="w-full border-t border-gray-300"></div>
-                                    </div>
-                                    <div className="relative flex justify-center text-sm">
-                                        <span className="px-4 bg-white text-gray-500">Or</span>
-                                    </div>
-                                </div>
-
+                            <div className="flex items-center justify-center gap-2 text-gray-600">
+                                <span>Remember your password?</span>
                                 <Link
                                     href="/signin"
-                                    className="block text-center text-sm font-medium text-gray-600 hover:text-gray-900"
+                                    className="text-black font-medium border-b border-black/50 hover:border-black pb-0.5 leading-none transition-colors"
                                 >
-                                    Try signing in again
+                                    Log in
                                 </Link>
                             </div>
                         </form>

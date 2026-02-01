@@ -6,6 +6,7 @@ import { products } from "@/lib/data";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Tag, Percent } from "lucide-react";
+import Image from "next/image";
 
 export default function OffersPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -34,13 +35,44 @@ export default function OffersPage() {
 
   return (
     <main className="flex flex-col items-center w-full pb-16 bg-white">
+      {/* Hero Section */}
+      <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8">
+        <div className="relative overflow-hidden min-h-[250px] md:min-h-[350px] flex items-center justify-center shadow-lg rounded-[2rem]">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/headers/offers-header.png"
+              alt="Special Offers"
+              fill
+              className="object-cover"
+              priority
+            />
+
+          </div>
+
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl z-[1]" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl z-[1]" />
+
+          {/* Content */}
+          <div className="relative z-10 text-center px-4 max-w-3xl">
+            <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
+              Special Offers
+            </h1>
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+              Discover amazing deals on your favorite products. Save big today!
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Offers Section */}
       <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-4xl font-extrabold text-[#253D4E]">Special Offers</h2>
-            <p className="text-gray-500 text-sm mt-2">{offerProducts.length} items found</p>
+            <h2 className="text-4xl font-extrabold text-[#253D4E]">Featured Deals</h2>
+            <p className="text-gray-500 text-sm mt-2">Don't miss out on these incredible savings</p>
           </div>
 
           {/* Navigation Arrows */}

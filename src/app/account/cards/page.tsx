@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CreditCard, Plus, Edit, Trash2, Star } from "lucide-react";
+import { CreditCard, Plus, Edit, Trash2, Star, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,15 +65,18 @@ export default function CardsPage() {
     }, [userName]);
 
     const [showModal, setShowModal] = useState(false);
+    const [showCVV, setShowCVV] = useState(false);
     const [editingCard, setEditingCard] = useState<PaymentCard | null>(null);
 
     const handleAddCard = () => {
         setEditingCard(null);
+        setShowCVV(false);
         setShowModal(true);
     };
 
     const handleEditCard = (card: PaymentCard) => {
         setEditingCard(card);
+        setShowCVV(false);
         setShowModal(true);
     };
 
@@ -114,7 +117,7 @@ export default function CardsPage() {
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Saved Cards</h2>
                         <p className="text-gray-600">Manage your payment methods securely</p>
                     </div>
-                    <Button onClick={handleAddCard} className="bg-lime-500 hover:bg-lime-600">
+                    <Button onClick={handleAddCard} className="bg-[#3BB77E] hover:bg-[#299E63]">
                         <Plus className="h-4 w-4 mr-2" />
                         Add New Card
                     </Button>
@@ -246,7 +249,7 @@ export default function CardsPage() {
                     <p className="text-gray-600 mb-6">
                         Add a payment method for faster checkout
                     </p>
-                    <Button onClick={handleAddCard} className="bg-lime-500 hover:bg-lime-600">
+                    <Button onClick={handleAddCard} className="bg-[#3BB77E] hover:bg-[#299E63]">
                         <Plus className="h-4 w-4 mr-2" />
                         Add Card
                     </Button>
@@ -295,20 +298,33 @@ export default function CardsPage() {
 
                                 <div>
                                     <Label htmlFor="cvv">CVV</Label>
-                                    <Input
-                                        id="cvv"
-                                        type="password"
-                                        placeholder="123"
-                                        maxLength={4}
-                                        className="mt-1"
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            id="cvv"
+                                            type={showCVV ? "text" : "password"}
+                                            placeholder="123"
+                                            maxLength={4}
+                                            className="mt-1 pr-10"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCVV(!showCVV)}
+                                            className="absolute right-3 top-1/2 -translate-y-[calc(50%-2px)] text-gray-400 hover:text-gray-600 focus:outline-none"
+                                        >
+                                            {showCVV ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="flex gap-3 pt-4">
                                 <Button
                                     type="button"
-                                    className="flex-1 bg-lime-500 hover:bg-lime-600"
+                                    className="flex-1 bg-[#3BB77E] hover:bg-[#299E63]"
                                 >
                                     Save Card
                                 </Button>

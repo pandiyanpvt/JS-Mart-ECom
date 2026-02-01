@@ -64,13 +64,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
                     {/* Action Icons */}
                     <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
-                        <button 
+                        <button
                             onClick={handleWishlistToggle}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${
-                                inWishlist 
-                                    ? "bg-[#3BB77E] text-white" 
+                            className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${inWishlist
+                                    ? "bg-[#3BB77E] text-white"
                                     : "bg-white hover:bg-[#3BB77E] hover:text-white"
-                            }`}
+                                }`}
                             title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                         >
                             <Heart className={`w-4 h-4 ${inWishlist ? "fill-white text-white" : "text-gray-700 group-hover/icon:text-white"}`} />
@@ -88,7 +87,7 @@ export function ProductCard({ product }: ProductCardProps) {
                             src={product.image}
                             alt={product.name}
                             fill
-                            className="object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
+                            className="object-contain group-hover:scale-110 transition-transform duration-500"
                         />
                     </div>
 

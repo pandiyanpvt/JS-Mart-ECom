@@ -48,51 +48,50 @@ export default function ResetPasswordPage() {
     const strengthLabels = ["Weak", "Fair", "Good", "Strong"];
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-8 bg-gray-50">
-            <div className="w-full max-w-md space-y-8">
-                {/* Logo and Header */}
-                <div className="flex flex-col items-center">
-                    <Link href="/" className="flex items-center gap-2 group mb-2">
-                        <div className="relative h-20 w-24 flex items-center justify-center">
-                            <Image
-                                src="/logo.png"
-                                alt="JS Mart Australia Logo"
-                                fill
-                                className="object-contain"
-                                priority
-                            />
-                        </div>
-                    </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 mt-4">Create New Password</h1>
-                    <p className="text-gray-600 mt-2 text-center">
-                        Your new password must be different from previously used passwords
-                    </p>
+        <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+            {/* Left Side - Image */}
+            <div className="relative hidden md:block w-full h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                        src="/auth-image.png"
+                        alt="Shopping Illustration"
+                        fill
+                        className="object-cover object-center hover:scale-105 transition-transform duration-700"
+                        priority
+                    />
                 </div>
+            </div>
 
-                {/* Content Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                    {/* Form */}
+            {/* Right Side - Form */}
+            <div className="flex flex-col justify-center px-8 md:px-24 py-12 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+                {/* No back button here usually, or maybe back to login? */}
+                <div className="w-full max-w-md mx-auto space-y-8">
+                    <div className="space-y-2">
+                        <h1 className="text-3xl md:text-4xl font-medium tracking-wide text-black">
+                            Create New Password
+                        </h1>
+                        <p className="text-black/60 text-base">
+                            Your new password must be different from previously used passwords
+                        </p>
+                    </div>
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* New Password */}
-                        <div className="space-y-2">
-                            <Label htmlFor="password" className="text-gray-700 font-medium">
-                                New Password
-                            </Label>
+                        <div className="space-y-6">
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                 <Input
                                     id="password"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="Create a strong password"
+                                    placeholder="New Password"
                                     value={formData.password}
                                     onChange={(e) => handlePasswordChange(e.target.value)}
-                                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-emerald-500 focus:ring-lime-500"
+                                    className="border-0 border-b border-gray-300 rounded-none px-0 pr-8 py-2 focus-visible:ring-0 focus-visible:border-[#DB4444] placeholder:text-gray-400 h-auto text-base transition-colors duration-300 w-full"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                                 >
                                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                 </button>
@@ -129,28 +128,22 @@ export default function ResetPasswordPage() {
                                     )}
                                 </div>
                             )}
-                        </div>
 
-                        {/* Confirm Password */}
-                        <div className="space-y-2">
-                            <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
-                                Confirm Password
-                            </Label>
+                            {/* Confirm Password */}
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                 <Input
                                     id="confirmPassword"
                                     type={showConfirmPassword ? "text" : "password"}
-                                    placeholder="Confirm your password"
+                                    placeholder="Confirm Password"
                                     value={formData.confirmPassword}
                                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-emerald-500 focus:ring-lime-500"
+                                    className="border-0 border-b border-gray-300 rounded-none px-0 pr-8 py-2 focus-visible:ring-0 focus-visible:border-[#DB4444] placeholder:text-gray-400 h-auto text-base transition-colors duration-300 w-full"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                                 >
                                     {showConfirmPassword ? (
                                         <EyeOff className="h-5 w-5" />
@@ -222,7 +215,7 @@ export default function ResetPasswordPage() {
                         {/* Reset Button */}
                         <Button
                             type="submit"
-                            className="w-full h-12 bg-emerald-500 hover:bg-green-600 text-white font-semibold text-base"
+                            className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                         >
                             Reset Password
                         </Button>

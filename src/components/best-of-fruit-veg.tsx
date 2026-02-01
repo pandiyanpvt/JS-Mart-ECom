@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, Star, Heart, Eye, ShoppingCart } from "lucid
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/lib/data";
 
-type Product = {
+type LocalProduct = {
     id: number;
     name: string;
     image: string;
@@ -20,7 +20,7 @@ type Product = {
     reviewCount?: number;
 };
 
-const products: Product[] = [
+const products: LocalProduct[] = [
     {
         id: 101,
         name: "Fresh Red Apple",
@@ -116,9 +116,9 @@ export default function BestOfFruitVeg() {
         );
     };
 
-    const handleWishlistToggle = (product: Product) => {
+    const handleWishlistToggle = (product: LocalProduct) => {
         const wishlistProduct: Product = {
-            id: product.id.toString(),
+            id: String(product.id),
             name: product.name,
             category: "fruits", // Default category, adjust as needed
             price: product.price,
@@ -196,28 +196,28 @@ export default function BestOfFruitVeg() {
 
                                 {/* Action Icons */}
                                 <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
-                                    <button 
+                                    <button
                                         onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
                                             handleWishlistToggle(product as any);
                                         }}
-                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${
-                                            isInWishlist(product.id.toString())
-                                                ? "bg-[#3BB77E] text-white"
-                                                : "bg-white hover:bg-[#3BB77E] hover:text-white"
-                                        }`}
-                                        title={isInWishlist(product.id.toString()) ? "Remove from wishlist" : "Add to wishlist"}
+                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${isInWishlist(String(product.id))
+                                            ? "bg-[#3BB77E] text-white"
+                                            : "bg-white hover:bg-[#3BB77E] hover:text-white"
+                                            }`}
+                                        title={isInWishlist(String(product.id)) ? "Remove from wishlist" : "Add to wishlist"}
                                     >
-                                        <Heart className={`w-4 h-4 ${
-                                            isInWishlist(product.id.toString())
-                                                ? "fill-white text-white"
-                                                : "text-gray-700 group-hover/icon:text-white"
-                                        }`} />
+                                        <Heart className={`w-4 h-4 ${isInWishlist(String(product.id))
+                                            ? "fill-white text-white"
+                                            : "text-gray-700 group-hover/icon:text-white"
+                                            }`} />
                                     </button>
-                                    <button className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#3BB77E] hover:text-white transition-all group/icon">
-                                        <Eye className="w-4 h-4 text-gray-700 group-hover/icon:text-white" />
-                                    </button>
+                                    <Link href={`/shop/${product.id}`}>
+                                        <button className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#3BB77E] hover:text-white transition-all group/icon">
+                                            <Eye className="w-4 h-4 text-gray-700 group-hover/icon:text-white" />
+                                        </button>
+                                    </Link>
                                 </div>
 
                                 {/* Product Image */}
@@ -239,7 +239,7 @@ export default function BestOfFruitVeg() {
 
                             {/* Product Info */}
                             <div className="p-4 space-y-2">
-                                <Link href={`/products/${product.id}`}>
+                                <Link href={`/shop/${product.id}`}>
                                     <h3 className="text-[#253D4E] font-semibold text-sm leading-tight hover:text-[#3BB77E] transition-colors">
                                         {product.name}
                                     </h3>
