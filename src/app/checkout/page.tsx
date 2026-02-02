@@ -1,14 +1,7 @@
-"use client";
+import React from "react";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+const Page = () => {
+    return <div></div>;
+};
 
-export default function CheckoutRootPage() {
-    const router = useRouter();
-
-    useEffect(() => {
-        router.replace("/checkout/address"); // redirect to address
-    }, [router]);
-
-    return null;
-}
+export default Page;
