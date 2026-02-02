@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,7 +8,7 @@ import { ArrowLeft, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function VerifyOTPPage() {
+function VerifyOTPContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const email = searchParams?.get("email") || "";
@@ -81,41 +81,42 @@ export default function VerifyOTPPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-8 bg-gray-50">
-            <div className="w-full max-w-md space-y-8">
-                {/* Back Button */}
-                <Link
-                    href="/forgot-password"
-                    className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                    <span className="font-medium">Back</span>
-                </Link>
-
-                {/* Logo and Header */}
-                <div className="flex flex-col items-center">
-                    <Link href="/" className="flex items-center gap-2 group mb-2">
-                        <div className="relative h-20 w-24 flex items-center justify-center">
-                            <Image
-                                src="/logo.png"
-                                alt="JS Mart Australia Logo"
-                                fill
-                                className="object-contain"
-                                priority
-                            />
-                        </div>
-                    </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 mt-4">Verify Your Email</h1>
-                    <p className="text-gray-600 mt-2 text-center">
-                        We've sent a 6-digit code to
-                        <br />
-                        <span className="font-medium text-gray-900">{email || "your email"}</span>
-                    </p>
+        <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+            {/* Left Side - Image */}
+            <div className="relative hidden md:block w-full h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                        src="/auth-image.png"
+                        alt="Shopping Illustration"
+                        fill
+                        className="object-cover object-center hover:scale-105 transition-transform duration-700"
+                        priority
+                    />
                 </div>
+            </div>
 
-                {/* Form Container */}
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                    {/* Form */}
+            {/* Right Side - Form */}
+            <div className="flex flex-col justify-center px-8 md:px-24 py-12 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+                <Button
+                    variant="ghost"
+                    className="absolute top-8 left-8 md:top-12 md:left-12 hover:bg-gray-100/80 transition-all duration-300"
+                    asChild
+                >
+                    <Link href="/forgot-password">
+                        <ArrowLeft />
+                        Back
+                    </Link>
+                </Button>
+                <div className="w-full max-w-md mx-auto space-y-8">
+                    <div className="space-y-2">
+                        <h1 className="text-3xl md:text-4xl font-medium tracking-wide text-black">
+                            Verify Your Email
+                        </h1>
+                        <p className="text-black/60 text-base">
+                            We've sent a 6-digit code to <span className="font-medium text-black">{email || "your email"}</span>
+                        </p>
+                    </div>
+
                     <form onSubmit={handleSubmit} className="space-y-8">
                         {/* OTP Input */}
                         <div className="space-y-4">
@@ -133,7 +134,7 @@ export default function VerifyOTPPage() {
                                         onChange={(e) => handleChange(index, e.target.value)}
                                         onKeyDown={(e) => handleKeyDown(index, e)}
                                         onPaste={handlePaste}
-                                        className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 focus:border-lime-500 focus:ring-lime-500 rounded-lg"
+                                        className="w-12 h-14 text-center text-2xl font-bold border-0 border-b-2 border-gray-300 focus-visible:border-[#DB4444] rounded-none focus-visible:ring-0"
                                         required
                                     />
                                 ))}
@@ -145,14 +146,14 @@ export default function VerifyOTPPage() {
                                     <button
                                         type="button"
                                         onClick={handleResend}
-                                        className="text-sm font-medium text-lime-600 hover:text-lime-700"
+                                        className="text-sm font-medium text-[#DB4444] hover:underline"
                                     >
                                         Resend Code
                                     </button>
                                 ) : (
                                     <p className="text-sm text-gray-600">
                                         Resend code in{" "}
-                                        <span className="font-semibold text-gray-900">
+                                        <span className="font-semibold text-black">
                                             {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, "0")}
                                         </span>
                                     </p>
@@ -164,18 +165,18 @@ export default function VerifyOTPPage() {
                         <Button
                             type="submit"
                             disabled={otp.some((digit) => !digit)}
-                            className="w-full h-12 bg-lime-500 hover:bg-lime-600 text-white font-semibold text-base disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
                             Verify & Continue
                         </Button>
 
                         {/* Help Text */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                             <div className="flex gap-3">
-                                <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                <Shield className="h-5 w-5 text-gray-600 flex-shrink-0 mt-0.5" />
                                 <div className="space-y-1">
-                                    <p className="text-sm font-medium text-blue-900">Security Tip</p>
-                                    <p className="text-xs text-blue-700">
+                                    <p className="text-sm font-medium text-gray-900">Security Tip</p>
+                                    <p className="text-xs text-gray-700">
                                         Never share this code with anyone. Our team will never ask for your
                                         verification code.
                                     </p>
@@ -184,18 +185,26 @@ export default function VerifyOTPPage() {
                         </div>
 
                         {/* Wrong Email */}
-                        <p className="text-center text-sm text-gray-600">
-                            Wrong email?{" "}
+                        <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
+                            <span>Wrong email?</span>
                             <Link
                                 href="/forgot-password"
-                                className="font-medium text-lime-600 hover:text-lime-700"
+                                className="text-black font-medium border-b border-black/50 hover:border-black pb-0.5 leading-none transition-colors"
                             >
                                 Change email address
                             </Link>
-                        </p>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function VerifyOTPPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <VerifyOTPContent />
+        </Suspense>
     );
 }

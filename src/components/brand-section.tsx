@@ -69,7 +69,7 @@ export default function BrandSection() {
         {brands.map((brand) => (
           <Link
             key={brand.id}
-            href={`/products?brand=${brand.id}`}
+            href="/shop"
             className="flex-shrink-0 group"
           >
             <div className="w-[240px] h-[140px] bg-white border border-gray-100 rounded-xl flex items-center justify-center p-4 transition-all duration-300 hover:shadow-lg hover:border-[#3BB77E]/30">

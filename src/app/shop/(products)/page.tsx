@@ -1,22 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { products, categories } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { ChevronDown, Filter, Grid, List, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Filter, Grid, List, SlidersHorizontal, ShoppingCart, Package } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { Input } from "@/components/ui/input";
 
 const ITEMS_PER_PAGE = 12;
 
-export default function ShopPage() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+function ShopContent() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category");
+
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "all");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Update selected category when URL param changes
+  useEffect(() => {
+    if (initialCategory) {
+      setSelectedCategory(initialCategory);
+    }
+  }, [initialCategory]);
 
   // Reset page when category changes
   useEffect(() => {
@@ -62,12 +73,33 @@ export default function ShopPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner Section */}
-      <section className="w-full bg-gradient-to-r from-[#3BB77E] to-[#299E63] py-16 px-4 md:px-8">
-        <div className="max-w-[1400px] mx-auto text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Our Products</h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-            Discover fresh, quality products delivered to your doorstep
-          </p>
+      <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8">
+        <div className="relative overflow-hidden min-h-[250px] md:min-h-[350px] flex items-center justify-center shadow-lg rounded-[2rem]">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/headers/shop-header.png"
+              alt="Fresh Groceries"
+              fill
+              className="object-cover"
+              priority
+            />
+
+          </div>
+
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl z-[1]" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl z-[1]" />
+
+          {/* Content */}
+          <div className="relative z-10 text-center px-4 max-w-3xl">
+            <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
+              Our Products
+            </h1>
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+              Discover fresh, quality products delivered to your doorstep
+            </p>
+          </div>
         </div>
       </section>
 
@@ -127,11 +159,10 @@ export default function ShopPage() {
                     <li key={cat.id}>
                       <button
                         onClick={() => setSelectedCategory(cat.id)}
-                        className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${
-                          selectedCategory === cat.id
-                            ? "bg-[#3BB77E] text-white"
-                            : "text-[#253D4E] hover:bg-gray-50"
-                        }`}
+                        className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedCategory === cat.id
+                          ? "bg-[#3BB77E] text-white"
+                          : "text-[#253D4E] hover:bg-gray-50"
+                          }`}
                       >
                         {cat.name}
                       </button>
@@ -195,11 +226,10 @@ export default function ShopPage() {
             {/* Product Grid */}
             {paginatedProducts.length > 0 ? (
               <>
-                <div className={`grid gap-6 ${
-                  viewMode === "grid"
-                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                    : "grid-cols-1"
-                }`}>
+                <div className={`grid gap-6 ${viewMode === "grid"
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                  : "grid-cols-1"
+                  }`}>
                   {paginatedProducts.map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}
@@ -269,5 +299,13 @@ export default function ShopPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ShopContent />
+    </Suspense>
   );
 }

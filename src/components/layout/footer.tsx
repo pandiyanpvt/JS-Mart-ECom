@@ -91,29 +91,61 @@ export default function Footer() {
           <div>
             <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Quick Links</h3>
             <ul className="space-y-3 text-sm">
-              {["Blog", "FAQs", "Payment", "Shipment", "Where is my order?", "Return policy"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
-                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-                    {item}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link href="/offers" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Offers
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  FAQs
+                </Link>
+              </li>
+              <li>
+                <Link href="/return-policy" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Return Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Start Shopping
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 3: Style Advisor */}
+          {/* Column 3: My Account */}
           <div>
-            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Style Advisor</h3>
+            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">My Account</h3>
             <ul className="space-y-3 text-sm">
-              {["Your Account", "Information", "Addresses", "Discount", "Order History", "Additional Information"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
-                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-                    {item}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link href="/account/profile" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Profile
+                </Link>
+              </li>
+              <li>
+                <Link href="/account/orders" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Order History
+                </Link>
+              </li>
+              <li>
+                <Link href="/wishlist" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Wishlist
+                </Link>
+              </li>
+              <li>
+                <Link href="/cart" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Cart
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -121,14 +153,30 @@ export default function Footer() {
           <div>
             <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Information</h3>
             <ul className="space-y-3 text-sm">
-              {["Site Map", "Search Terms", "Advanced Search", "About Us", "Contact Us", "Suppliers"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
-                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-                    {item}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link href="/about" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  Terms & Conditions
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

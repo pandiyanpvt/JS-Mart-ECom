@@ -8,7 +8,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Percent, Heart } from "lucide-react";
+import { Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Percent, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Leaf, Smartphone, Shirt, Home, Baby, Sparkles, Grid3x3 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 // import {
@@ -94,13 +94,62 @@ export function Navbar() {
                 {/* Search Bar */}
                 <div className="flex-1 max-w-3xl hidden md:flex items-center border-2 border-gray-100 rounded-lg overflow-hidden focus-within:border-[#3BB77E] transition-colors">
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="px-5 py-2 flex items-center gap-2 text-sm font-semibold border-r border-gray-100 hover:bg-gray-50 outline-none whitespace-nowrap">
+                        <DropdownMenuTrigger className="px-5 py-2 flex items-center gap-2 text-sm font-semibold border-r border-gray-100 hover:bg-gray-50 outline-none whitespace-nowrap transition-all">
+                            <Grid3x3 className="h-4 w-4 text-[#3BB77E]" />
                             All Categories <ChevronDown className="h-4 w-4" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                            <DropdownMenuItem>Fruits & Vegetables</DropdownMenuItem>
-                            <DropdownMenuItem>Dairy & Eggs</DropdownMenuItem>
-                            <DropdownMenuItem>Bakery</DropdownMenuItem>
+                        <DropdownMenuContent className="w-64">
+                            <DropdownMenuLabel className="text-xs text-gray-500">SHOP BY CATEGORY</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=vegetables" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Apple className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Fruits & Vegetables</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=dairy" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Milk className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Dairy & Eggs</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=bakery" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Cake className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Bakery & Snacks</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=beverages" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Coffee className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Beverages</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=meats" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Beef className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Meat & Seafood</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=frozen_food" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Fish className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Frozen Foods</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=household" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Home className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Household</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=baby_products" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors flex items-center w-full">
+                                    <Baby className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Baby Care</span>
+                                </Link>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <div className="flex-1 relative">
@@ -204,10 +253,86 @@ export function Navbar() {
             <div className="border-y border-gray-100 py-3 px-4 md:px-8 flex items-center justify-between">
                 <div className="flex items-center gap-8">
                     {/* Categories Trigger */}
-                    <button className="flex items-center gap-3 font-bold text-sm text-gray-900 hover:text-[#3BB77E] transition-colors group">
-                        <Menu className="h-5 w-5" />
-                        Browse All Categories
-                    </button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-3 font-bold text-sm text-white bg-[#3BB77E] hover:bg-[#299E63] px-6 py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg outline-none">
+                                <Menu className="h-5 w-5" />
+                                Browse All Categories
+                                <ChevronDown className="h-4 w-4" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-72" align="start">
+                            <DropdownMenuLabel className="text-xs text-gray-500 uppercase tracking-wide">All Categories</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+
+                            {/* Food & Groceries */}
+                            <div className="px-2 py-1">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Food & Groceries</p>
+                            </div>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=vegetables" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Apple className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Fruits & Vegetables</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=dairy" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Milk className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Dairy & Eggs</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=bakery" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Cake className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Bakery & Snacks</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=beverages" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Coffee className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Beverages</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=meats" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Beef className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Meat & Seafood</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=frozen_food" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Fish className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Frozen Foods</span>
+                                </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            {/* Lifestyle & More */}
+                            <div className="px-2 py-1">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Lifestyle & More</p>
+                            </div>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=household" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Home className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Home & Kitchen</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop?category=baby_products" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
+                                    <Baby className="h-4 w-4 mr-3 text-[#3BB77E]" />
+                                    <span className="font-medium">Baby Care</span>
+                                </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/shop" className="cursor-pointer font-bold text-[#3BB77E] hover:bg-[#3BB77E]/10 justify-center">
+                                    View All Categories →
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <div className="h-6 w-px bg-gray-200 hidden lg:block" />
 
@@ -217,24 +342,20 @@ export function Navbar() {
                             // Check if current path matches the link
                             // For exact matches (like /about, /contact) use strict equality
                             // For routes with nested paths (like /shop), check if pathname starts with the href
-                            const isActive = link.href === "/" 
+                            const isActive = link.href === "/"
                                 ? pathname === "/"
                                 : pathname === link.href || pathname.startsWith(link.href + "/");
-                            
+
                             return (
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className={`text-sm font-bold flex items-center gap-1 transition-colors ${
-                                        isActive
-                                            ? "text-[#3BB77E]"
-                                            : "text-gray-900 hover:text-[#3BB77E]"
-                                    }`}
+                                    className={`text-sm font-semibold flex items-center gap-1 transition-colors ${isActive
+                                        ? "text-[#3BB77E]"
+                                        : "text-gray-900 hover:text-[#3BB77E]"
+                                        }`}
                                 >
                                     {link.name}
-                                    {link.name === "Shop" && (
-                                        <ChevronDown className="h-3 w-3 opacity-50" />
-                                    )}
                                 </Link>
                             );
                         })}
