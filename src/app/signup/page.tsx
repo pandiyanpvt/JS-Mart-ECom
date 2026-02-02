@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import {signIn} from "next-auth/react";
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -33,6 +34,26 @@ export default function SignUpPage() {
 
         // Redirect to account dashboard or login
         router.push("/account");
+    };
+
+    const handleGoogleLogin = async () => {
+        const res = await signIn("google", {
+            redirect: false, // prevent automatic redirect
+        });
+
+        if (res?.ok) {
+            // Get the session after login
+            const session = await fetch("/api/auth/session").then((r) => r.json());
+
+            // Store email (or name) in localStorage for Navbar
+            if (session?.user) {
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify({ email: session.user.email, name: session.user.name })
+                );
+                router.push("/account"); // redirect after storing
+            }
+        }
     };
 
     return (
@@ -122,6 +143,7 @@ export default function SignUpPage() {
                             </Button>
 
                             <Button
+                                onClick={() => handleGoogleLogin()}
                                 type="button"
                                 variant="outline"
                                 className="w-full h-12 border border-gray-300 text-gray-700 font-medium text-base rounded flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors duration-300"
