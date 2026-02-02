@@ -350,7 +350,7 @@ export function Navbar() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className={`text-sm font-bold flex items-center gap-1 transition-colors ${isActive
+                                    className={`text-sm font-semibold flex items-center gap-1 transition-colors ${isActive
                                         ? "text-[#3BB77E]"
                                         : "text-gray-900 hover:text-[#3BB77E]"
                                         }`}
