@@ -1,13 +1,15 @@
 "use client";
 
-import {useState} from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {useRouter} from "next/navigation";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {ArrowLeft, Eye, EyeOff} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
+import { authService } from "@/services";
+import toast from "react-hot-toast";
 
 export default function SignInPage() {
     const router = useRouter();
@@ -16,18 +18,32 @@ export default function SignInPage() {
         emailOrPhone: "",
         password: "",
     });
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle sign in logic here
-        console.log("Sign in with:", formData);
+        setError("");
+        setLoading(true);
 
-        // Store user session
-        localStorage.setItem("user", JSON.stringify({email: formData.emailOrPhone}));
-
-        // Redirect to account dashboard
-        router.push("/account");
+        try {
+            await authService.login({
+                emailAddress: formData.emailOrPhone,
+                password: formData.password
+            });
+            // Login successful, redirect to account
+            toast.success("Login success");
+            // Dispatch event to update navbar
+            window.dispatchEvent(new Event("auth-change"));
+            router.push("/");
+        } catch (err: any) {
+            console.error("Login failed", err);
+            setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
+
     const handleGoogleLogin = () => {
         signIn("google", { callbackUrl: "/account" });
     };
@@ -56,7 +72,7 @@ export default function SignInPage() {
                     asChild
                 >
                     <Link href="/">
-                        <ArrowLeft/>
+                        <ArrowLeft />
                         Back
                     </Link>
                 </Button>
@@ -71,12 +87,17 @@ export default function SignInPage() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+                                {error}
+                            </div>
+                        )}
                         <div className="space-y-6">
                             <Input
                                 type="text"
                                 placeholder="Email or Phone Number"
                                 value={formData.emailOrPhone}
-                                onChange={(e) => setFormData({...formData, emailOrPhone: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, emailOrPhone: e.target.value })}
                                 className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-[#DB4444] placeholder:text-gray-400 h-auto text-base transition-colors duration-300"
                                 required
                             />
@@ -85,7 +106,7 @@ export default function SignInPage() {
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Password"
                                     value={formData.password}
-                                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className="border-0 border-b border-gray-300 rounded-none px-0 pr-8 py-2 focus-visible:ring-0 focus-visible:border-[#DB4444] placeholder:text-gray-400 h-auto text-base transition-colors duration-300 w-full"
                                     required
                                 />
@@ -95,9 +116,9 @@ export default function SignInPage() {
                                     className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                                 >
                                     {showPassword ? (
-                                        <EyeOff className="h-5 w-5"/>
+                                        <EyeOff className="h-5 w-5" />
                                     ) : (
-                                        <Eye className="h-5 w-5"/>
+                                        <Eye className="h-5 w-5" />
                                     )}
                                 </button>
                             </div>
@@ -117,9 +138,10 @@ export default function SignInPage() {
                         <div className="space-y-4 pt-2">
                             <Button
                                 type="submit"
-                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                                disabled={loading}
+                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                Log In
+                                {loading ? "Logging in..." : "Log In"}
                             </Button>
                         </div>
 
@@ -134,23 +156,13 @@ export default function SignInPage() {
                         </div>
                         {/* Divider */}
                         <div className="flex items-center gap-4 py-4">
-                            <div className="h-px flex-1 bg-gray-200"/>
+                            <div className="h-px flex-1 bg-gray-200" />
                             <span className="text-sm text-gray-400">Or, login with</span>
-                            <div className="h-px flex-1 bg-gray-200"/>
+                            <div className="h-px flex-1 bg-gray-200" />
                         </div>
 
                         {/* Social Login */}
                         <div className="flex justify-center gap-6">
-                            {/* Google */}
-                            {/*<button*/}
-                            {/*    type="button"*/}
-                            {/*    onClick={() => handleGoogleLogin()}*/}
-                            {/*    className="flex items-center gap-2 border rounded-md px-4 py-2 hover:bg-gray-50 transition"*/}
-                            {/*>*/}
-                            {/*    <Image src="/logo/google-icon.svg"*/}
-                            {/*           alt="Google" width={20} height={20}/>*/}
-                            {/*    <span className="text-sm">Google</span>*/}
-                            {/*</button>*/}
                             <Button
                                 onClick={() => handleGoogleLogin()}
                                 type="button"

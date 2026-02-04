@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import Footer from "@/components/layout/footer";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { Toaster } from "react-hot-toast";
 
 export default function AppLayout({
     children,
@@ -27,6 +28,7 @@ export default function AppLayout({
                 {!isAuthPage && <Navbar />}
                 {children}
                 {!isAuthPage && <Footer />}
+                <Toaster position="top-right" />
             </WishlistProvider>
         </CartProvider>
     );

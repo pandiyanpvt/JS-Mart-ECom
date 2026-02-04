@@ -7,52 +7,52 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import {signIn} from "next-auth/react";
+import { signIn } from "next-auth/react";
+import { authService } from "@/services";
 
 export default function SignUpPage() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
-        emailOrPhone: "",
+        email: "",
+        phone: "",
         password: "",
     });
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle sign up logic here
-        console.log("Sign up with:", formData);
+        setError("");
+        setLoading(true);
 
-        // Store user session (in a real app, this would come from your backend)
-        localStorage.setItem(
-            "user",
-            JSON.stringify({
-                name: formData.name,
-                email: formData.emailOrPhone, // Simplified for demo
-            })
-        );
-
-        // Redirect to account dashboard or login
-        router.push("/account");
+        try {
+            await authService.register({
+                fullName: formData.name,
+                emailAddress: formData.email,
+                phoneNumber: formData.phone,
+                password: formData.password,
+                userRoleId: 1 // Default to USER role (assuming 1 is USER, or handle dynamically)
+            });
+            // Redirect to verify otp page with email params
+            router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
+        } catch (err: any) {
+            console.error("Registration failed", err);
+            setError(err.response?.data?.message || "Registration failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoogleLogin = async () => {
         const res = await signIn("google", {
-            redirect: false, // prevent automatic redirect
+            redirect: false,
         });
 
         if (res?.ok) {
-            // Get the session after login
-            const session = await fetch("/api/auth/session").then((r) => r.json());
-
-            // Store email (or name) in localStorage for Navbar
-            if (session?.user) {
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify({ email: session.user.email, name: session.user.name })
-                );
-                router.push("/account"); // redirect after storing
-            }
+            // Handle google session syncing if needed
+            router.push("/account");
         }
     };
 
@@ -94,6 +94,11 @@ export default function SignUpPage() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+                                {error}
+                            </div>
+                        )}
                         <div className="space-y-6">
                             <Input
                                 type="text"
@@ -104,10 +109,18 @@ export default function SignUpPage() {
                                 required
                             />
                             <Input
-                                type="text"
-                                placeholder="Email or Phone Number"
-                                value={formData.emailOrPhone}
-                                onChange={(e) => setFormData({ ...formData, emailOrPhone: e.target.value })}
+                                type="email"
+                                placeholder="Email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-[#DB4444] placeholder:text-gray-400 h-auto text-base transition-colors duration-300"
+                                required
+                            />
+                            <Input
+                                type="tel"
+                                placeholder="Phone Number"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-[#DB4444] placeholder:text-gray-400 h-auto text-base transition-colors duration-300"
                                 required
                             />
@@ -137,9 +150,10 @@ export default function SignUpPage() {
                         <div className="space-y-4 pt-2">
                             <Button
                                 type="submit"
-                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                                disabled={loading}
+                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                Create Account
+                                {loading ? "Creating Account..." : "Create Account"}
                             </Button>
 
                             <Button

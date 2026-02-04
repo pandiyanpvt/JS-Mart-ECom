@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Package, ShoppingBag, MapPin, CreditCard, TrendingUp } from "lucide-react";
+import Cookies from 'js-cookie';
 import {useSession} from "next-auth/react";
 
 export default function AccountDashboard() {
@@ -37,11 +38,22 @@ export default function AccountDashboard() {
 
     useEffect(() => {
         const updateUserName = () => {
-            const user = localStorage.getItem("user");
+            const user = Cookies.get("user");
             if (user) {
                 try {
                     const userData = JSON.parse(user);
-                    setUserName(userData.name || "User");
+                    // Construct full name if possible
+                    let fullName = "User";
+                    if (userData.firstName && userData.lastName) {
+                        fullName = `${userData.firstName} ${userData.lastName}`;
+                    } else if (userData.fullName) {
+                        fullName = userData.fullName;
+                    } else if (userData.firstName) {
+                        fullName = userData.firstName;
+                    } else if (userData.name) {
+                        fullName = userData.name;
+                    }
+                    setUserName(fullName);
                 } catch (error) {
                     console.error("Error parsing user data:", error);
                 }
@@ -52,10 +64,10 @@ export default function AccountDashboard() {
         updateUserName();
 
         // Listen for user updates
-        window.addEventListener("userUpdated", updateUserName);
+        window.addEventListener("auth-change", updateUserName);
 
         return () => {
-            window.removeEventListener("userUpdated", updateUserName);
+            window.removeEventListener("auth-change", updateUserName);
         };
     }, []);
 

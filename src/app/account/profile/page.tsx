@@ -5,6 +5,7 @@ import { User, Mail, Phone, Calendar, Camera, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Cookies from "js-cookie";
 
 export default function ProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
@@ -13,20 +14,31 @@ export default function ProfilePage() {
         email: "",
         phone: "",
         dateOfBirth: "",
-        gender: "Male",
     });
 
     useEffect(() => {
-        const user = localStorage.getItem("user");
+        const user = Cookies.get("user");
         if (user) {
             try {
                 const userData = JSON.parse(user);
+
+                // Construct full name
+                let fullName = "";
+                if (userData.firstName && userData.lastName) {
+                    fullName = `${userData.firstName} ${userData.lastName}`;
+                } else if (userData.fullName) {
+                    fullName = userData.fullName;
+                } else if (userData.firstName) {
+                    fullName = userData.firstName;
+                } else if (userData.name) {
+                    fullName = userData.name;
+                }
+
                 setFormData({
-                    fullName: userData.name || "",
-                    email: userData.email || "",
-                    phone: userData.phone || "",
+                    fullName: fullName,
+                    email: userData.email || userData.emailAddress || "",
+                    phone: userData.phone || userData.phoneNumber || "",
                     dateOfBirth: userData.dateOfBirth || "",
-                    gender: userData.gender || "Male",
                 });
             } catch (error) {
                 console.error("Error parsing user data:", error);
@@ -39,29 +51,34 @@ export default function ProfilePage() {
         // Handle profile update
         console.log("Profile updated:", formData);
 
-        // Update localStorage with new user data
-        const user = localStorage.getItem("user");
-        let userData;
+        // Update Cookies with new user data
+        const user = Cookies.get("user");
+        let userData: any = {};
         if (user) {
             try {
                 userData = JSON.parse(user);
             } catch (error) {
                 userData = {};
             }
-        } else {
-            userData = {};
         }
 
-        // Update user data
+        // Simulating splitting name back if needed or just storing as name
+        // For now, since we display fullName, let's store it conceptually or keep original fields
+        // Simplification: Update 'name' or 'firstName'
+        const names = formData.fullName.split(' ');
+        if (names.length > 0) userData.firstName = names[0];
+        if (names.length > 1) userData.lastName = names.slice(1).join(' ');
+        userData.fullName = formData.fullName;
         userData.name = formData.fullName;
+
         userData.email = formData.email;
         userData.phone = formData.phone;
         userData.dateOfBirth = formData.dateOfBirth;
-        userData.gender = formData.gender;
 
-        localStorage.setItem("user", JSON.stringify(userData));
+        Cookies.set("user", JSON.stringify(userData), { expires: 1 });
 
         // Trigger custom event to update other components
+        window.dispatchEvent(new Event("auth-change"));
         window.dispatchEvent(new Event("userUpdated"));
 
         setIsEditing(false);
@@ -190,27 +207,6 @@ export default function ProfilePage() {
                                             disabled={!isEditing}
                                         />
                                     </div>
-                                </div>
-
-                                {/* Gender */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="gender" className="text-gray-700 font-medium">
-                                        Gender
-                                    </Label>
-                                    <select
-                                        id="gender"
-                                        value={formData.gender}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, gender: e.target.value })
-                                        }
-                                        className="w-full h-12 px-3 rounded-lg border border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E] disabled:bg-gray-50"
-                                        disabled={!isEditing}
-                                    >
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                        <option>Other</option>
-                                        <option>Prefer not to say</option>
-                                    </select>
                                 </div>
                             </div>
 
