@@ -3,10 +3,38 @@
 import { useEffect, useState } from "react";
 import { Package, ShoppingBag, MapPin, CreditCard, TrendingUp } from "lucide-react";
 import Cookies from 'js-cookie';
+import {useSession} from "next-auth/react";
 
 export default function AccountDashboard() {
     // ... (keep state and effects)
+    const { data: session, status } = useSession();
+
     const [userName, setUserName] = useState("User");
+
+
+    //  When Google login completes, store user into localStorage("user")
+    useEffect(() => {
+        if (status !== "authenticated") return;
+        if (!session?.user) return;
+
+        const userToStore = {
+            name: session.user.name ?? "User",
+            email: session.user.email ?? "",
+            image: session.user.image ?? "",
+            id:
+                (session.user as typeof session.user & { id?: string }).id ??
+                "", // (optional)
+        };
+
+        console.log("Google user stored:", userToStore);
+
+        // Keep your existing "user" localStorage key (so your UI logic still works)
+        localStorage.setItem("user", JSON.stringify(userToStore));
+
+        // Trigger your existing listener
+        window.dispatchEvent(new Event("userUpdated"));
+    }, [status, session]);
+
 
     useEffect(() => {
         const updateUserName = () => {
