@@ -7,6 +7,7 @@ import Image from "next/image";
 import { ArrowLeft, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/services";
 
 function VerifyOTPContent() {
     const router = useRouter();
@@ -16,6 +17,8 @@ function VerifyOTPContent() {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [timer, setTimer] = useState(60);
     const [canResend, setCanResend] = useState(false);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     useEffect(() => {
@@ -62,22 +65,41 @@ function VerifyOTPContent() {
         inputRefs.current[lastFilledIndex]?.focus();
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const otpCode = otp.join("");
-        if (otpCode.length === 6) {
-            // Handle OTP verification logic here
-            console.log("Verify OTP:", otpCode);
-            // Navigate to reset password or success page
-            router.push("/reset-password");
+        if (otpCode.length !== 6) return;
+
+        setError("");
+        setLoading(true);
+
+        try {
+            await authService.verifyOtp({
+                emailAddress: email,
+                otp: otpCode
+            });
+            // Verification successful, redirect to login
+            router.push("/signin");
+        } catch (err: any) {
+            console.error("Verification failed", err);
+            setError(err.response?.data?.message || "Invalid OTP or expired. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleResend = () => {
+    const handleResend = async () => {
         setTimer(60);
         setCanResend(false);
         setOtp(["", "", "", "", "", ""]);
-        console.log("Resending OTP to:", email);
+        setError("");
+
+        try {
+            await authService.resendOtp(email);
+        } catch (err) {
+            console.error("Failed to resend otp", err);
+            setError("Failed to resend OTP");
+        }
     };
 
     return (
@@ -102,7 +124,7 @@ function VerifyOTPContent() {
                     className="absolute top-8 left-8 md:top-12 md:left-12 hover:bg-gray-100/80 transition-all duration-300"
                     asChild
                 >
-                    <Link href="/forgot-password">
+                    <Link href="/signup">
                         <ArrowLeft />
                         Back
                     </Link>
@@ -118,6 +140,11 @@ function VerifyOTPContent() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+                                {error}
+                            </div>
+                        )}
                         {/* OTP Input */}
                         <div className="space-y-4">
                             <div className="flex justify-center gap-3">
@@ -164,10 +191,10 @@ function VerifyOTPContent() {
                         {/* Verify Button */}
                         <Button
                             type="submit"
-                            disabled={otp.some((digit) => !digit)}
+                            disabled={otp.some((digit) => !digit) || loading}
                             className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
-                            Verify & Continue
+                            {loading ? "Verifying..." : "Verify & Continue"}
                         </Button>
 
                         {/* Help Text */}
@@ -188,7 +215,7 @@ function VerifyOTPContent() {
                         <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
                             <span>Wrong email?</span>
                             <Link
-                                href="/forgot-password"
+                                href="/signup"
                                 className="text-black font-medium border-b border-black/50 hover:border-black pb-0.5 leading-none transition-colors"
                             >
                                 Change email address
