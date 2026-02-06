@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { authService } from "@/services";
 import toast from "react-hot-toast";
+import Cookies from "js-cookie";
 
 export default function SignInPage() {
     const router = useRouter();
+    const { data: session, status } = useSession();
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         emailOrPhone: "",
@@ -20,6 +22,29 @@ export default function SignInPage() {
     });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (status === "authenticated" && session?.user) {
+            console.log("Session authenticated:", session);
+
+            // Store user data in cookies
+            const userData = {
+                firstName: session.user.name?.split(" ")[0] || "",
+                lastName: session.user.name?.split(" ")[1] || "",
+                fullName: session.user.name || "",
+                email: session.user.email,
+                image: session.user.image,
+            };
+
+            Cookies.set("user", JSON.stringify(userData), { expires: 7 });
+
+            // Dispatch event to update navbar
+            window.dispatchEvent(new Event("auth-change"));
+
+            toast.success("Login successful!");
+            router.push("/account");
+        }
+    }, [session, status, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,9 +56,8 @@ export default function SignInPage() {
                 emailAddress: formData.emailOrPhone,
                 password: formData.password
             });
-            // Login successful, redirect to account
+
             toast.success("Login success");
-            // Dispatch event to update navbar
             window.dispatchEvent(new Event("auth-change"));
             router.push("/");
         } catch (err: any) {
@@ -44,8 +68,17 @@ export default function SignInPage() {
         }
     };
 
-    const handleGoogleLogin = () => {
-        signIn("google", { callbackUrl: "/account" });
+    const handleGoogleLogin = async () => {
+        try {
+            console.log("🔵 Starting Google sign in...");
+            await signIn("google", {
+                callbackUrl: "/signin",
+                redirect: true
+            });
+        } catch (error) {
+            console.error("Google sign in error:", error);
+            toast.error("Failed to sign in with Google");
+        }
     };
 
     return (

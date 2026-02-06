@@ -15,6 +15,8 @@ import ShippingAddressList from "./(checkout)/_components/list-shipping-address"
 
 type ShippingMethodType = "standard" | "express";
 
+type PaymentMethodType = "cod" | "bank";
+
 export default function CheckoutPage() {
   const router = useRouter();
 
@@ -26,9 +28,13 @@ export default function CheckoutPage() {
     province: "",
     district: "",
     postal_code: "",
+    phone: "",
+
   });
   const [selectedShippingMethod, setSelectedShippingMethod] =
       useState<ShippingMethodType>("standard");
+  const [paymentMethod, setPaymentMethod] =
+      useState<PaymentMethodType>("cod");
 
   const [shippingPrice, setShippingPrice] = useState({
     standard: 5,
@@ -41,19 +47,48 @@ export default function CheckoutPage() {
     if (storedCartItems) setCartItems(JSON.parse(storedCartItems));
   }, []);
 
-  const handleClickContinue = () => {
+  const handleClickContinue = async () => {
+    console.log(address)
+
     if (
-        address.name &&
-        address.street_address &&
-        address.province &&
-        address.district &&
-        address.postal_code
-    ) {
+        address.name.trim() &&
+        address.street_address.trim() &&
+        address.province.trim() &&
+        address.district.trim() &&
+        address.postal_code.trim() &&
+        address.phone.trim()
+    )
+
+    {
+      const subtotal = cartItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+      );
+
+      const shippingCost = shippingPrice[selectedShippingMethod];
+      const total = subtotal + shippingCost;
+
+      await fetch("/api/orders/route.ts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          cartItems,
+          shippingMethod: selectedShippingMethod,
+          shippingPrice: shippingCost,
+          subtotal,
+          total,
+        }),
+      });
+
       setStep(2);
     } else {
       alert("Please fill in all address fields.");
     }
   };
+
 
   const handleConfirmOrder = () => {
     // Simulate checkout
@@ -61,7 +96,7 @@ export default function CheckoutPage() {
     // Clear cart
     localStorage.removeItem("cartItems");
     alert("Order placed successfully!");
-    router.push("/orders");
+    router.push("/");
   };
 
   return (
@@ -95,6 +130,27 @@ export default function CheckoutPage() {
               <OrderSummary
                   shippingPrice={shippingPrice[selectedShippingMethod]}
               />
+            </div>
+
+            {/* PAYMENT */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2">
+                <input
+                    type="radio"
+                    checked={paymentMethod === "bank"}
+                    onChange={() => setPaymentMethod("bank")}
+                />
+                Bank
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                    type="radio"
+                    checked={paymentMethod === "cod"}
+                    onChange={() => setPaymentMethod("cod")}
+                />
+                Cash on delivery
+              </label>
             </div>
           </div>
 
