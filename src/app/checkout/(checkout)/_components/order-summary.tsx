@@ -64,6 +64,8 @@ const OrderSummary = ({
 
   const total = subTotal + shippingPrice;
 
+
+
   return (
       <div className="lg:mt-0">
         <div className="rounded-md border border-gray-200 bg-white shadow-xs">
