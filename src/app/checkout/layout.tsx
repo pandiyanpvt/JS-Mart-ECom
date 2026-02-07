@@ -47,6 +47,7 @@ export default function CheckoutPage() {
     if (storedCartItems) setCartItems(JSON.parse(storedCartItems));
   }, []);
 
+
   const handleClickContinue = async () => {
     console.log(address)
 
@@ -90,13 +91,42 @@ export default function CheckoutPage() {
   };
 
 
+  //  FINAL CONFIRM
   const handleConfirmOrder = () => {
-    // Simulate checkout
-    console.log("Order confirmed:", { cartItems, address, selectedShippingMethod });
-    // Clear cart
+    const subtotal = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+    );
+
+    const shippingCost = shippingPrice[selectedShippingMethod];
+    const total = subtotal + shippingCost;
+
+    const newOrder = {
+      id: crypto.randomUUID(),
+      cartItems,
+      address,
+      shippingMethod: selectedShippingMethod,
+      paymentMethod,
+      shippingPrice: shippingCost,
+      subtotal,
+      total,
+      status: "Pending",
+      createdAt: new Date().toISOString(),
+    };
+
+    const existingOrders = JSON.parse(
+        localStorage.getItem("orders") || "[]"
+    );
+
+    const updatedOrders = [newOrder, ...existingOrders];
+
+    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+
     localStorage.removeItem("cartItems");
+
     alert("Order placed successfully!");
-    router.push("/");
+
+    router.push("/orders");
   };
 
   return (
