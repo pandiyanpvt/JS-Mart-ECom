@@ -93,7 +93,7 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans bg-white">
             {/* Main Bar */}
-            <div className="py-5 px-4 md:px-8 flex items-center justify-between gap-8">
+            <div className="py-5 px-4 md:px-8 flex items-center fixed bg-white w-full z-50 justify-between gap-8">
                 {/* Logo */}
                 <Link href="/" className="flex-shrink-0">
                     <div className="relative h-12 w-40 md:h-16 md:w-56">
@@ -204,7 +204,7 @@ export function Navbar() {
             </div>
 
             {/* Bottom Bar - Navigation */}
-            <div className="border-y border-gray-100 py-3 px-4 md:px-8 flex items-center justify-between">
+            <div className="border-y border-gray-100 py-3 px-4 md:px-8 flex items-center pt-32 justify-between">
                 <div className="flex items-center gap-8">
                     {/* Categories Trigger */}
                     <DropdownMenu>

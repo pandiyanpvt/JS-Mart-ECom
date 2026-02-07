@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Star, Heart, Eye, ShoppingCart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext"; // ✅ Import cart context
 import { Product } from "@/lib/data";
 
 type LocalProduct = {
@@ -21,106 +22,43 @@ type LocalProduct = {
 };
 
 const products: LocalProduct[] = [
-    {
-        id: 101,
-        name: "Fresh Red Apple",
-        image: "/images/products/apple.png",
-        price: 250.00,
-        originalPrice: 350.00,
-        rating: 5,
-        discount: 29,
-        unit: "1kg",
-        reviewCount: 85
-    },
-    {
-        id: 102,
-        name: "Organic Cabbage",
-        image: "/images/products/cabbage.png",
-        price: 80.00,
-        originalPrice: 100.00,
-        rating: 4,
-        discount: 20,
-        unit: "1pc",
-        reviewCount: 62
-    },
-    {
-        id: 103,
-        name: "Fresh Tomato",
-        image: "/images/products/tomato.png",
-        price: 150.00,
-        rating: 5,
-        isNew: true,
-        unit: "1kg",
-        reviewCount: 94
-    },
-    {
-        id: 104,
-        name: "Sweet Litchi",
-        image: "/images/products/litchi.png",
-        price: 450.00,
-        originalPrice: 500.00,
-        rating: 4,
-        discount: 10,
-        unit: "500g",
-        reviewCount: 47
-    },
-    {
-        id: 105,
-        name: "Premium Almonds",
-        image: "/images/products/almond.png",
-        price: 1200.00,
-        rating: 5,
-        unit: "250g",
-        reviewCount: 128
-    },
-    {
-        id: 106,
-        name: "Fresh Broccoli",
-        image: "/images/category-section/vegetables.png",
-        price: 300.00,
-        rating: 4,
-        unit: "1pc",
-        reviewCount: 56
-    },
+    { id: 101, name: "Fresh Red Apple", image: "/images/products/apple.png", price: 250.0, originalPrice: 350.0, rating: 5, discount: 29, unit: "1kg", reviewCount: 85 },
+    { id: 102, name: "Organic Cabbage", image: "/images/products/cabbage.png", price: 80.0, originalPrice: 100.0, rating: 4, discount: 20, unit: "1pc", reviewCount: 62 },
+    { id: 103, name: "Fresh Tomato", image: "/images/products/tomato.png", price: 150.0, rating: 5, isNew: true, unit: "1kg", reviewCount: 94 },
+    { id: 104, name: "Sweet Litchi", image: "/images/products/litchi.png", price: 450.0, originalPrice: 500.0, rating: 4, discount: 10, unit: "500g", reviewCount: 47 },
+    { id: 105, name: "Premium Almonds", image: "/images/products/almond.png", price: 1200.0, rating: 5, unit: "250g", reviewCount: 128 },
+    { id: 106, name: "Fresh Broccoli", image: "/images/category-section/vegetables.png", price: 300.0, rating: 4, unit: "1pc", reviewCount: 56 },
 ];
 
 export default function BestOfFruitVeg() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+    const { addToCart } = useCart(); // ✅ Get addToCart from CartContext
 
     const scroll = (direction: "left" | "right") => {
         if (scrollContainerRef.current) {
             const scrollAmount = 300;
-            const newScrollLeft =
-                scrollContainerRef.current.scrollLeft +
-                (direction === "left" ? -scrollAmount : scrollAmount);
-
-            scrollContainerRef.current.scrollTo({
-                left: newScrollLeft,
-                behavior: "smooth",
-            });
+            const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === "left" ? -scrollAmount : scrollAmount);
+            scrollContainerRef.current.scrollTo({ left: newScrollLeft, behavior: "smooth" });
         }
     };
 
-    const renderStars = (rating: number) => {
-        return (
-            <div className="flex gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                    <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < rating ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-200"
-                            }`}
-                    />
-                ))}
-            </div>
-        );
-    };
+    const renderStars = (rating: number) => (
+        <div className="flex gap-0.5">
+            {[...Array(5)].map((_, i) => (
+                <Star
+                    key={i}
+                    className={`w-4 h-4 ${i < rating ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-200"}`}
+                />
+            ))}
+        </div>
+    );
 
     const handleWishlistToggle = (product: LocalProduct) => {
         const wishlistProduct: Product = {
             id: String(product.id),
             name: product.name,
-            category: "fruits", // Default category, adjust as needed
+            category: "fruits", // Adjust category if needed
             price: product.price,
             originalPrice: product.originalPrice,
             image: product.image,
@@ -135,6 +73,19 @@ export default function BestOfFruitVeg() {
         } else {
             addToWishlist(wishlistProduct);
         }
+    };
+
+    const handleAddToCart = (product: LocalProduct) => {
+        const cartProduct: Product = {
+            id: String(product.id),
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            weight: product.unit,
+            tag: "fruits",
+            quantity: 1,
+        };
+        addToCart(cartProduct);
     };
 
     return (
@@ -163,18 +114,10 @@ export default function BestOfFruitVeg() {
             </div>
 
             {/* Scrollable Products */}
-            <div
-                ref={scrollContainerRef}
-                className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
+            <div ref={scrollContainerRef} className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                 {products.map((product) => (
-                    <div
-                        key={product.id}
-                        className="flex-shrink-0 group min-w-[270px]"
-                    >
+                    <div key={product.id} className="flex-shrink-0 group min-w-[270px]">
                         <div className="bg-white rounded-lg border border-gray-200 transition-all duration-300 hover:shadow-xl relative overflow-hidden">
-                            {/* Top Section with Image and Icons */}
                             <div className="relative bg-gray-50 p-4">
                                 {/* Discount Badge */}
                                 {product.discount && (
@@ -200,18 +143,15 @@ export default function BestOfFruitVeg() {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            handleWishlistToggle(product as any);
+                                            handleWishlistToggle(product);
                                         }}
                                         className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${isInWishlist(String(product.id))
                                             ? "bg-[#3BB77E] text-white"
                                             : "bg-white hover:bg-[#3BB77E] hover:text-white"
-                                            }`}
+                                        }`}
                                         title={isInWishlist(String(product.id)) ? "Remove from wishlist" : "Add to wishlist"}
                                     >
-                                        <Heart className={`w-4 h-4 ${isInWishlist(String(product.id))
-                                            ? "fill-white text-white"
-                                            : "text-gray-700 group-hover/icon:text-white"
-                                            }`} />
+                                        <Heart className={`w-4 h-4 ${isInWishlist(String(product.id)) ? "fill-white text-white" : "text-gray-700 group-hover/icon:text-white"}`} />
                                     </button>
                                     <Link href={`/shop/${product.id}`}>
                                         <button className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#3BB77E] hover:text-white transition-all group/icon">
@@ -231,7 +171,10 @@ export default function BestOfFruitVeg() {
                                 </div>
 
                                 {/* Add to Cart Button */}
-                                <button className="w-full bg-[#0F1111] text-white py-3 rounded font-medium hover:bg-[#232F3E] transition-all flex items-center justify-center gap-2 mt-4 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300">
+                                <button
+                                    onClick={() => handleAddToCart(product)}
+                                    className="w-full bg-[#0F1111] text-white py-3 rounded font-medium hover:bg-[#232F3E] transition-all flex items-center justify-center gap-2 mt-4 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300"
+                                >
                                     <ShoppingCart className="w-4 h-4" />
                                     Add To Cart
                                 </button>
@@ -247,13 +190,9 @@ export default function BestOfFruitVeg() {
 
                                 {/* Price */}
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[#FF4858] font-bold text-xl">
-                                        ${product.price.toFixed(0)}
-                                    </span>
+                                    <span className="text-[#FF4858] font-bold text-xl">${product.price.toFixed(0)}</span>
                                     {product.originalPrice && (
-                                        <span className="text-gray-400 text-sm line-through font-medium">
-                                            ${product.originalPrice.toFixed(0)}
-                                        </span>
+                                        <span className="text-gray-400 text-sm line-through font-medium">${product.originalPrice.toFixed(0)}</span>
                                     )}
                                 </div>
 
@@ -268,12 +207,11 @@ export default function BestOfFruitVeg() {
                 ))}
             </div>
 
-            {/* Custom CSS to hide scrollbar */}
             <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
         </section>
     );
 }
