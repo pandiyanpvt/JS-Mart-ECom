@@ -31,6 +31,7 @@ export default function CheckoutPage() {
     phone: "",
 
   });
+  console.log(address)
   const [selectedShippingMethod, setSelectedShippingMethod] =
       useState<ShippingMethodType>("standard");
   const [paymentMethod, setPaymentMethod] =
@@ -101,22 +102,33 @@ export default function CheckoutPage() {
     const shippingCost = shippingPrice[selectedShippingMethod];
     const total = subtotal + shippingCost;
 
-    const newOrder = {
+    // Map cartItems to OrderItem type
+    const items = cartItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+      category: item.category || undefined,
+    }));
+
+    const newOrder: Order = {
       id: crypto.randomUUID(),
-      cartItems,
-      address,
+      items, // important: matches OrderViewPage type
+      address: {
+        name: address.name,
+        street: address.street_address,
+        city: address.province,
+        zip: address.postal_code,
+      },
       shippingMethod: selectedShippingMethod,
       paymentMethod,
-      shippingPrice: shippingCost,
-      subtotal,
-      total,
       status: "Pending",
       createdAt: new Date().toISOString(),
+      total,
+      trackingNumber: undefined, // optional
     };
 
-    const existingOrders = JSON.parse(
-        localStorage.getItem("orders") || "[]"
-    );
+    const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
 
     const updatedOrders = [newOrder, ...existingOrders];
 
@@ -128,6 +140,7 @@ export default function CheckoutPage() {
 
     router.push("/orders");
   };
+
 
   return (
       <div className="bg-white min-h-screen">
