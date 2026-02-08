@@ -1,15 +1,31 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import Link from "next/link";
 import { products } from "@/lib/data";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Tag, Percent } from "lucide-react";
 import Image from "next/image";
+import {offerService} from "@/services/offer.service";
 
 export default function OffersPage() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+   const [offers, setOffers] = useState([]);
+
+    useEffect(() => {
+      const fetchOffers = async () => {
+        try {
+          const data = await offerService.getAllOffers();
+          setOffers(data);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchOffers();
+    }, []);
+
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Filter products that have a discount (originalPrice > price) or an "OFF"/ "Sale" badge
   const offerProducts = useMemo(() => {
