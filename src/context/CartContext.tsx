@@ -1,6 +1,6 @@
 "use client";
 
-import {createContext, useContext, useState, ReactNode, useEffect} from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 export type Product = {
     id: string;
@@ -33,16 +33,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<Product[]>([]);
 
 
+    const [isInitialized, setIsInitialized] = useState(false);
+
     useEffect(() => {
         const stored = localStorage.getItem("cartItems");
         if (stored) {
-            setCart(JSON.parse(stored));
+            try {
+                setCart(JSON.parse(stored));
+            } catch (e) {
+                console.error("Failed to parse cart items", e);
+            }
         }
+        setIsInitialized(true);
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("cartItems", JSON.stringify(cart));
-    }, [cart]);
+        if (isInitialized) {
+            localStorage.setItem("cartItems", JSON.stringify(cart));
+        }
+    }, [cart, isInitialized]);
 
     const addToCart = (product: Product, quantity = 1) => {
         setCart(prev => {

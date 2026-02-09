@@ -38,32 +38,32 @@ export default function ContactPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8">
-                <div className="relative overflow-hidden min-h-[250px] md:min-h-[350px] flex items-center justify-center shadow-lg rounded-[2rem]">
-                    {/* Background Image */}
-                    <div className="absolute inset-0 z-0">
-                        <Image
-                            src="/images/headers/contact-header.png"
-                            alt="Contact Us"
-                            fill
-                            className="object-cover"
-                            priority
-                        />
+            <section className="w-full pt-[100px]">
+                <div className="w-full">
+                    <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-center">
+                        {/* Background Image */}
+                        <div className="absolute inset-0 z-0">
+                            <Image
+                                src="/images/headers/contact-header.png"
+                                alt="Contact Us"
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                        </div>
 
-                    </div>
+                        {/* Dark overlay for text readability */}
+                        <div className="absolute inset-0 bg-black/30"></div>
 
-                    {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl z-[1]" />
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl z-[1]" />
-
-                    {/* Content */}
-                    <div className="relative z-10 text-center px-4 max-w-3xl">
-                        <h1 className="text-4xl md:text-7xl font-black text-white mb-6 drop-shadow-lg">
-                            Get in <span className="text-[#253D4E]">Touch</span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-                            Have a question or need assistance? We're here to help! Reach out to our friendly customer support team.
-                        </p>
+                        {/* Content */}
+                        <div className="relative z-10 text-center px-4 max-w-3xl">
+                            <h1 className="text-4xl md:text-7xl font-black text-white mb-6 drop-shadow-lg">
+                                Get in <span className="text-[#3BB77E]">Touch</span>
+                            </h1>
+                            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                                Have a question or need assistance? We're here to help! Reach out to our friendly customer support team.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>

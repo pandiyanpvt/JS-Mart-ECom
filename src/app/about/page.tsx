@@ -40,39 +40,43 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8">
-        <div className="relative overflow-hidden min-h-[250px] md:min-h-[350px] flex items-center justify-center shadow-lg rounded-[2rem]">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/images/headers/about-header.png"
-              alt="Fresh Produce Background"
-              fill
-              className="object-cover"
-              priority
-            />
+      <section className="w-full pt-[100px]">
+        <div className="w-full">
+          <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-center">
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/images/headers/about-header.png"
+                alt="Fresh Produce Background"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
 
-          </div>
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-black/30"></div>
 
-          <div className="relative z-10 text-center text-white px-4 max-w-4xl">
-            <h1 className="text-4xl md:text-7xl font-black tracking-tight mb-6 drop-shadow-lg text-white">
-              Freshness Delivered <br />
-              <span className="text-[#3BB77E] font-black">To Your Doorstep</span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md">
-              We&apos;re on a mission to provide the freshest groceries and a seamless shopping
-              experience for every household.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/shop" className="no-underline">
-                <Button className="h-12 px-8 bg-[#3BB77E] hover:bg-[#299E63] text-white font-semibold text-lg transition-all shadow-lg rounded-full">
-                  Start Shopping <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/contact" className="no-underline">
-                <Button className="h-12 px-8 bg-white hover:bg-gray-100 text-[#253D4E] font-semibold text-lg transition-all shadow-lg rounded-full border border-gray-200">
-                  Contact Us
-                </Button>
-              </Link>
+            <div className="relative z-10 text-center text-white px-4 max-w-4xl">
+              <h1 className="text-4xl md:text-7xl font-black tracking-tight mb-6 drop-shadow-lg text-white">
+                Freshness Delivered <br />
+                <span className="text-[#3BB77E] font-black">To Your Doorstep</span>
+              </h1>
+              <p className="text-lg md:text-xl text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md">
+                We&apos;re on a mission to provide the freshest groceries and a seamless shopping
+                experience for every household.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/shop" className="no-underline">
+                  <Button className="h-12 px-8 bg-[#3BB77E] hover:bg-[#299E63] text-white font-semibold text-lg transition-all shadow-lg rounded-full">
+                    Start Shopping <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href="/contact" className="no-underline">
+                  <Button className="h-12 px-8 bg-white hover:bg-gray-100 text-[#253D4E] font-semibold text-lg transition-all shadow-lg rounded-full border border-gray-200">
+                    Contact Us
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

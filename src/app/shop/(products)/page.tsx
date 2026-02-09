@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { products, categories } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { ChevronDown, Filter, Grid, List, SlidersHorizontal, ShoppingCart, Package } from "lucide-react";
+import { ChevronDown, Filter, Grid, List, SlidersHorizontal, ShoppingCart, Package, Loader2 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { Input } from "@/components/ui/input";
+import { productService, categoryService } from "@/services";
+import type { Product } from "@/services/product.service";
+import type { Category } from "@/services/category.service";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -15,12 +17,43 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category");
 
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "all");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || "all");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Fetch products and categories from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [productsData, categoriesData] = await Promise.all([
+          productService.getAll(),
+          categoryService.getActive()
+        ]);
+
+        setProducts(productsData);
+        setCategories(categoriesData);
+
+        // Set max price based on actual products
+        if (productsData.length > 0) {
+          const maxProductPrice = Math.max(...productsData.map(p => Number(p.price)));
+          setPriceRange([0, maxProductPrice]);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Update selected category when URL param changes
   useEffect(() => {
@@ -37,20 +70,24 @@ function ShopContent() {
   const filteredProducts = useMemo(() => {
     let filtered = selectedCategory === "all"
       ? products
-      : products.filter((p) => p.category === selectedCategory);
+      : products.filter((p) => {
+        // Support both category ID and category name
+        return p.productCategoryId === Number(selectedCategory) ||
+          p.product_category?.category === selectedCategory;
+      });
 
     // Apply price filter
     filtered = filtered.filter(
-      (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
+      (p) => Number(p.price) >= priceRange[0] && Number(p.price) <= priceRange[1]
     );
 
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
         case "low":
-          return a.price - b.price;
+          return Number(a.price) - Number(b.price);
         case "high":
-          return b.price - a.price;
+          return Number(b.price) - Number(a.price);
         case "newest":
         default:
           return 0; // Keep original order for newest
@@ -58,7 +95,7 @@ function ShopContent() {
     });
 
     return sorted;
-  }, [selectedCategory, sortBy, priceRange]);
+  }, [products, selectedCategory, sortBy, priceRange]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
@@ -68,37 +105,90 @@ function ShopContent() {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
-  const maxPrice = Math.max(...products.map(p => p.price));
+  // Category banner mapping
+  const categoryBanners: { [key: string]: { image: string; title: string; description: string } } = {
+    all: {
+      image: "/images/headers/shop-header.png",
+      title: "Our Products",
+      description: "Discover fresh, quality products delivered to your doorstep"
+    },
+    "1": { // Vegetables
+      image: "/slider-1.png",
+      title: "Fresh Vegetables",
+      description: "Farm-fresh vegetables delivered daily to your door"
+    },
+    // Add other specific banners here if available
+  };
+
+  // Get current banner based on selected category
+  const selectedCategoryObj = categories.find(c => String(c.id) === selectedCategory);
+
+  let currentBanner = categoryBanners.all;
+
+  if (selectedCategory !== "all") {
+    if (categoryBanners[selectedCategory]) {
+      currentBanner = categoryBanners[selectedCategory];
+    } else if (selectedCategoryObj) {
+      currentBanner = {
+        image: "/images/headers/shop-header.png", // Fallback to generic image, can be specific if backend provides one
+        title: selectedCategoryObj.category,
+        description: `Explore our premium collection of ${selectedCategoryObj.category.toLowerCase()}`
+      };
+    }
+  }
+
+  const maxPrice = products.length > 0 ? Math.max(...products.map(p => Number(p.price))) : 10000;
+
+  // Adapter function to convert backend Product to frontend Product
+  const adaptProduct = (backendProduct: Product) => {
+    const primaryImage = backendProduct.product_images?.find(img => img.isPrimary)?.imageUrl ||
+      backendProduct.product_images?.[0]?.imageUrl ||
+      '/images/products/placeholder.png';
+
+    return {
+      id: String(backendProduct.id),
+      name: backendProduct.productName,
+      category: backendProduct.product_category?.category || 'Uncategorized',
+      price: Number(backendProduct.price),
+      originalPrice: undefined, // Can be added if you have discount logic
+      image: primaryImage,
+      rating: 4, // Default rating, update if you have ratings in backend
+      reviews: 45, // Default reviews, update if you have reviews in backend
+      description: backendProduct.description || '',
+      stock: backendProduct.quantity,
+      weight: backendProduct.weight ? `${backendProduct.weight}g` : '1kg', // Convert to string format
+    };
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner Section */}
-      <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8">
-        <div className="relative overflow-hidden min-h-[250px] md:min-h-[350px] flex items-center justify-center shadow-lg rounded-[2rem]">
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/images/headers/shop-header.png"
-              alt="Fresh Groceries"
-              fill
-              className="object-cover"
-              priority
-            />
+      <section className="w-full pt-[100px]">
+        <div className="w-full">
+          <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-center">
+            {/* Background Image - Dynamic based on category */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src={currentBanner.image}
+                alt={currentBanner.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
 
-          </div>
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-black/30"></div>
 
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl z-[1]" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl z-[1]" />
-
-          {/* Content */}
-          <div className="relative z-10 text-center px-4 max-w-3xl">
-            <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
-              Our Products
-            </h1>
-            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-              Discover fresh, quality products delivered to your doorstep
-            </p>
+            {/* Content - Dynamic based on category */}
+            <div className="relative z-10 text-center px-4 max-w-3xl">
+              <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
+                {currentBanner.title}
+              </h1>
+              <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                {currentBanner.description}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -154,21 +244,38 @@ function ShopContent() {
               {/* Categories */}
               <div>
                 <h3 className="font-extrabold text-[#253D4E] text-lg mb-4">Categories</h3>
-                <ul className="space-y-2">
-                  {categories.map(cat => (
-                    <li key={cat.id}>
+                {loading ? (
+                  <div className="flex justify-center py-4">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#3BB77E]" />
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    <li>
                       <button
-                        onClick={() => setSelectedCategory(cat.id)}
-                        className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedCategory === cat.id
+                        onClick={() => setSelectedCategory("all")}
+                        className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedCategory === "all"
                           ? "bg-[#3BB77E] text-white"
                           : "text-[#253D4E] hover:bg-gray-50"
                           }`}
                       >
-                        {cat.name}
+                        All Products
                       </button>
                     </li>
-                  ))}
-                </ul>
+                    {categories.map(cat => (
+                      <li key={cat.id}>
+                        <button
+                          onClick={() => setSelectedCategory(String(cat.id))}
+                          className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedCategory === String(cat.id)
+                            ? "bg-[#3BB77E] text-white"
+                            : "text-[#253D4E] hover:bg-gray-50"
+                            }`}
+                        >
+                          {cat.category}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {/* Price Filter */}
@@ -223,15 +330,22 @@ function ShopContent() {
 
           {/* PRODUCTS */}
           <main className="lg:col-span-9">
-            {/* Product Grid */}
-            {paginatedProducts.length > 0 ? (
+            {/* Loading State */}
+            {loading ? (
+              <div className="flex justify-center items-center min-h-[400px]">
+                <div className="text-center">
+                  <Loader2 className="w-12 h-12 animate-spin text-[#3BB77E] mx-auto mb-4" />
+                  <p className="text-gray-600 font-semibold">Loading products...</p>
+                </div>
+              </div>
+            ) : paginatedProducts.length > 0 ? (
               <>
                 <div className={`grid gap-6 ${viewMode === "grid"
                   ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                   : "grid-cols-1"
                   }`}>
                   {paginatedProducts.map(product => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard key={product.id} product={adaptProduct(product)} />
                   ))}
                 </div>
 

@@ -83,15 +83,14 @@ export default function FeaturedCategories() {
                         className="flex-shrink-0 group"
                     >
                         <div
-                            className="w-[140px] h-[160px] rounded-2xl flex flex-col items-center justify-center p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                            style={{ backgroundColor: category.bgColor }}
+                            className="w-[140px] h-[160px] rounded-2xl flex flex-col items-center justify-center p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-[#F2F3F4]"
                         >
                             <div className="relative w-20 h-20 mb-3 transform group-hover:scale-110 transition-transform duration-300">
                                 <Image
                                     src={category.image}
                                     alt={category.name}
                                     fill
-                                    className="object-contain drop-shadow-md mix-blend-multiply"
+                                    className="object-contain drop-shadow-md"
                                 />
                             </div>
                             <h3 className="text-[#253D4E] font-semibold text-sm text-center mb-1 leading-tight">
