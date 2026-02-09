@@ -9,12 +9,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Percent, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Leaf, Smartphone, Shirt, Home, Baby, Sparkles, Grid3x3 } from "lucide-react";
+import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// import {
-//     Bars3Icon,
-// } from "@heroicons/react/16/solid";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -27,11 +24,49 @@ export function Navbar() {
     const router = useRouter();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
-    const { cart } = useCart(); // get current cart items
-    const { wishlist } = useWishlist(); // get current wishlist items
+    const { cart } = useCart();
+    const { wishlist } = useWishlist();
     const [isOpen, setIsOpen] = useState(false);
+    const [categories, setCategories] = useState<Array<{ id: number; name: string; href: string }>>([]);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Check login status on component mount and when pathname changes
+    // Fetch categories from backend
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const { categoryService } = await import('@/services');
+                const categoriesData = await categoryService.getActive();
+
+                // Transform backend categories to navbar format and deduplicate by name
+                const seenNames = new Set<string>();
+                const transformedCategories = categoriesData
+                    .map(cat => ({
+                        id: cat.id,
+                        name: cat.category,
+                        href: `/shop?category=${cat.id}`
+                    }))
+                    .filter(cat => {
+                        const key = cat.name.trim().toLowerCase();
+                        if (seenNames.has(key)) return false;
+                        seenNames.add(key);
+                        return true;
+                    });
+
+                setCategories(transformedCategories);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                // Fallback to default categories if fetch fails
+                setCategories([
+                    { id: 0, name: "All", href: "/shop" },
+                    { id: 1, name: "Fresh", href: "/shop?category=fresh" },
+                    { id: 2, name: "Bestsellers", href: "/shop?category=bestsellers" },
+                ]);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
     useEffect(() => {
         const checkLoginStatus = () => {
             const user = Cookies.get("user");
@@ -40,7 +75,6 @@ export function Navbar() {
                     const userData = JSON.parse(user);
                     setIsLoggedIn(true);
 
-                    // Construct full name if possible
                     let fullName = "User";
                     if (userData.firstName && userData.lastName) {
                         fullName = `${userData.firstName} ${userData.lastName}`;
@@ -63,7 +97,6 @@ export function Navbar() {
 
         checkLoginStatus();
 
-        // Custom event listener for auth changes
         const handleAuthChange = () => checkLoginStatus();
         window.addEventListener("auth-change", handleAuthChange);
 
@@ -89,241 +122,304 @@ export function Navbar() {
         { name: "Contact Us", href: "/contact" },
     ];
 
-
     return (
         <div className="w-full flex flex-col font-sans bg-white">
-            {/* Main Bar */}
-            <div className="py-5 px-4 md:px-8 flex items-center fixed bg-white w-full z-50 justify-between gap-8">
-                {/* Logo */}
-                <Link href="/" className="flex-shrink-0">
-                    <div className="relative h-12 w-40 md:h-16 md:w-56">
-                        <Image
-                            src="/logo.png"
-                            alt="JS Mart Logo"
-                            fill
-                            className="object-contain"
-                            priority
-                        />
+            {/* Main Navbar */}
+            <div className="py-3 px-4 md:px-8 fixed top-0 bg-white w-full z-50 border-b border-gray-200 shadow-sm">
+                <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+                    {/* Hamburger Menu + Logo */}
+                    <div className="flex items-center gap-3">
+                        {/* Hamburger Menu Button */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            aria-label="Toggle menu"
+                        >
+                            <svg
+                                className="w-6 h-6 text-gray-700"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                {isMobileMenuOpen ? (
+                                    <path d="M6 18L18 6M6 6l12 12" />
+                                ) : (
+                                    <path d="M4 6h16M4 12h16M4 18h16" />
+                                )}
+                            </svg>
+                        </button>
+
+                        {/* Logo with Location */}
+                        <Link href="/" className="flex items-center gap-3 flex-shrink-0">
+                            <div className="relative h-10 w-24 md:h-12 md:w-32">
+                                <Image
+                                    src="/logo.png"
+                                    alt="JS Mart Logo"
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                />
+                            </div>
+                            <div className="hidden md:flex items-center gap-1.5 text-xs">
+                                <MapPin className="h-3.5 w-3.5 text-gray-600" />
+                                <span className="text-gray-600">Hello - <span className="font-semibold text-gray-900">AUSTRALIA</span></span>
+                            </div>
+                        </Link>
                     </div>
-                </Link>
 
-                {/* Search Bar */}
-                <div className="flex-1 max-w-3xl hidden md:flex items-center border-2 border-gray-100 rounded-lg overflow-hidden focus-within:border-[#3BB77E] transition-colors">
+                    {/* Search Bar */}
+                    <div className="flex-1 max-w-3xl hidden md:flex items-center">
+                        <div className="flex w-full items-center border-2 border-gray-300 rounded-md overflow-hidden focus-within:border-[#3BB77E] transition-all">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border-r border-gray-300 text-sm font-medium text-gray-700 flex items-center gap-1.5 outline-none transition-colors whitespace-nowrap">
+                                        All
+                                        <ChevronDown className="h-3.5 w-3.5" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-48 max-h-[400px] overflow-y-auto">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/shop" className="cursor-pointer">All Categories</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    {categories.map((category) => (
+                                        <DropdownMenuItem key={category.id} asChild>
+                                            <Link href={category.href} className="cursor-pointer">
+                                                {category.name}
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
 
-                    <div className="flex-1 relative">
-                        <Input
-                            className="w-full h-11 border-0 focus-visible:ring-0 text-gray-900 placeholder:text-gray-400 px-4 text-sm"
-                            placeholder="Search for products..."
-                        />
+                            <Input
+                                className="flex-1 h-9 border-0 focus-visible:ring-0 text-gray-900 placeholder:text-gray-500 px-3 text-sm bg-white"
+                                placeholder="Search Here"
+                            />
+
+                            <Button className="h-9 rounded-none bg-[#3BB77E] hover:bg-[#2a9d5f] text-white px-5 font-semibold text-sm transition-all">
+                                <Search className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
-                    <Button className="h-11 rounded-none bg-[#3BB77E] hover:bg-[#299E63] text-white px-8 font-bold text-sm transition-all">
-                        Search
-                    </Button>
-                </div>
 
-                {/* Right Actions */}
-                <div className="flex items-center gap-6">
-                    {/* Wishlist */}
-                    <Link href="/wishlist" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors group">
-                        <Heart className={`h-6 w-6 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
-                        {wishlist.length > 0 && (
-                            <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                                {wishlist.length}
-                            </span>
+                    {/* Right Actions */}
+                    <div className="flex items-center gap-3">
+                        {/* Sign In / User Account */}
+                        {isLoggedIn ? (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="hidden md:flex items-center gap-1.5 hover:text-[#3BB77E] transition-colors p-1.5 rounded outline-none">
+                                        <User className="h-5 w-5 text-gray-700" />
+                                        <ChevronDown className="h-3.5 w-3.5 text-gray-600" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48">
+                                    <DropdownMenuLabel className="font-normal truncate">{userName}</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/account/profile" className="cursor-pointer flex items-center gap-2">
+                                            <User className="h-4 w-4" />
+                                            My Account
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/account/orders" className="cursor-pointer flex items-center gap-2">
+                                            <Package className="h-4 w-4" />
+                                            Orders
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={handleLogout}
+                                        className="cursor-pointer text-red-600 focus:text-red-600 flex items-center gap-2"
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                        Logout
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <Link
+                                href="/signin"
+                                className="hidden md:inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md bg-[#3BB77E] hover:bg-[#2a9d5f] text-white text-sm font-semibold transition-colors"
+                            >
+                                Sign In
+                            </Link>
                         )}
-                    </Link>
 
-                    {/* Cart */}
-                    <div className="relative">
+                        {/* Wishlist */}
+                        <Link href="/wishlist" className="hidden md:flex items-center gap-1.5 hover:text-[#3BB77E] transition-colors relative p-1.5 rounded">
+                            <Heart className={`h-5 w-5 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
+                            {wishlist.length > 0 && (
+                                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                                    {wishlist.length}
+                                </span>
+                            )}
+                        </Link>
+
+                        {/* Cart */}
                         <button
                             onClick={toggleModal}
-                            className="flex items-center gap-3 group outline-none"
+                            className="flex items-center gap-1.5 hover:text-[#3BB77E] transition-colors relative p-1.5 rounded outline-none"
                         >
-                            <div className="relative p-2 rounded-full group-hover:bg-gray-100 transition-colors">
-                                <ShoppingBag className="h-6 w-6 text-gray-700" />
-                                {cart.length > 0 && (
-                                    <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                                        {cart.length}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="hidden lg:flex flex-col items-start">
-                                <span className="text-[11px] text-gray-500 font-medium leading-none">Your Cart</span>
-                                <span className="text-sm font-bold text-gray-900">
-                                    ${cart.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2)}
+                            <ShoppingBag className="h-6 w-6 text-gray-900" />
+                            {cart.length > 0 && (
+                                <span className="absolute -top-1 -right-1 h-5 w-5 bg-[#3BB77E] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                    {cart.length}
                                 </span>
-                            </div>
+                            )}
                         </button>
                         <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
                     </div>
-
-                    {/* Account */}
-                    {isLoggedIn ? (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-2 group outline-none ml-2">
-                                    <div className="p-2 rounded-full bg-[#3BB77E]/10 group-hover:bg-[#3BB77E]/20 transition-colors border border-[#3BB77E]/20">
-                                        <User className="h-5 w-5 text-[#3BB77E]" />
-                                    </div>
-                                    <div className="hidden lg:flex flex-col items-start text-left">
-                                        <span className="text-[11px] text-gray-500 font-medium">Account</span>
-                                        <span className="text-sm font-bold text-gray-900 line-clamp-1 max-w-[120px]">{userName}</span>
-                                    </div>
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem asChild>
-                                    <Link href="/account/profile" className="cursor-pointer">
-                                        <User className="h-4 w-4 mr-2" />
-                                        My Profile
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link href="/account/orders" className="cursor-pointer">
-                                        <Package className="h-4 w-4 mr-2" />
-                                        My Orders
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
-                                    <LogOut className="h-4 w-4 mr-2" />
-                                    Logout
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    ) : (
-                        <Button asChild className="bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold text-sm px-5 py-2 rounded shadow-sm hover:shadow-md transition-all">
-                            <Link href="/signin">
-                                Sign In
-                            </Link>
-                        </Button>
-                    )}
                 </div>
             </div>
 
-            {/* Bottom Bar - Navigation */}
-            <div className="border-y border-gray-100 py-3 px-4 md:px-8 flex items-center pt-32 justify-between">
-                <div className="flex items-center gap-8">
-                    {/* Categories Trigger */}
+            {/* Green Category Navigation Bar */}
+            <div className="bg-[#1F5632] text-white py-2 px-4 md:px-8 fixed top-[60px] w-full z-40 shadow-md">
+                <div className="max-w-[1600px] mx-auto flex items-center gap-3 overflow-x-auto scrollbar-hide">
+                    {/* All Categories Dropdown Menu */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="flex items-center gap-3 font-bold text-sm text-white bg-[#3BB77E] hover:bg-[#299E63] px-6 py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg outline-none">
-                                <Menu className="h-5 w-5" />
-                                Browse All Categories
-                                <ChevronDown className="h-4 w-4" />
+                            <button className="flex items-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 py-2 rounded text-sm font-semibold whitespace-nowrap transition-colors">
+                                <Menu className="h-4 w-4" />
+                                All Categories
+                                <ChevronDown className="h-3.5 w-3.5" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-72" align="start">
-                            <DropdownMenuLabel className="text-xs text-gray-500 uppercase tracking-wide">All Categories</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-
-                            {/* Food & Groceries */}
-                            <div className="px-2 py-1">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Food & Groceries</p>
-                            </div>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=vegetables" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Apple className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Fruits & Vegetables</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=dairy" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Milk className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Dairy & Eggs</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=bakery" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Cake className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Bakery & Snacks</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=beverages" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Coffee className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Beverages</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=meats" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Beef className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Meat & Seafood</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=frozen_food" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Fish className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Frozen Foods</span>
-                                </Link>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuSeparator />
-
-                            {/* Lifestyle & More */}
-                            <div className="px-2 py-1">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Lifestyle & More</p>
-                            </div>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=household" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Home className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Home & Kitchen</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/shop?category=baby_products" className="cursor-pointer hover:bg-[#3BB77E]/10 hover:text-[#3BB77E] transition-colors pl-4 flex items-center w-full">
-                                    <Baby className="h-4 w-4 mr-3 text-[#3BB77E]" />
-                                    <span className="font-medium">Baby Care</span>
-                                </Link>
-                            </DropdownMenuItem>
-
+                        <DropdownMenuContent align="start" className="w-56 bg-white max-h-[400px] overflow-y-auto">
+                            <DropdownMenuLabel className="text-gray-700 font-bold">Product Categories</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                                <Link href="/shop" className="cursor-pointer font-bold text-[#3BB77E] hover:bg-[#3BB77E]/10 justify-center">
-                                    View All Categories →
+                                <Link href="/shop" className="cursor-pointer font-semibold">
+                                    All Products
                                 </Link>
                             </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            {categories.map((category, index) => (
+                                <DropdownMenuItem key={index} asChild>
+                                    <Link
+                                        href={category.href}
+                                        className="cursor-pointer"
+                                    >
+                                        {category.name}
+                                    </Link>
+                                </DropdownMenuItem>
+                            ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <div className="h-6 w-px bg-gray-200 hidden lg:block" />
+                    {/* Pages Dropdown Menu */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 py-2 rounded text-sm font-semibold whitespace-nowrap transition-colors">
+                                Pages
+                                <ChevronDown className="h-3.5 w-3.5" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-56 bg-white">
+                            <DropdownMenuLabel className="text-gray-700 font-bold">Main Pages</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {navLinks.map((link, index) => (
+                                <DropdownMenuItem key={index} asChild>
+                                    <Link
+                                        href={link.href}
+                                        className={`cursor-pointer ${pathname === link.href ? "bg-[#3BB77E] text-white font-semibold" : ""
+                                            }`}
+                                    >
+                                        {link.name}
+                                    </Link>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                    {/* Nav Links */}
-                    <nav className="hidden lg:flex items-center gap-8">
-                        {navLinks.map((link) => {
-                            // Check if current path matches the link
-                            // For exact matches (like /about, /contact) use strict equality
-                            // For routes with nested paths (like /shop), check if pathname starts with the href
-                            const isActive = link.href === "/"
-                                ? pathname === "/"
-                                : pathname === link.href || pathname.startsWith(link.href + "/");
-
-                            return (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className={`text-sm font-semibold flex items-center gap-1 transition-colors ${isActive
-                                        ? "text-[#3BB77E]"
-                                        : "text-gray-900 hover:text-[#3BB77E]"
-                                        }`}
-                                >
-                                    {link.name}
-                                </Link>
-                            );
-                        })}
-                    </nav>
-                </div>
-
-                {/* Promo Badge */}
-                <div className="hidden xl:flex items-center gap-2 text-sm">
-                    <div className="h-6 w-6 bg-red-100 rounded-full flex items-center justify-center">
-                        <Percent className="h-3 w-3 text-red-600" />
-                    </div>
-                    <span className="font-bold text-gray-900">Sale $20 Off Your First Order.</span>
+                    {/* Category Links */}
+                    {categories.map((category, index) => (
+                        <Link
+                            key={index}
+                            href={category.href}
+                            className="px-3 py-2 text-sm font-medium hover:bg-[#174428] rounded transition-colors whitespace-nowrap"
+                        >
+                            {category.name}
+                        </Link>
+                    ))}
                 </div>
             </div>
+
+            {/* Mobile Navigation Dropdown */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden fixed top-[100px] left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-30 animate-slide-down">
+                    <div className="px-4 py-3 space-y-1">
+                        {navLinks.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`block px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${pathname === link.href
+                                    ? "bg-[#3BB77E] text-white"
+                                    : "text-gray-700 hover:bg-gray-100"
+                                    }`}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
+
+                        {/* Divider */}
+                        <div className="border-t border-gray-200 my-2"></div>
+
+                        {/* Additional Mobile Links */}
+                        <Link
+                            href="/wishlist"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            <Heart className="h-4 w-4" />
+                            Wishlist
+                            {wishlist.length > 0 && (
+                                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                    {wishlist.length}
+                                </span>
+                            )}
+                        </Link>
+
+                        {isLoggedIn ? (
+                            <>
+                                <Link
+                                    href="/account/profile"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                                >
+                                    <User className="h-4 w-4" />
+                                    My Account
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        handleLogout();
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                    Logout
+                                </button>
+                            </>
+                        ) : (
+                            <Link
+                                href="/signin"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                                <User className="h-4 w-4" />
+                                Sign In
+                            </Link>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

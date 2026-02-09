@@ -61,14 +61,24 @@ export function ProductCard({ product }: ProductCardProps) {
                             </span>
                         </div>
                     )}
+                    {/* Custom Badges */}
+                    {product.badges && product.badges.length > 0 && (
+                        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1 mt-8">
+                            {product.badges.map((badge, index) => (
+                                <span key={index} className="bg-[#3BB77E] text-white text-xs font-bold px-2.5 py-1 rounded w-fit">
+                                    {badge}
+                                </span>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Action Icons */}
                     <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
                         <button
                             onClick={handleWishlistToggle}
                             className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${inWishlist
-                                    ? "bg-[#3BB77E] text-white"
-                                    : "bg-white hover:bg-[#3BB77E] hover:text-white"
+                                ? "bg-[#3BB77E] text-white"
+                                : "bg-white hover:bg-[#3BB77E] hover:text-white"
                                 }`}
                             title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                         >

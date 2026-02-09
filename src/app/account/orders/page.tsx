@@ -77,10 +77,10 @@ export default function OrdersPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pt-[120px]">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                    My Orders
+                    Order Management
                 </h1>
             </div>
 
@@ -117,7 +117,7 @@ export default function OrdersPage() {
                                 <select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="h-12 px-4 rounded-lg border border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E]"
+                                    className="h-12 px-4 rounded-lg border border-gray-300 focus:border-[#00028C] focus:ring-[#00028C]"
                                 >
                                     <option value="all">All Orders</option>
                                     <option value="pending">Pending</option>
@@ -191,7 +191,7 @@ export default function OrdersPage() {
                                                     </p>
                                                 </div>
                                                 <Link href={`/account/orders/${order.id}`}>
-                                                    <Button className="bg-[#3BB77E] hover:bg-[#299E63]">
+                                                    <Button className="bg-[#00028C] hover:bg-[#00026e]">
                                                         View Details
                                                         <ChevronRight className="h-4 w-4 ml-1" />
                                                     </Button>
