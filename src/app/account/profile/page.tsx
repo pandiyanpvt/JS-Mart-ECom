@@ -1,14 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { User, Mail, Phone, Calendar, Camera, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Cookies from "js-cookie";
+import userService from "@/services/user.service";
+import toast from "react-hot-toast";
 
 export default function ProfilePage() {
+    const router = useRouter();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [profileImg, setProfileImg] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -17,72 +26,77 @@ export default function ProfilePage() {
     });
 
     useEffect(() => {
-        const user = Cookies.get("user");
-        if (user) {
-            try {
-                const userData = JSON.parse(user);
-
-                // Construct full name
-                let fullName = "";
-                if (userData.firstName && userData.lastName) {
-                    fullName = `${userData.firstName} ${userData.lastName}`;
-                } else if (userData.fullName) {
-                    fullName = userData.fullName;
-                } else if (userData.firstName) {
-                    fullName = userData.firstName;
-                } else if (userData.name) {
-                    fullName = userData.name;
-                }
-
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/signin?redirect=/account/profile");
+            return;
+        }
+        userService.getProfile()
+            .then((user) => {
+                if (!user) return;
                 setFormData({
-                    fullName: fullName,
-                    email: userData.email || userData.emailAddress || "",
-                    phone: userData.phone || userData.phoneNumber || "",
-                    dateOfBirth: userData.dateOfBirth || "",
+                    fullName: user.fullName || "",
+                    email: user.emailAddress || "",
+                    phone: user.phoneNumber || "",
+                    dateOfBirth: "",
                 });
-            } catch (error) {
-                console.error("Error parsing user data:", error);
-            }
-        }
-    }, []);
+                setProfileImg(user.profileImg || null);
+                Cookies.set("user", JSON.stringify({ ...user, id: user.id, emailAddress: user.emailAddress, fullName: user.fullName, phoneNumber: user.phoneNumber }), { expires: 1 });
+            })
+            .catch(() => toast.error("Failed to load profile"))
+            .finally(() => setLoading(false));
+    }, [router]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle profile update
-        console.log("Profile updated:", formData);
-
-        // Update Cookies with new user data
-        const user = Cookies.get("user");
-        let userData: any = {};
-        if (user) {
-            try {
-                userData = JSON.parse(user);
-            } catch (error) {
-                userData = {};
+        setSaving(true);
+        try {
+            await userService.updateProfile({
+                fullName: formData.fullName,
+                phoneNumber: formData.phone || undefined,
+            });
+            const user = await userService.getProfile();
+            if (user) {
+                setFormData((prev) => ({ ...prev, fullName: user.fullName || prev.fullName, phone: user.phoneNumber || prev.phone }));
+                Cookies.set("user", JSON.stringify({ ...user, id: user.id, emailAddress: user.emailAddress, fullName: user.fullName, phoneNumber: user.phoneNumber }), { expires: 1 });
             }
+            window.dispatchEvent(new Event("auth-change"));
+            window.dispatchEvent(new Event("userUpdated"));
+            setIsEditing(false);
+            toast.success("Profile updated");
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : "Failed to update profile");
+        } finally {
+            setSaving(false);
         }
-
-        // Simulating splitting name back if needed or just storing as name
-        // For now, since we display fullName, let's store it conceptually or keep original fields
-        // Simplification: Update 'name' or 'firstName'
-        const names = formData.fullName.split(' ');
-        if (names.length > 0) userData.firstName = names[0];
-        if (names.length > 1) userData.lastName = names.slice(1).join(' ');
-        userData.fullName = formData.fullName;
-        userData.name = formData.fullName;
-
-        userData.email = formData.email;
-        userData.phone = formData.phone;
-        userData.dateOfBirth = formData.dateOfBirth;
-
-        Cookies.set("user", JSON.stringify(userData), { expires: 1 });
-
-        // Trigger custom event to update other components
-        window.dispatchEvent(new Event("auth-change"));
-        window.dispatchEvent(new Event("userUpdated"));
-
-        setIsEditing(false);
     };
+
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const updated = await userService.uploadProfileImage(file);
+            setProfileImg(updated.profileImg || null);
+            Cookies.set("user", JSON.stringify({ ...updated, id: updated.id, emailAddress: updated.emailAddress, fullName: updated.fullName, phoneNumber: updated.phoneNumber, profileImg: updated.profileImg }), { expires: 1 });
+            window.dispatchEvent(new Event("auth-change"));
+            window.dispatchEvent(new Event("userUpdated"));
+            toast.success("Photo updated");
+        } catch {
+            toast.error("Failed to upload photo");
+        } finally {
+            setUploading(false);
+            e.target.value = "";
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <p className="text-gray-600">Loading profile...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -100,7 +114,7 @@ export default function ProfilePage() {
                             {!isEditing && (
                                 <Button
                                     onClick={() => setIsEditing(true)}
-                                    className="bg-[#3BB77E] hover:bg-[#299E63]"
+                                    className="bg-[#005000] hover:bg-[#006600]"
                                 >
                                     Edit Profile
                                 </Button>
@@ -109,20 +123,35 @@ export default function ProfilePage() {
 
                         {/* Profile Picture */}
                         <div className="flex items-center gap-6 pb-8 border-b border-gray-200">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleImageChange}
+                                disabled={uploading}
+                            />
                             <div className="relative">
-                                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-lime-400 to-[#299E63] flex items-center justify-center">
-                                    <User className="h-12 w-12 text-white" />
+                                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#006600] to-[#005000] flex items-center justify-center overflow-hidden">
+                                    {profileImg ? (
+                                        <img src={profileImg} alt="Profile" className="h-full w-full object-cover" />
+                                    ) : (
+                                        <User className="h-12 w-12 text-white" />
+                                    )}
                                 </div>
-                                {isEditing && (
-                                    <button className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border-2 border-gray-200 hover:border-[#3BB77E] transition-colors">
-                                        <Camera className="h-4 w-4 text-gray-600" />
-                                    </button>
-                                )}
+                                <button
+                                    type="button"
+                                    disabled={uploading}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border-2 border-gray-200 hover:border-[#005000] transition-colors disabled:opacity-50"
+                                >
+                                    <Camera className="h-4 w-4 text-gray-600" />
+                                </button>
                             </div>
                             <div>
                                 <h3 className="text-xl font-bold text-gray-900">{formData.fullName}</h3>
                                 <p className="text-gray-600">{formData.email}</p>
-                                <p className="text-sm text-[#299E63] font-medium mt-1">Premium Member</p>
+                                <p className="text-sm text-[#006600] font-medium mt-1">Premium Member</p>
                             </div>
                         </div>
 
@@ -160,13 +189,11 @@ export default function ProfilePage() {
                                             id="email"
                                             type="email"
                                             value={formData.email}
-                                            onChange={(e) =>
-                                                setFormData({ ...formData, email: e.target.value })
-                                            }
-                                            className="pl-10 h-12"
-                                            disabled={!isEditing}
+                                            className="pl-10 h-12 bg-gray-50"
+                                            readOnly
                                         />
                                     </div>
+                                    <p className="text-xs text-gray-500">Email cannot be changed here.</p>
                                 </div>
 
                                 {/* Phone */}
@@ -215,10 +242,11 @@ export default function ProfilePage() {
                                 <div className="flex gap-4 pt-6 border-t border-gray-200">
                                     <Button
                                         type="submit"
-                                        className="bg-[#3BB77E] hover:bg-[#299E63] px-8"
+                                        disabled={saving}
+                                        className="bg-[#005000] hover:bg-[#006600] px-8"
                                     >
                                         <Save className="h-4 w-4 mr-2" />
-                                        Save Changes
+                                        {saving ? "Saving..." : "Save Changes"}
                                     </Button>
                                     <Button
                                         type="button"

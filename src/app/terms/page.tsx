@@ -40,7 +40,7 @@ export default function TermsConditions() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-4">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
-                <Link href="/" className="inline-flex items-center gap-2 text-[#3BB77E] font-semibold mb-6 hover:text-[#299E63] transition-colors">
+                <Link href="/" className="inline-flex items-center gap-2 text-[#005000] font-semibold mb-6 hover:text-[#006600] transition-colors">
                     <ArrowLeft className="h-5 w-5" /> Back to Store
                 </Link>
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -56,12 +56,12 @@ export default function TermsConditions() {
                 <div className="grid gap-12">
                     {terms.map((term, i) => (
                         <div key={i} className="flex flex-col md:flex-row gap-8 items-start group">
-                            <div className="flex-shrink-0 h-16 w-16 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 group-hover:text-lime-500 group-hover:bg-lime-50 transition-all duration-300 border border-gray-100 group-hover:border-lime-100">
+                            <div className="flex-shrink-0 h-16 w-16 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 group-hover:text-[#005000] group-hover:bg-green-50 transition-all duration-300 border border-gray-100 group-hover:border-green-100">
                                 {term.icon}
                             </div>
                             <div className="space-y-4">
                                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                                    <span className="text-lime-500 font-mono text-sm opacity-50">0{i + 1}</span>
+                                    <span className="text-[#005000] font-mono text-sm opacity-50">0{i + 1}</span>
                                     {term.title}
                                 </h2>
                                 <p className="text-gray-600 leading-relaxed text-lg font-sans">
@@ -73,7 +73,7 @@ export default function TermsConditions() {
                 </div>
 
                 {/* Footer Note */}
-                <div className="mt-24 p-12 bg-lime-50 rounded-[2.5rem] border border-lime-100 text-center">
+                <div className="mt-24 p-12 bg-green-50 rounded-[2.5rem] border border-green-100 text-center">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Any disagreements?</h3>
                     <p className="text-gray-600 mb-8 max-w-xl mx-auto text-lg leading-relaxed">
                         If you have any questions or concern regarding our Terms & Conditions,

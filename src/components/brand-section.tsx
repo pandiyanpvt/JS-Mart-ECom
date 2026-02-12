@@ -41,7 +41,7 @@ export default function BrandSection() {
         {/* Brands Grid Container */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#3BB77E] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#005000] animate-spin" />
             <span className="ml-3 text-gray-600">Loading brands...</span>
           </div>
         ) : brands.length > 0 ? (
@@ -62,7 +62,7 @@ export default function BrandSection() {
                       sizes="(max-width: 640px) 140px, 180px"
                     />
                   </div>
-                  <p className="text-center text-sm font-medium text-gray-600 mt-2 group-hover:text-[#3BB77E] transition-colors">
+                  <p className="text-center text-sm font-medium text-gray-600 mt-2 group-hover:text-[#005000] transition-colors">
                     {brandItem.brand}
                   </p>
                 </Link>

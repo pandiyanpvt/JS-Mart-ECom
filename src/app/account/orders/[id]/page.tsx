@@ -42,7 +42,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
     if (loading) {
         return (
             <div className="min-h-screen pt-[120px] flex justify-center items-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3BB77E]"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005000]"></div>
             </div>
         );
     }
@@ -117,10 +117,10 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                                 <div key={index} className="flex flex-1 flex-col items-center relative">
                                     {/* Line connecting steps - hidden on last item */}
                                     {index < trackingSteps.length - 1 && (
-                                        <div className={`hidden md:block absolute top-[20px] left-[50%] right-[-50%] h-1 ${step.completed && trackingSteps[index + 1].completed ? 'bg-[#3BB77E]' : 'bg-gray-200'} z-0`} />
+                                        <div className={`hidden md:block absolute top-[20px] left-[50%] right-[-50%] h-1 ${step.completed && trackingSteps[index + 1].completed ? 'bg-[#005000]' : 'bg-gray-200'} z-0`} />
                                     )}
 
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${step.completed ? 'bg-[#3BB77E] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${step.completed ? 'bg-[#005000] text-white' : 'bg-gray-200 text-gray-400'}`}>
                                         {step.completed ? <CheckCircle className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
                                     </div>
                                     <p className={`mt-2 font-semibold ${step.completed ? 'text-gray-900' : 'text-gray-400'}`}>{step.status}</p>
@@ -139,7 +139,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                         {order.details?.map((detail: any) => (
                             <div
                                 key={detail.id}
-                                className="flex gap-4 p-4 rounded-lg border border-gray-200 hover:border-[#3BB77E] transition-colors"
+                                className="flex gap-4 p-4 rounded-lg border border-gray-200 hover:border-[#005000] transition-colors"
                             >
                                 <div className="h-20 w-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                                     {detail.Product?.productImage ? (
@@ -181,7 +181,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                             </div> */}
                             <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
                                 <span>Total</span>
-                                <span className="text-[#3BB77E]">Rs. {order.totalAmount?.toFixed(2)}</span>
+                                <span className="text-[#005000]">Rs. {order.totalAmount?.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
@@ -192,18 +192,23 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                     {/* Shipping Address */}
                     <div className="bg-white rounded-xl shadow-md p-8">
                         <div className="flex items-center gap-3 mb-4">
-                            <MapPin className="h-6 w-6 text-[#3BB77E]" />
+                            <MapPin className="h-6 w-6 text-[#005000]" />
                             <h3 className="text-lg font-bold text-gray-900">Shipping Address</h3>
                         </div>
                         {order.shippingAddress ? (
                             <div className="text-gray-600 space-y-1">
-                                <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
-                                <p>{order.shippingAddress.streetAddress}</p>
+                                <p className="font-semibold text-gray-900">{order.shippingAddress.addressLine1 || 'Address'}</p>
+                                {order.shippingAddress.addressLine2 && (
+                                    <p>{order.shippingAddress.addressLine2}</p>
+                                )}
                                 <p>
-                                    {order.shippingAddress.district}, {order.shippingAddress.province}{" "}
-                                    {order.shippingAddress.postalCode}
+                                    {order.shippingAddress.city || ''}{order.shippingAddress.city && order.shippingAddress.state ? ', ' : ''}
+                                    {order.shippingAddress.state || ''}
+                                    {order.shippingAddress.postalCode ? ` ${order.shippingAddress.postalCode}` : ''}
                                 </p>
-                                <p>{order.shippingAddress.phoneNumber}</p>
+                                {order.shippingAddress.country && (
+                                    <p>{order.shippingAddress.country}</p>
+                                )}
                             </div>
                         ) : (
                             <p className="text-gray-500">No shipping address details available.</p>
@@ -213,7 +218,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                     {/* Payment Method */}
                     <div className="bg-white rounded-xl shadow-md p-8">
                         <div className="flex items-center gap-3 mb-4">
-                            <CreditCard className="h-6 w-6 text-[#3BB77E]" />
+                            <CreditCard className="h-6 w-6 text-[#005000]" />
                             <h3 className="text-lg font-bold text-gray-900">Payment Method</h3>
                         </div>
                         <div className="text-gray-600">

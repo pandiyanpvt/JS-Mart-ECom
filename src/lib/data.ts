@@ -12,6 +12,7 @@ export interface Product {
     reviews: number;
     badges?: string[];
     tag?: string;
+    brand?: string;
 }
 
 export const categories = [

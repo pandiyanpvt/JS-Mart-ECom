@@ -77,14 +77,14 @@ export default function AccountDashboard() {
             label: "Total Orders",
             value: "24",
             icon: Package,
-            color: "bg-[#3BB77E]",
+            color: "bg-[#005000]",
             trend: "+12% this month",
         },
         {
             label: "Active Orders",
             value: "3",
             icon: ShoppingBag,
-            color: "bg-[#3BB77E]",
+            color: "bg-[#005000]",
             trend: "2 in transit",
         },
         {
@@ -183,7 +183,7 @@ export default function AccountDashboard() {
                         <h3 className="text-xl font-bold text-gray-900">Recent Orders</h3>
                         <a
                             href="/account/orders"
-                            className="text-[#3BB77E] hover:text-[#299E63] font-medium text-sm"
+                            className="text-[#005000] hover:text-[#006600] font-medium text-sm"
                         >
                             View All →
                         </a>
@@ -219,7 +219,7 @@ export default function AccountDashboard() {
                                         <td className="py-4 px-4">
                                             <a
                                                 href={`/account/orders/${order.id}`}
-                                                className="text-[#3BB77E] hover:text-[#299E63] font-medium"
+                                                className="text-[#005000] hover:text-[#006600] font-medium"
                                             >
                                                 {order.id}
                                             </a>
@@ -247,17 +247,17 @@ export default function AccountDashboard() {
 
                 {/* Quick Actions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-[#3BB77E] to-[#299E63] rounded-xl shadow-md p-8 text-white">
+                    <div className="bg-gradient-to-br from-[#005000] to-[#006600] rounded-xl shadow-md p-8 text-white">
                         <h3 className="text-xl font-bold mb-2">Need Help?</h3>
-                        <p className="text-lime-100 mb-4">
+                        <p className="text-green-100 mb-4">
                             Our support team is ready to assist you
                         </p>
-                        <button className="bg-white text-[#3BB77E] px-6 py-2 rounded-lg font-semibold hover:bg-[#3BB77E]/10 transition-colors">
+                        <button className="bg-white text-[#005000] px-6 py-2 rounded-lg font-semibold hover:bg-[#005000]/10 transition-colors">
                             Contact Support
                         </button>
                     </div>
 
-                    <div className="bg-gradient-to-br from-[#3BB77E] to-[#299E63] rounded-xl shadow-md p-8 text-white">
+                    <div className="bg-gradient-to-br from-[#005000] to-[#006600] rounded-xl shadow-md p-8 text-white">
                         <h3 className="text-xl font-bold mb-2">Track Your Order</h3>
                         <p className="text-purple-100 mb-4">
                             Get real-time updates on your deliveries

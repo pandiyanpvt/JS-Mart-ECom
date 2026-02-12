@@ -31,7 +31,7 @@ const categoryService = {
 
     // Search categories
     search: async (query: string): Promise<Category[]> => {
-        const response = await api.get(`/product-categories/search/query?q=${query}`);
+        const response = await api.get(`/product-categories/search/query?query=${encodeURIComponent(query)}`);
         return response.data;
     },
 };

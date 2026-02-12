@@ -58,7 +58,7 @@ export default function FAQPage() {
     return (
         <div className="min-h-screen bg-white pb-20 pt-4">
             {/* Header Section */}
-            <section className="bg-lime-500 py-20 px-4">
+            <section className="bg-[#005000] py-20 px-4">
                 <div className="container mx-auto max-w-4xl text-center">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
                         How can we <span className="text-black">help you?</span>
@@ -81,7 +81,7 @@ export default function FAQPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-black">
                     {categories.map((cat, i) => (
                         <button key={i} className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-gray-100 group">
-                            <div className="h-12 w-12 bg-lime-100 rounded-full flex items-center justify-center text-lime-600 mb-3 group-hover:scale-110 transition-transform">
+                            <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center text-[#005000] mb-3 group-hover:scale-110 transition-transform">
                                 {cat.icon}
                             </div>
                             <span className="font-semibold text-gray-900">{cat.label}</span>
@@ -95,7 +95,7 @@ export default function FAQPage() {
                 <div className="space-y-4">
                     {filteredFaqs.length > 0 ? (
                         filteredFaqs.map((faq, index) => (
-                            <div key={index} className="border border-gray-100 rounded-2xl overflow-hidden hover:border-lime-300 transition-colors">
+                            <div key={index} className="border border-gray-100 rounded-2xl overflow-hidden hover:border-green-300 transition-colors">
                                 <button
                                     onClick={() => setOpenIndex(openIndex === index ? null : index)}
                                     className="w-full flex items-center justify-between p-6 bg-white hover:bg-gray-50 text-left transition-colors"
@@ -107,7 +107,7 @@ export default function FAQPage() {
                                     <div className="p-6 bg-gray-50 text-gray-600 leading-relaxed border-t border-gray-100 animate-in slide-in-from-top-2 duration-300">
                                         <p>{faq.answer}</p>
                                         <div className="mt-4 flex items-center gap-2">
-                                            <span className="text-xs font-bold uppercase tracking-wider text-lime-600 px-2 py-1 bg-lime-100 rounded">
+                                            <span className="text-xs font-bold uppercase tracking-wider text-[#005000] px-2 py-1 bg-green-100 rounded">
                                                 {faq.category}
                                             </span>
                                         </div>
@@ -128,13 +128,13 @@ export default function FAQPage() {
             {/* Contact CTA */}
             <section className="container mx-auto px-4 max-w-4xl mt-20">
                 <div className="bg-gray-900 rounded-[2rem] p-10 md:p-16 text-center text-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-lime-500 opacity-10 rounded-full blur-3xl -mr-20 -mt-20" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#005000] opacity-10 rounded-full blur-3xl -mr-20 -mt-20" />
                     <h2 className="text-3xl font-bold mb-4">Still have questions?</h2>
                     <p className="text-gray-400 mb-8 max-w-lg mx-auto">
                         Cant find the answer you looking for? Please chat to our friendly team.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button className="h-12 px-8 bg-lime-500 hover:bg-lime-600 text-white font-bold" asChild>
+                        <Button className="h-12 px-8 bg-[#005000] hover:bg-[#006600] text-white font-bold" asChild>
                             <Link href="/contact" className="no-underline text-white">Contact Us <ArrowRight className="ml-2 h-5 w-5" /></Link>
                         </Button>
                         <Button variant="outline" className="h-12 px-8 border-white text-white hover:bg-white hover:text-black font-bold">

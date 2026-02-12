@@ -18,53 +18,44 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import CartModal from "@/components/layout/add-cart-modal";
+import { categoryService } from "@/services";
 
 export function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
+    const [userProfileImg, setUserProfileImg] = useState<string | null>(null);
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const [isOpen, setIsOpen] = useState(false);
     const [categories, setCategories] = useState<Array<{ id: number; name: string; href: string }>>([]);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Fetch categories from backend
+    // Fetch categories from backend (used in dropdown + green bar)
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const { categoryService } = await import('@/services');
-                const categoriesData = await categoryService.getActive();
-
-                // Transform backend categories to navbar format and deduplicate by name
+        categoryService
+            .getActive()
+            .then((categoriesData) => {
                 const seenNames = new Set<string>();
-                const transformedCategories = categoriesData
-                    .map(cat => ({
+                const transformed = categoriesData
+                    .map((cat) => ({
                         id: cat.id,
                         name: cat.category,
-                        href: `/shop?category=${cat.id}`
+                        href: `/shop?category=${cat.id}`,
                     }))
-                    .filter(cat => {
+                    .filter((cat) => {
                         const key = cat.name.trim().toLowerCase();
                         if (seenNames.has(key)) return false;
                         seenNames.add(key);
                         return true;
                     });
-
-                setCategories(transformedCategories);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-                // Fallback to default categories if fetch fails
-                setCategories([
-                    { id: 0, name: "All", href: "/shop" },
-                    { id: 1, name: "Fresh", href: "/shop?category=fresh" },
-                    { id: 2, name: "Bestsellers", href: "/shop?category=bestsellers" },
-                ]);
-            }
-        };
-
-        fetchCategories();
+                setCategories(transformed);
+            })
+            .catch((error) => {
+                console.error("Error fetching categories:", error);
+                setCategories([]);
+            });
     }, []);
 
     useEffect(() => {
@@ -87,11 +78,14 @@ export function Navbar() {
                     }
 
                     setUserName(fullName);
+                    setUserProfileImg(userData.profileImg || null);
                 } catch (error) {
                     setIsLoggedIn(false);
+                    setUserProfileImg(null);
                 }
             } else {
                 setIsLoggedIn(false);
+                setUserProfileImg(null);
             }
         };
 
@@ -156,9 +150,10 @@ export function Navbar() {
                         <Link href="/" className="flex items-center gap-3 flex-shrink-0">
                             <div className="relative h-10 w-24 md:h-12 md:w-32">
                                 <Image
-                                    src="/logo.png"
-                                    alt="JS Mart Logo"
+                                    src="/logo/Web_Logo_Mart-01%20(1).png"
+                                    alt="JS Mart Australia"
                                     fill
+                                    sizes="(max-width: 768px) 96px, 128px"
                                     className="object-contain"
                                     priority
                                 />
@@ -172,35 +167,13 @@ export function Navbar() {
 
                     {/* Search Bar */}
                     <div className="flex-1 max-w-3xl hidden md:flex items-center">
-                        <div className="flex w-full items-center border-2 border-gray-300 rounded-md overflow-hidden focus-within:border-[#3BB77E] transition-all">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border-r border-gray-300 text-sm font-medium text-gray-700 flex items-center gap-1.5 outline-none transition-colors whitespace-nowrap">
-                                        All
-                                        <ChevronDown className="h-3.5 w-3.5" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start" className="w-48 max-h-[400px] overflow-y-auto">
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/shop" className="cursor-pointer">All Categories</Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    {categories.map((category) => (
-                                        <DropdownMenuItem key={category.id} asChild>
-                                            <Link href={category.href} className="cursor-pointer">
-                                                {category.name}
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-
+                        <div className="flex w-full items-center border-2 border-gray-300 rounded-md overflow-hidden focus-within:border-[#005000] transition-all">
                             <Input
                                 className="flex-1 h-9 border-0 focus-visible:ring-0 text-gray-900 placeholder:text-gray-500 px-3 text-sm bg-white"
                                 placeholder="Search Here"
                             />
 
-                            <Button className="h-9 rounded-none bg-[#3BB77E] hover:bg-[#2a9d5f] text-white px-5 font-semibold text-sm transition-all">
+                            <Button className="h-9 rounded-none bg-[#005000] hover:bg-[#006600] text-white px-5 font-semibold text-sm transition-all">
                                 <Search className="h-4 w-4" />
                             </Button>
                         </div>
@@ -212,8 +185,22 @@ export function Navbar() {
                         {isLoggedIn ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <button className="hidden md:flex items-center gap-1.5 hover:text-[#3BB77E] transition-colors p-1.5 rounded outline-none">
-                                        <User className="h-5 w-5 text-gray-700" />
+                                    <button className="hidden md:flex items-center gap-2 hover:opacity-90 transition-opacity p-1 rounded-full outline-none ring-2 ring-transparent hover:ring-[#005000]/30 focus:ring-2 focus:ring-[#005000]/50">
+                                        {userProfileImg ? (
+                                            <span className="relative h-8 w-8 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                                                <Image
+                                                    src={userProfileImg}
+                                                    alt={userName}
+                                                    fill
+                                                    className="object-cover"
+                                                    sizes="32px"
+                                                />
+                                            </span>
+                                        ) : (
+                                            <span className="h-8 w-8 rounded-full bg-[#005000] flex items-center justify-center flex-shrink-0">
+                                                <User className="h-4 w-4 text-white" />
+                                            </span>
+                                        )}
                                         <ChevronDown className="h-3.5 w-3.5 text-gray-600" />
                                     </button>
                                 </DropdownMenuTrigger>
@@ -245,14 +232,14 @@ export function Navbar() {
                         ) : (
                             <Link
                                 href="/signin"
-                                className="hidden md:inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md bg-[#3BB77E] hover:bg-[#2a9d5f] text-white text-sm font-semibold transition-colors"
+                                className="hidden md:inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold transition-colors"
                             >
                                 Sign In
                             </Link>
                         )}
 
                         {/* Wishlist */}
-                        <Link href="/wishlist" className="hidden md:flex items-center gap-1.5 hover:text-[#3BB77E] transition-colors relative p-1.5 rounded">
+                        <Link href="/wishlist" className="hidden md:flex items-center gap-1.5 hover:text-[#005000] transition-colors relative p-1.5 rounded">
                             <Heart className={`h-5 w-5 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
                             {wishlist.length > 0 && (
                                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
@@ -264,11 +251,11 @@ export function Navbar() {
                         {/* Cart */}
                         <button
                             onClick={toggleModal}
-                            className="flex items-center gap-1.5 hover:text-[#3BB77E] transition-colors relative p-1.5 rounded outline-none"
+                            className="flex items-center gap-1.5 hover:text-[#005000] transition-colors relative p-1.5 rounded outline-none"
                         >
                             <ShoppingBag className="h-6 w-6 text-gray-900" />
                             {cart.length > 0 && (
-                                <span className="absolute -top-1 -right-1 h-5 w-5 bg-[#3BB77E] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                <span className="absolute -top-1 -right-1 h-5 w-5 bg-[#005000] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                                     {cart.length}
                                 </span>
                             )}
@@ -278,32 +265,44 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* Green Category Navigation Bar */}
-            <div className="bg-[#1F5632] text-white py-2 px-4 md:px-8 fixed top-[60px] w-full z-40 shadow-md">
-                <div className="max-w-[1600px] mx-auto flex items-center gap-3 overflow-x-auto scrollbar-hide">
+            {/* Green Category Navigation Bar - fixed height, all items same height */}
+            <div className="bg-[#1F5632] text-white min-h-11 py-2 px-4 md:px-8 fixed top-[60px] left-0 right-0 w-full z-40 shadow-md flex items-center">
+                <div className="max-w-[1600px] mx-auto w-full flex flex-wrap items-center justify-start gap-x-2 gap-y-2 min-h-9">
                     {/* All Categories Dropdown Menu */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="flex items-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 py-2 rounded text-sm font-semibold whitespace-nowrap transition-colors">
-                                <Menu className="h-4 w-4" />
+                            <button
+                                type="button"
+                                className="h-9 min-w-[120px] flex items-center justify-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 rounded text-sm font-semibold whitespace-nowrap transition-colors border-0 text-white leading-none"
+                            >
+                                <Menu className="h-4 w-4 shrink-0" />
                                 All Categories
-                                <ChevronDown className="h-3.5 w-3.5" />
+                                <ChevronDown className="h-3.5 w-3.5 shrink-0" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56 bg-white max-h-[400px] overflow-y-auto">
-                            <DropdownMenuLabel className="text-gray-700 font-bold">Product Categories</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
+                        <DropdownMenuContent
+                            align="start"
+                            sideOffset={6}
+                            className="w-56 bg-white text-gray-900 border border-gray-200 shadow-lg z-[100] max-h-[min(400px,70vh)] overflow-y-auto rounded-lg py-1"
+                        >
+                            <DropdownMenuLabel className="px-3 py-2 text-gray-700 font-bold text-sm">
+                                Product Categories
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator className="my-1" />
                             <DropdownMenuItem asChild>
-                                <Link href="/shop" className="cursor-pointer font-semibold">
+                                <Link
+                                    href="/shop"
+                                    className="flex cursor-pointer px-3 py-2 text-sm font-medium hover:bg-gray-100 focus:bg-gray-100 rounded-none"
+                                >
                                     All Products
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            {categories.map((category, index) => (
-                                <DropdownMenuItem key={index} asChild>
+                            <DropdownMenuSeparator className="my-1" />
+                            {categories.map((category) => (
+                                <DropdownMenuItem key={category.id} asChild>
                                     <Link
                                         href={category.href}
-                                        className="cursor-pointer"
+                                        className="flex cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 rounded-none"
                                     >
                                         {category.name}
                                     </Link>
@@ -315,20 +314,32 @@ export function Navbar() {
                     {/* Pages Dropdown Menu */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="flex items-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 py-2 rounded text-sm font-semibold whitespace-nowrap transition-colors">
+                            <button
+                                type="button"
+                                className="h-9 min-w-[80px] flex items-center justify-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 rounded text-sm font-semibold whitespace-nowrap transition-colors border-0 text-white leading-none"
+                            >
                                 Pages
-                                <ChevronDown className="h-3.5 w-3.5" />
+                                <ChevronDown className="h-3.5 w-3.5 shrink-0" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56 bg-white">
-                            <DropdownMenuLabel className="text-gray-700 font-bold">Main Pages</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            {navLinks.map((link, index) => (
-                                <DropdownMenuItem key={index} asChild>
+                        <DropdownMenuContent
+                            align="start"
+                            sideOffset={6}
+                            className="w-56 bg-white text-gray-900 border border-gray-200 shadow-lg z-[100] rounded-lg py-1"
+                        >
+                            <DropdownMenuLabel className="px-3 py-2 text-gray-700 font-bold text-sm">
+                                Main Pages
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator className="my-1" />
+                            {navLinks.map((link) => (
+                                <DropdownMenuItem key={link.href} asChild>
                                     <Link
                                         href={link.href}
-                                        className={`cursor-pointer ${pathname === link.href ? "bg-[#3BB77E] text-white font-semibold" : ""
-                                            }`}
+                                        className={`flex cursor-pointer px-3 py-2 text-sm rounded-none ${
+                                            pathname === link.href
+                                                ? "bg-[#005000] text-white font-semibold hover:bg-[#006600] hover:text-white"
+                                                : "text-gray-700 hover:bg-gray-100 focus:bg-gray-100"
+                                        }`}
                                     >
                                         {link.name}
                                     </Link>
@@ -342,7 +353,7 @@ export function Navbar() {
                         <Link
                             key={index}
                             href={category.href}
-                            className="px-3 py-2 text-sm font-medium hover:bg-[#174428] rounded transition-colors whitespace-nowrap"
+                            className="h-9 flex items-center px-3 text-sm font-medium hover:bg-[#174428] rounded transition-colors whitespace-nowrap leading-none"
                         >
                             {category.name}
                         </Link>
@@ -360,7 +371,7 @@ export function Navbar() {
                                 href={link.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 className={`block px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${pathname === link.href
-                                    ? "bg-[#3BB77E] text-white"
+                                    ? "bg-[#005000] text-white"
                                     : "text-gray-700 hover:bg-gray-100"
                                     }`}
                             >

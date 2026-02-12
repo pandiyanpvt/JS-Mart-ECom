@@ -43,12 +43,12 @@ export default function Footer() {
           {/* Column 1: Company Info */}
           <div>
             <Link href="/" className="inline-block mb-8">
-              <div className="relative h-16 w-40">
+              <div className="relative h-16 w-44">
                 <Image
-                  src="/logo.png"
-                  alt="JS Mart Logo"
+                  src="/logo/Web_Logo_Mart-01%20(1).png"
+                  alt="JS Mart Australia"
                   fill
-                  className="object-contain"
+                  className="object-contain object-left"
                 />
               </div>
             </Link>

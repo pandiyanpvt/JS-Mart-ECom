@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ChevronDown, Filter, Grid, List, SlidersHorizontal, ShoppingCart, Package, Loader2 } from "lucide-react";
@@ -9,12 +9,14 @@ import { ProductCard } from "@/components/product-card";
 import { Input } from "@/components/ui/input";
 import { productService, categoryService } from "@/services";
 import type { Product } from "@/services/product.service";
+import { getProductImages, getProductImageUrl } from "@/services/product.service";
 import type { Category } from "@/services/category.service";
 
 const ITEMS_PER_PAGE = 12;
 
 function ShopContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialCategory = searchParams.get("category");
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,7 +29,6 @@ function ShopContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch products and categories from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,7 +41,6 @@ function ShopContent() {
         setProducts(productsData);
         setCategories(categoriesData);
 
-        // Set max price based on actual products
         if (productsData.length > 0) {
           const maxProductPrice = Math.max(...productsData.map(p => Number(p.price)));
           setPriceRange([0, maxProductPrice]);
@@ -55,33 +55,32 @@ function ShopContent() {
     fetchData();
   }, []);
 
-  // Update selected category when URL param changes
   useEffect(() => {
-    if (initialCategory) {
-      setSelectedCategory(initialCategory);
-    }
+    setSelectedCategory(initialCategory || "all");
   }, [initialCategory]);
 
-  // Reset page when category changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, sortBy]);
+
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    const url = categoryId === "all" ? "/shop" : `/shop?category=${categoryId}`;
+    router.replace(url, { scroll: false });
+  };
 
   const filteredProducts = useMemo(() => {
     let filtered = selectedCategory === "all"
       ? products
       : products.filter((p) => {
-        // Support both category ID and category name
         return p.productCategoryId === Number(selectedCategory) ||
           p.product_category?.category === selectedCategory;
       });
 
-    // Apply price filter
     filtered = filtered.filter(
       (p) => Number(p.price) >= priceRange[0] && Number(p.price) <= priceRange[1]
     );
 
-    // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
         case "low":
@@ -90,14 +89,13 @@ function ShopContent() {
           return Number(b.price) - Number(a.price);
         case "newest":
         default:
-          return 0; // Keep original order for newest
+          return 0;
       }
     });
 
     return sorted;
   }, [products, selectedCategory, sortBy, priceRange]);
 
-  // Pagination calculations
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
   const paginatedProducts = useMemo(() => {
@@ -105,22 +103,19 @@ function ShopContent() {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
-  // Category banner mapping
   const categoryBanners: { [key: string]: { image: string; title: string; description: string } } = {
     all: {
       image: "/images/headers/shop-header.png",
       title: "Our Products",
       description: "Discover fresh, quality products delivered to your doorstep"
     },
-    "1": { // Vegetables
+    "1": {
       image: "/slider-1.png",
       title: "Fresh Vegetables",
       description: "Farm-fresh vegetables delivered daily to your door"
     },
-    // Add other specific banners here if available
   };
 
-  // Get current banner based on selected category
   const selectedCategoryObj = categories.find(c => String(c.id) === selectedCategory);
 
   let currentBanner = categoryBanners.all;
@@ -130,7 +125,7 @@ function ShopContent() {
       currentBanner = categoryBanners[selectedCategory];
     } else if (selectedCategoryObj) {
       currentBanner = {
-        image: "/images/headers/shop-header.png", // Fallback to generic image, can be specific if backend provides one
+        image: "/images/headers/shop-header.png",
         title: selectedCategoryObj.category,
         description: `Explore our premium collection of ${selectedCategoryObj.category.toLowerCase()}`
       };
@@ -139,34 +134,32 @@ function ShopContent() {
 
   const maxPrice = products.length > 0 ? Math.max(...products.map(p => Number(p.price))) : 10000;
 
-  // Adapter function to convert backend Product to frontend Product
   const adaptProduct = (backendProduct: Product) => {
-    const primaryImage = backendProduct.product_images?.find(img => img.isPrimary)?.imageUrl ||
-      backendProduct.product_images?.[0]?.imageUrl ||
-      '/images/products/placeholder.png';
+    const imgs = getProductImages(backendProduct);
+    const primary = imgs.find(img => img.isPrimary) || imgs[0];
+    const primaryImage = primary ? getProductImageUrl(primary) : '/images/products/placeholder.png';
 
     return {
       id: String(backendProduct.id),
       name: backendProduct.productName,
       category: backendProduct.product_category?.category || 'Uncategorized',
       price: Number(backendProduct.price),
-      originalPrice: undefined, // Can be added if you have discount logic
+      originalPrice: undefined,
       image: primaryImage,
-      rating: 4, // Default rating, update if you have ratings in backend
-      reviews: 45, // Default reviews, update if you have reviews in backend
+      rating: 4,
+      reviews: 45,
       description: backendProduct.description || '',
       stock: backendProduct.quantity,
-      weight: backendProduct.weight ? `${backendProduct.weight}g` : '1kg', // Convert to string format
+      weight: backendProduct.weight ? `${backendProduct.weight}g` : '1kg',
+      brand: (backendProduct.brand as { brand?: string; brandName?: string } | undefined)?.brand ?? (backendProduct.brand as { brand?: string; brandName?: string } | undefined)?.brandName ?? '',
     };
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Banner Section */}
       <section className="w-full pt-[100px]">
         <div className="w-full">
           <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-center">
-            {/* Background Image - Dynamic based on category */}
             <div className="absolute inset-0 z-0">
               <Image
                 src={currentBanner.image}
@@ -176,11 +169,7 @@ function ShopContent() {
                 priority
               />
             </div>
-
-            {/* Dark overlay for text readability */}
             <div className="absolute inset-0 bg-black/30"></div>
-
-            {/* Content - Dynamic based on category */}
             <div className="relative z-10 text-center px-4 max-w-3xl">
               <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
                 {currentBanner.title}
@@ -194,7 +183,6 @@ function ShopContent() {
       </section>
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8">
-        {/* Toolbar */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div className="flex items-center gap-4">
             <button
@@ -207,13 +195,13 @@ function ShopContent() {
             <div className="hidden md:flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded ${viewMode === "grid" ? "bg-[#3BB77E] text-white" : "text-gray-600"}`}
+                className={`p-2 rounded ${viewMode === "grid" ? "bg-[#005000] text-white" : "text-gray-600"}`}
               >
                 <Grid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded ${viewMode === "list" ? "bg-[#3BB77E] text-white" : "text-gray-600"}`}
+                className={`p-2 rounded ${viewMode === "list" ? "bg-[#005000] text-white" : "text-gray-600"}`}
               >
                 <List className="w-4 h-4" />
               </button>
@@ -225,7 +213,7 @@ function ShopContent() {
               Showing {paginatedProducts.length} of {filteredProducts.length} products
             </p>
             <select
-              className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#3BB77E] focus:border-transparent"
+              className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -236,25 +224,22 @@ function ShopContent() {
           </div>
         </div>
 
-        {/* MAIN LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* SIDEBAR - Filters */}
           <aside className={`lg:col-span-3 ${showFilters ? "block" : "hidden lg:block"}`}>
             <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 sticky top-8">
-              {/* Categories */}
               <div>
                 <h3 className="font-extrabold text-[#253D4E] text-lg mb-4">Categories</h3>
                 {loading ? (
                   <div className="flex justify-center py-4">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#3BB77E]" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#005000]" />
                   </div>
                 ) : (
                   <ul className="space-y-2">
                     <li>
                       <button
-                        onClick={() => setSelectedCategory("all")}
+                        onClick={() => handleCategoryChange("all")}
                         className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedCategory === "all"
-                          ? "bg-[#3BB77E] text-white"
+                          ? "bg-[#005000] text-white"
                           : "text-[#253D4E] hover:bg-gray-50"
                           }`}
                       >
@@ -264,9 +249,9 @@ function ShopContent() {
                     {categories.map(cat => (
                       <li key={cat.id}>
                         <button
-                          onClick={() => setSelectedCategory(String(cat.id))}
+                          onClick={() => handleCategoryChange(String(cat.id))}
                           className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedCategory === String(cat.id)
-                            ? "bg-[#3BB77E] text-white"
+                            ? "bg-[#005000] text-white"
                             : "text-[#253D4E] hover:bg-gray-50"
                             }`}
                         >
@@ -278,7 +263,6 @@ function ShopContent() {
                 )}
               </div>
 
-              {/* Price Filter */}
               <div>
                 <h3 className="font-extrabold text-[#253D4E] text-lg mb-4">Filter by Price</h3>
                 <div className="space-y-4">
@@ -305,7 +289,7 @@ function ShopContent() {
                     max={maxPrice}
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#3BB77E]"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#005000]"
                   />
                   <div className="flex justify-between text-xs text-gray-500">
                     <span>Rs. {priceRange[0]}</span>
@@ -314,27 +298,24 @@ function ShopContent() {
                 </div>
               </div>
 
-              {/* Clear Filters */}
               <Button
                 onClick={() => {
-                  setSelectedCategory("all");
+                  handleCategoryChange("all");
                   setPriceRange([0, maxPrice]);
                 }}
                 variant="outline"
-                className="w-full border-[#3BB77E] text-[#3BB77E] hover:bg-[#3BB77E] hover:text-white"
+                className="w-full border-[#005000] text-[#005000] hover:bg-[#005000] hover:text-white"
               >
                 Clear All Filters
               </Button>
             </div>
           </aside>
 
-          {/* PRODUCTS */}
           <main className="lg:col-span-9">
-            {/* Loading State */}
             {loading ? (
               <div className="flex justify-center items-center min-h-[400px]">
                 <div className="text-center">
-                  <Loader2 className="w-12 h-12 animate-spin text-[#3BB77E] mx-auto mb-4" />
+                  <Loader2 className="w-12 h-12 animate-spin text-[#005000] mx-auto mb-4" />
                   <p className="text-gray-600 font-semibold">Loading products...</p>
                 </div>
               </div>
@@ -349,7 +330,6 @@ function ShopContent() {
                   ))}
                 </div>
 
-                {/* PAGINATION */}
                 {totalPages > 1 && (
                   <div className="flex justify-center items-center gap-2 mt-12">
                     <Button
@@ -357,7 +337,7 @@ function ShopContent() {
                       size="sm"
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(p => p - 1)}
-                      className="border-gray-200 hover:bg-[#3BB77E] hover:text-white hover:border-[#3BB77E] disabled:opacity-50"
+                      className="border-gray-200 hover:bg-[#005000] hover:text-white hover:border-[#005000] disabled:opacity-50"
                     >
                       Previous
                     </Button>
@@ -382,8 +362,8 @@ function ShopContent() {
                           onClick={() => setCurrentPage(page)}
                           className={
                             page === currentPage
-                              ? "bg-[#3BB77E] hover:bg-[#299E63] text-white"
-                              : "border-gray-200 hover:bg-[#3BB77E] hover:text-white hover:border-[#3BB77E]"
+                              ? "bg-[#005000] hover:bg-[#006600] text-white"
+                              : "border-gray-200 hover:bg-[#005000] hover:text-white hover:border-[#005000]"
                           }
                         >
                           {page}
@@ -396,7 +376,7 @@ function ShopContent() {
                       size="sm"
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(p => p + 1)}
-                      className="border-gray-200 hover:bg-[#3BB77E] hover:text-white hover:border-[#3BB77E] disabled:opacity-50"
+                      className="border-gray-200 hover:bg-[#005000] hover:text-white hover:border-[#005000] disabled:opacity-50"
                     >
                       Next
                     </Button>
