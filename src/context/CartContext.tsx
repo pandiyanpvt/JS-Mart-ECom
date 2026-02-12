@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import Cookies from "js-cookie";
 
 export type Product = {
     id: string;
@@ -11,6 +12,9 @@ export type Product = {
     tag?: string;
     quantity?: number;
 };
+
+const CART_COOKIE_NAME = "jsmart_cart";
+const CART_COOKIE_DAYS = 7;
 
 type CartContextType = {
     cart: Product[];
@@ -31,25 +35,41 @@ export const useCart = () => {
 
 export function CartProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<Product[]>([]);
-
-
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        const stored = localStorage.getItem("cartItems");
-        if (stored) {
+        let loaded: Product[] = [];
+        const fromCookie = Cookies.get(CART_COOKIE_NAME);
+        if (fromCookie) {
             try {
-                setCart(JSON.parse(stored));
+                loaded = JSON.parse(fromCookie);
             } catch (e) {
-                console.error("Failed to parse cart items", e);
+                console.error("Failed to parse cart cookie", e);
             }
         }
+        if (loaded.length === 0 && typeof localStorage !== "undefined") {
+            const fromStorage = localStorage.getItem("cartItems");
+            if (fromStorage) {
+                try {
+                    loaded = JSON.parse(fromStorage);
+                    localStorage.removeItem("cartItems");
+                } catch (e) {
+                    console.error("Failed to migrate cart from localStorage", e);
+                }
+            }
+        }
+        if (loaded.length > 0) setCart(loaded);
         setIsInitialized(true);
     }, []);
 
     useEffect(() => {
         if (isInitialized) {
-            localStorage.setItem("cartItems", JSON.stringify(cart));
+            const value = JSON.stringify(cart);
+            Cookies.set(CART_COOKIE_NAME, value, {
+                path: "/",
+                sameSite: "Lax",
+                expires: CART_COOKIE_DAYS,
+            });
         }
     }, [cart, isInitialized]);
 

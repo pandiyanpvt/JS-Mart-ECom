@@ -34,12 +34,15 @@ export default function OrdersPage() {
         const fetchOrders = async () => {
             try {
                 const user = authService.getCurrentUser();
-                if (user && user.id) {
-                    const data = await orderService.getMyOrders(user.id);
-                    setOrders(data);
+                if (!user?.id) {
+                    setOrders([]);
+                    return;
                 }
+                const data = await orderService.getMyOrders(user.id);
+                setOrders(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
+                setOrders([]);
             } finally {
                 setLoading(false);
             }
@@ -79,9 +82,10 @@ export default function OrdersPage() {
     return (
         <div className="min-h-screen bg-gray-50 pt-[120px]">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                    Order Management
+                <h1 className="text-3xl md:text-4xl font-bold text-[#253D4E]">
+                    Order summary
                 </h1>
+                <p className="text-gray-600 mt-1">Your order history — only your orders are shown here</p>
             </div>
 
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pb-12">
@@ -90,12 +94,12 @@ export default function OrdersPage() {
                     <div className="bg-white rounded-xl shadow-md p-8">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">My Orders</h2>
-                                <p className="text-gray-600">Track and manage your orders</p>
+                                <h2 className="text-2xl font-bold text-[#253D4E] mb-2">Your orders</h2>
+                                <p className="text-gray-600">Track and manage your order history</p>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <Package className="h-5 w-5" />
-                                <span className="font-semibold">{orders.length}</span> Total Orders
+                                <span className="font-semibold">{orders.length}</span> orders
                             </div>
                         </div>
 
@@ -187,7 +191,7 @@ export default function OrdersPage() {
                                                 <div className="text-right">
                                                     <p className="text-sm text-gray-600 mb-1">Total</p>
                                                     <p className="text-2xl font-bold text-gray-900">
-                                                        ${order.totalAmount}
+                                                        Rs. {typeof order.totalAmount === 'string' ? parseFloat(order.totalAmount).toFixed(2) : Number(order.totalAmount).toFixed(2)}
                                                     </p>
                                                 </div>
                                                 <Link href={`/account/orders/${order.id}`}>
@@ -204,15 +208,15 @@ export default function OrdersPage() {
                                     {/* Quick Actions */}
                                     {order.status === "Delivered" && (
                                         <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 flex flex-wrap gap-3">
-                                            <button className="text-sm text-[#3BB77E] hover:text-[#299E63] font-medium">
+                                            <button className="text-sm text-[#005000] hover:text-[#006600] font-medium">
                                                 Buy Again
                                             </button>
                                             <span className="text-gray-300">•</span>
-                                            <button className="text-sm text-[#3BB77E] hover:text-[#299E63] font-medium">
+                                            <button className="text-sm text-[#005000] hover:text-[#006600] font-medium">
                                                 Write Review
                                             </button>
                                             <span className="text-gray-300">•</span>
-                                            <button className="text-sm text-[#3BB77E] hover:text-[#299E63] font-medium">
+                                            <button className="text-sm text-[#005000] hover:text-[#006600] font-medium">
                                                 Download Invoice
                                             </button>
                                         </div>

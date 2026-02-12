@@ -89,10 +89,10 @@ export default function PopularProducts() {
 
                 {/* Navigation Arrows */}
                 <div className="flex items-center gap-2">
-                    <button onClick={() => scroll("left")} className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group">
+                    <button onClick={() => scroll("left")} className="w-8 h-8 rounded bg-[#005000] flex items-center justify-center hover:bg-[#006600] transition-all shadow-sm group">
                         <ChevronLeft className="w-5 h-5 text-white" />
                     </button>
-                    <button onClick={() => scroll("right")} className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group">
+                    <button onClick={() => scroll("right")} className="w-8 h-8 rounded bg-[#005000] flex items-center justify-center hover:bg-[#006600] transition-all shadow-sm group">
                         <ChevronRight className="w-5 h-5 text-white" />
                     </button>
                 </div>
@@ -114,7 +114,7 @@ export default function PopularProducts() {
                                 {/* New Badge */}
                                 {product.isNew && (
                                     <div className="absolute top-3 left-3 z-10">
-                                        <span className="bg-[#3BB77E] text-white text-xs font-bold px-2.5 py-1 rounded">NEW</span>
+                                        <span className="bg-[#005000] text-white text-xs font-bold px-2.5 py-1 rounded">NEW</span>
                                     </div>
                                 )}
 
@@ -126,13 +126,13 @@ export default function PopularProducts() {
                                             e.stopPropagation();
                                             handleWishlistToggle(product);
                                         }}
-                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${isInWishlist(String(product.id)) ? "bg-[#3BB77E] text-white" : "bg-white hover:bg-[#3BB77E] hover:text-white"}`}
+                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${isInWishlist(String(product.id)) ? "bg-[#005000] text-white" : "bg-white hover:bg-[#005000] hover:text-white"}`}
                                         title={isInWishlist(String(product.id)) ? "Remove from wishlist" : "Add to wishlist"}
                                     >
                                         <Heart className={`w-4 h-4 ${isInWishlist(String(product.id)) ? "fill-white text-white" : "text-gray-700 group-hover/icon:text-white"}`} />
                                     </button>
                                     <Link href={`/shop/${product.id}`}>
-                                        <button className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#3BB77E] hover:text-white transition-all group/icon">
+                                        <button className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#005000] hover:text-white transition-all group/icon">
                                             <Eye className="w-4 h-4 text-gray-700 group-hover/icon:text-white" />
                                         </button>
                                     </Link>
@@ -156,7 +156,7 @@ export default function PopularProducts() {
                             {/* Product Info */}
                             <div className="p-4 space-y-2">
                                 <Link href={`/shop/${product.id}`}>
-                                    <h3 className="text-[#253D4E] font-semibold text-sm leading-tight hover:text-[#3BB77E] transition-colors">{product.name}</h3>
+                                    <h3 className="text-[#253D4E] font-semibold text-sm leading-tight hover:text-[#005000] transition-colors">{product.name}</h3>
                                 </Link>
 
                                 {/* Price */}

@@ -62,9 +62,9 @@ export default function ForgotPasswordPage() {
                     {isSubmitted ? (
                         /* Success Message */
                         <div className="space-y-6">
-                            <div className="bg-lime-50 border border-lime-200 rounded-lg p-6 space-y-4">
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-6 space-y-4">
                                 <div className="flex justify-center">
-                                    <div className="w-16 h-16 bg-lime-500 rounded-full flex items-center justify-center">
+                                    <div className="w-16 h-16 bg-[#005000] rounded-full flex items-center justify-center">
                                         <Mail className="h-8 w-8 text-white" />
                                     </div>
                                 </div>

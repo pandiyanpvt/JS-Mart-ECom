@@ -47,7 +47,7 @@ export default function WishlistPage() {
                             Start adding products to your wishlist by clicking the heart icon on any product card.
                         </p>
                         <Link href="/shop">
-                            <Button className="bg-[#3BB77E] hover:bg-[#299E63] text-white px-8 py-6 text-lg font-semibold">
+                            <Button className="bg-[#005000] hover:bg-[#006600] text-white px-8 py-6 text-lg font-semibold">
                                 <ShoppingBag className="w-5 h-5 mr-2" />
                                 Start Shopping
                             </Button>
@@ -83,7 +83,7 @@ export default function WishlistPage() {
                                     <div className="mt-2 flex gap-2">
                                         <Button
                                             onClick={() => handleAddToCart(product)}
-                                            className="flex-1 bg-[#3BB77E] hover:bg-[#299E63] text-white text-sm font-semibold"
+                                            className="flex-1 bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold"
                                         >
                                             <ShoppingBag className="w-4 h-4 mr-2" />
                                             Add to Cart

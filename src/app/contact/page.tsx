@@ -58,7 +58,7 @@ export default function ContactPage() {
                         {/* Content */}
                         <div className="relative z-10 text-center px-4 max-w-3xl">
                             <h1 className="text-4xl md:text-7xl font-black text-white mb-6 drop-shadow-lg">
-                                Get in <span className="text-[#3BB77E]">Touch</span>
+                                Get in <span className="text-[#005000]">Touch</span>
                             </h1>
                             <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
                                 Have a question or need assistance? We're here to help! Reach out to our friendly customer support team.
@@ -102,7 +102,7 @@ export default function ContactPage() {
                                     <Input
                                         type="text"
                                         placeholder="John"
-                                        className="h-12 border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E]"
+                                        className="h-12 border-gray-300 focus:border-[#005000] focus:ring-[#005000]"
                                     />
                                 </div>
                                 <div>
@@ -110,7 +110,7 @@ export default function ContactPage() {
                                     <Input
                                         type="text"
                                         placeholder="Doe"
-                                        className="h-12 border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E]"
+                                        className="h-12 border-gray-300 focus:border-[#005000] focus:ring-[#005000]"
                                     />
                                 </div>
                             </div>
@@ -120,7 +120,7 @@ export default function ContactPage() {
                                 <Input
                                     type="email"
                                     placeholder="john@example.com"
-                                    className="h-12 border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E]"
+                                    className="h-12 border-gray-300 focus:border-[#005000] focus:ring-[#005000]"
                                 />
                             </div>
 
@@ -129,7 +129,7 @@ export default function ContactPage() {
                                 <Input
                                     type="tel"
                                     placeholder="+94 77 123 4567"
-                                    className="h-12 border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E]"
+                                    className="h-12 border-gray-300 focus:border-[#005000] focus:ring-[#005000]"
                                 />
                             </div>
 
@@ -138,7 +138,7 @@ export default function ContactPage() {
                                 <Input
                                     type="text"
                                     placeholder="How can we help you?"
-                                    className="h-12 border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E]"
+                                    className="h-12 border-gray-300 focus:border-[#005000] focus:ring-[#005000]"
                                 />
                             </div>
 
@@ -147,11 +147,11 @@ export default function ContactPage() {
                                 <Textarea
                                     placeholder="Tell us more about your inquiry..."
                                     rows={5}
-                                    className="border-gray-300 focus:border-[#3BB77E] focus:ring-[#3BB77E] resize-none"
+                                    className="border-gray-300 focus:border-[#005000] focus:ring-[#005000] resize-none"
                                 />
                             </div>
 
-                            <Button className="w-full h-12 bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold text-lg rounded-full flex items-center justify-center gap-2">
+                            <Button className="w-full h-12 bg-[#005000] hover:bg-[#006600] text-white font-bold text-lg rounded-full flex items-center justify-center gap-2">
                                 <Send className="h-5 w-5" />
                                 Send Message
                             </Button>
@@ -180,7 +180,7 @@ export default function ContactPage() {
                                 Check out our FAQ section for instant answers to common questions about orders, delivery, and more.
                             </p>
                             <Link href="/faq">
-                                <Button className="bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold h-12 px-8 rounded-full">
+                                <Button className="bg-[#005000] hover:bg-[#006600] text-white font-bold h-12 px-8 rounded-full">
                                     Visit FAQ
                                 </Button>
                             </Link>
@@ -200,12 +200,12 @@ export default function ContactPage() {
                         <div className="bg-white rounded-xl p-6 border border-gray-200">
                             <p className="font-bold text-[#253D4E] mb-2">Weekdays</p>
                             <p className="text-gray-600">Monday - Saturday</p>
-                            <p className="text-[#3BB77E] font-bold text-xl mt-2">8:00 AM - 8:00 PM</p>
+                            <p className="text-[#005000] font-bold text-xl mt-2">8:00 AM - 8:00 PM</p>
                         </div>
                         <div className="bg-white rounded-xl p-6 border border-gray-200">
                             <p className="font-bold text-[#253D4E] mb-2">Weekend</p>
                             <p className="text-gray-600">Sunday</p>
-                            <p className="text-[#3BB77E] font-bold text-xl mt-2">9:00 AM - 6:00 PM</p>
+                            <p className="text-[#005000] font-bold text-xl mt-2">9:00 AM - 6:00 PM</p>
                         </div>
                     </div>
                 </div>

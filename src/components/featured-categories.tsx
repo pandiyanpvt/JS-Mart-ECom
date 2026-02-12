@@ -1,49 +1,39 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import categoryService, { type Category as BackendCategory } from "@/services/category.service";
+import { Loader2 } from "lucide-react";
 
-type Category = {
-    id: string;
-    name: string;
-    image: string;
-    itemCount: number;
-    bgColor: string;
-};
-
-const categories: Category[] = [
-    { id: "fruits", name: "Fresh Fruits", image: "/images/category-section/fruits.png", itemCount: 45, bgColor: "#FFF3E0" },
-    { id: "vegetables", name: "Fresh Vegetables", image: "/images/category-section/vegetables.png", itemCount: 38, bgColor: "#E8F5E9" },
-    { id: "dairy", name: "Dairy & Eggs", image: "/images/category-section/dairy.png", itemCount: 28, bgColor: "#FFF8E1" },
-    { id: "meats", name: "Meat & Seafood", image: "/images/category-section/meat.png", itemCount: 32, bgColor: "#FFEBEE" },
-    { id: "bakery", name: "Bakery & Bread", image: "/images/category-section/bakery.png", itemCount: 24, bgColor: "#FFF9C4" },
-    { id: "beverages", name: "Beverages", image: "/images/category-section/beverages.png", itemCount: 52, bgColor: "#E3F2FD" },
-    { id: "snacks_confectionery", name: "Snacks & Chips", image: "/images/category-section/snacks.png", itemCount: 41, bgColor: "#FCE4EC" },
-    { id: "frozen_food", name: "Frozen Foods", image: "/images/category-section/frozen.png", itemCount: 29, bgColor: "#E0F2F1" },
-    { id: "food_cupboard", name: "Pantry Staples", image: "/images/category-section/pantry.png", itemCount: 67, bgColor: "#F3E5F5" },
-    { id: "household", name: "Household", image: "/images/category-section/personal_care.png", itemCount: 35, bgColor: "#FFF3E0" },
-];
-
-
+const DEFAULT_CATEGORY_IMG = "/images/category-section/vegetables.png";
 
 export default function FeaturedCategories() {
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [categories, setCategories] = useState<BackendCategory[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const scroll = (direction: "left" | "right") => {
-        if (scrollContainerRef.current) {
-            const scrollAmount = 300;
-            const newScrollLeft =
-                scrollContainerRef.current.scrollLeft +
-                (direction === "left" ? -scrollAmount : scrollAmount);
+    useEffect(() => {
+        categoryService
+            .getActive()
+            .then(setCategories)
+            .catch(() => setCategories([]))
+            .finally(() => setLoading(false));
+    }, []);
 
-            scrollContainerRef.current.scrollTo({
-                left: newScrollLeft,
-                behavior: "smooth",
-            });
-        }
-    };
+    if (loading) {
+        return (
+            <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12">
+                <h2 className="text-4xl font-extrabold text-[#253D4E] mb-8">Featured Categories</h2>
+                <div className="flex items-center justify-center py-16">
+                    <Loader2 className="w-10 h-10 animate-spin text-[#005000]" />
+                </div>
+            </section>
+        );
+    }
+
+    if (categories.length === 0) {
+        return null;
+    }
 
     return (
         <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12">
@@ -51,28 +41,16 @@ export default function FeaturedCategories() {
             <div className="flex items-center justify-between mb-8">
                 <h2 className="text-4xl font-extrabold text-[#253D4E]">Featured Categories</h2>
 
-                {/* Navigation Arrows */}
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => scroll("left")}
-                        className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
-                        aria-label="Scroll left"
-                    >
-                        <ChevronLeft className="w-5 h-5 text-white" />
-                    </button>
-                    <button
-                        onClick={() => scroll("right")}
-                        className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
-                        aria-label="Scroll right"
-                    >
-                        <ChevronRight className="w-5 h-5 text-white" />
-                    </button>
-                </div>
+                <Link
+                    href="/shop"
+                    className="shrink-0 px-5 py-2.5 rounded-lg bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold transition-colors"
+                >
+                    View More
+                </Link>
             </div>
 
-            {/* Scrollable Categories */}
+            {/* Scrollable Categories - from backend */}
             <div
-                ref={scrollContainerRef}
                 className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
@@ -87,17 +65,17 @@ export default function FeaturedCategories() {
                         >
                             <div className="relative w-20 h-20 mb-3 transform group-hover:scale-110 transition-transform duration-300">
                                 <Image
-                                    src={category.image}
-                                    alt={category.name}
+                                    src={category.categoryImg || DEFAULT_CATEGORY_IMG}
+                                    alt={category.category}
                                     fill
                                     className="object-contain drop-shadow-md"
                                 />
                             </div>
                             <h3 className="text-[#253D4E] font-semibold text-sm text-center mb-1 leading-tight">
-                                {category.name}
+                                {category.category}
                             </h3>
                             <p className="text-[#7E7E7E] text-xs">
-                                {category.itemCount} items
+                                Shop now
                             </p>
                         </div>
                     </Link>

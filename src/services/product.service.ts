@@ -13,6 +13,8 @@ export interface Product {
     isFeatured: boolean;
     createdAt?: string;
     updatedAt?: string;
+    /** Backend returns alias "images" */
+    images?: ProductImage[];
     product_images?: ProductImage[];
     product_category?: ProductCategory;
     brand?: Brand;
@@ -21,10 +23,22 @@ export interface Product {
 export interface ProductImage {
     id: number;
     productId: number;
-    imageUrl: string;
+    /** Backend uses productImg; we support both */
+    productImg?: string;
+    imageUrl?: string;
     isPrimary: boolean;
     createdAt?: string;
     updatedAt?: string;
+}
+
+/** Get image URL from backend (productImg) or frontend (imageUrl) */
+export function getProductImageUrl(img: ProductImage): string {
+    return img?.productImg ?? img?.imageUrl ?? "";
+}
+
+/** Get images array (backend uses "images" alias) */
+export function getProductImages(product: Product): ProductImage[] {
+    return product?.images ?? product?.product_images ?? [];
 }
 
 export interface ProductCategory {
@@ -71,7 +85,7 @@ const productService = {
 
     // Search products
     search: async (query: string): Promise<Product[]> => {
-        const response = await api.get(`/products/search/query?q=${query}`);
+        const response = await api.get(`/products/search/query?query=${encodeURIComponent(query)}`);
         return response.data;
     },
 

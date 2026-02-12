@@ -36,7 +36,7 @@ export default function PrivacyPolicy() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-4">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
-                <Link href="/" className="inline-flex items-center gap-2 text-[#3BB77E] font-semibold mb-6 hover:text-[#299E63] transition-colors">
+                <Link href="/" className="inline-flex items-center gap-2 text-[#005000] font-semibold mb-6 hover:text-[#006600] transition-colors">
                     <ArrowLeft className="h-5 w-5" /> Back to Home
                 </Link>
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -53,7 +53,7 @@ export default function PrivacyPolicy() {
                     <div className="p-8 md:p-12 space-y-12">
                         {sections.map((section, i) => (
                             <div key={i} className="flex gap-6 group">
-                                <div className="flex-shrink-0 h-14 w-14 bg-lime-50 rounded-2xl flex items-center justify-center text-lime-600 group-hover:bg-lime-500 group-hover:text-white transition-all duration-300">
+                                <div className="flex-shrink-0 h-14 w-14 bg-green-50 rounded-2xl flex items-center justify-center text-[#005000] group-hover:bg-[#005000] group-hover:text-white transition-all duration-300">
                                     {section.icon}
                                 </div>
                                 <div className="space-y-3">

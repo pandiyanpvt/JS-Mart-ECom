@@ -30,7 +30,7 @@ export const brandService = {
 
     // Search brands
     async search(query: string): Promise<Brand[]> {
-        const response = await apiClient.get(`/brands/search/query?q=${query}`);
+        const response = await apiClient.get(`/brands/search/query?query=${encodeURIComponent(query)}`);
         return response.data;
     }
 };

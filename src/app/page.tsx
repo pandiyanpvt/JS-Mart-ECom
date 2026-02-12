@@ -19,7 +19,7 @@ export default function HomePage() {
     <main className="flex flex-col items-center w-full pb-16">
       {/* Hero Section */}
       <HeroSection />
-      {/* Advertisement Section */}
+      {/* Featured Categories - from backend */}
       <FeaturedCategories />
       {/* Popular Products */}
       <PopularProducts />

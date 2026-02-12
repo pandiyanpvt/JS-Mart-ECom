@@ -74,7 +74,7 @@ export default function ShoppingCart() {
                         Your cart is empty —{" "}
                         <Link
                             href="/shop"
-                            className="underline text-[#3BB77E]"
+                            className="underline text-[#005000]"
                         >
                             Start Shopping
                         </Link>
@@ -133,7 +133,7 @@ export default function ShoppingCart() {
                                                     Number(e.target.value)
                                                 )
                                             }
-                                            className="w-16 border rounded text-center h-9 focus:ring-1 focus:ring-[#3BB77E] outline-none"
+                                            className="w-16 border rounded text-center h-9 focus:ring-1 focus:ring-[#005000] outline-none"
                                         />
                                         <button
                                             onClick={() =>
@@ -146,7 +146,7 @@ export default function ShoppingCart() {
                                     </div>
 
                                     {/* SUBTOTAL */}
-                                    <p className="font-bold text-end text-[#3BB77E]">
+                                    <p className="font-bold text-end text-[#005000]">
                                         ${(item.price * item.quantity).toFixed(2)}
                                     </p>
                                 </li>

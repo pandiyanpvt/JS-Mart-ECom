@@ -31,7 +31,7 @@ export default function ReturnPolicy() {
     return (
         <div className="min-h-screen bg-white pb-20">
             {/* Header */}
-            <section className="bg-lime-500 py-24">
+            <section className="bg-[#005000] py-24">
                 <div className="container mx-auto px-4 max-w-4xl text-center">
                     <Link href="/" className="inline-flex items-center gap-2 text-white font-bold mb-6 hover:translate-x-[-4px] transition-transform">
                         <ArrowLeft className="h-5 w-5" /> Back to Shopping
@@ -50,7 +50,7 @@ export default function ReturnPolicy() {
             <section className="container mx-auto px-4 max-w-4xl -mt-12">
                 <div className="grid md:grid-cols-2 gap-6">
                     {rules.map((rule, i) => (
-                        <div key={i} className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hover:border-lime-500 transition-all group">
+                        <div key={i} className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hover:border-[#005000] transition-all group">
                             <div className="h-14 w-14 bg-lime-100 rounded-2xl flex items-center justify-center text-lime-600 mb-6 group-hover:bg-lime-500 group-hover:text-white transition-all duration-300">
                                 {rule.icon}
                             </div>
@@ -64,7 +64,7 @@ export default function ReturnPolicy() {
 
                 {/* Detailed Sections */}
                 <div className="mt-20 space-y-12">
-                    <div className="border-l-4 border-lime-500 pl-8 overflow-hidden">
+                    <div className="border-l-4 border-[#005000] pl-8 overflow-hidden">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Non-Returnable Items</h2>
                         <ul className="list-disc list-inside text-gray-600 space-y-2 text-lg">
                             <li>Gift cards</li>

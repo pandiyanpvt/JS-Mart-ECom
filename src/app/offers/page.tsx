@@ -152,14 +152,14 @@ export default function OffersPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => scroll("left")}
-                className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
+                className="w-8 h-8 rounded bg-[#005000] flex items-center justify-center hover:bg-[#006600] transition-all shadow-sm group"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="w-5 h-5 text-white" />
               </button>
               <button
                 onClick={() => scroll("right")}
-                className="w-8 h-8 rounded bg-[#3BB77E] flex items-center justify-center hover:bg-[#299E63] transition-all shadow-sm group"
+                className="w-8 h-8 rounded bg-[#005000] flex items-center justify-center hover:bg-[#006600] transition-all shadow-sm group"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="w-5 h-5 text-white" />
@@ -226,7 +226,7 @@ export default function OffersPage() {
             <h3 className="text-xl font-bold text-gray-900 mb-2">No active offers right now</h3>
             <p className="text-gray-500 mb-8">Check back soon for new exciting deals!</p>
             <Link href="/shop">
-              <Button className="bg-[#3BB77E] hover:bg-[#299E63] text-white font-bold h-12 px-8 rounded-full shadow-lg transition-all">
+              <Button className="bg-[#005000] hover:bg-[#006600] text-white font-bold h-12 px-8 rounded-full shadow-lg transition-all">
                 Browse All Products
               </Button>
             </Link>

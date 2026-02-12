@@ -57,7 +57,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         <div className="p-6 border-t">
                             <Button
                                 onClick={handleStartShopping}
-                                className="w-full bg-[#3BB77E] hover:bg-[#299E63] text-white py-2 rounded-md"
+                                className="w-full bg-[#005000] hover:bg-[#006600] text-white py-2 rounded-md"
                             >
                                 Start Shopping
                             </Button>
@@ -125,7 +125,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                                 >
                                     Clear Cart
                                 </Button>
-                                <Button onClick={handleCheckout} className="flex-1 bg-[#3BB77E] hover:bg-[#299E63] text-white">
+                                <Button onClick={handleCheckout} className="flex-1 bg-[#005000] hover:bg-[#006600] text-white">
                                     Checkout
                                 </Button>
                             </div>

@@ -117,7 +117,7 @@ export default function CardsPage() {
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Saved Cards</h2>
                         <p className="text-gray-600">Manage your payment methods securely</p>
                     </div>
-                    <Button onClick={handleAddCard} className="bg-[#3BB77E] hover:bg-[#299E63]">
+                    <Button onClick={handleAddCard} className="bg-[#005000] hover:bg-[#006600]">
                         <Plus className="h-4 w-4 mr-2" />
                         Add New Card
                     </Button>
@@ -249,7 +249,7 @@ export default function CardsPage() {
                     <p className="text-gray-600 mb-6">
                         Add a payment method for faster checkout
                     </p>
-                    <Button onClick={handleAddCard} className="bg-[#3BB77E] hover:bg-[#299E63]">
+                    <Button onClick={handleAddCard} className="bg-[#005000] hover:bg-[#006600]">
                         <Plus className="h-4 w-4 mr-2" />
                         Add Card
                     </Button>
@@ -324,7 +324,7 @@ export default function CardsPage() {
                             <div className="flex gap-3 pt-4">
                                 <Button
                                     type="button"
-                                    className="flex-1 bg-[#3BB77E] hover:bg-[#299E63]"
+                                    className="flex-1 bg-[#005000] hover:bg-[#006600]"
                                 >
                                     Save Card
                                 </Button>

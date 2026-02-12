@@ -27,7 +27,7 @@ export default function HeroSection() {
             description: "Farm-fresh organic vegetables at your doorstep",
             buttonText: "Explore",
             buttonLink: "/shop?category=vegetables",
-            gradient: "from-green-500 via-emerald-500 to-teal-500",
+            gradient: "from-[#006600] via-[#005000] to-[#003d00]",
             image: "/slider-2.png"
         },
         {
