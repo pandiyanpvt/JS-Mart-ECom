@@ -387,7 +387,7 @@ function ShopContent() {
         </div>
 
         {/* Content Container - Left Aligned with Site Padding */}
-        <div className="relative z-10 w-full min-h-[250px] sm:min-h-[400px] md:min-h-[500px] flex items-center justify-start px-8 md:px-12 lg:px-20">
+        <div className="relative z-10 w-full min-h-[250px] sm:min-h-[400px] md:min-h-[500px] flex items-center justify-start px-4 md:px-6 lg:px-8">
           <div className="max-w-4xl">
             <h1 className="text-4xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
               {currentBanner.title}
@@ -399,7 +399,7 @@ function ShopContent() {
         </div>
       </section>
 
-      <div className="w-full px-8 md:px-12 lg:px-20 py-8">
+      <div className="w-full px-4 md:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">

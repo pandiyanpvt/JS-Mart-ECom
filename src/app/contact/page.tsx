@@ -5,7 +5,19 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import Image from "next/image";
+import HeroSection, { HeroSlide } from "@/components/hero-section";
+
+const contactHeroSlides: HeroSlide[] = [
+    {
+        id: 1,
+        title: "Get in Touch",
+        subtitle: "Contact Us",
+        description: "Have a question or need assistance? We're here to help! Reach out to our friendly customer support team.",
+        buttonText: "Visit FAQ",
+        buttonLink: "/faq",
+        image: "/images/headers/contact-header.png"
+    }
+];
 
 export default function ContactPage() {
     const contactInfo = [
@@ -37,39 +49,10 @@ export default function ContactPage() {
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Hero Section */}
-            <section className="w-full pt-[100px]">
-                <div className="w-full">
-                    <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-center">
-                        {/* Background Image */}
-                        <div className="absolute inset-0 z-0">
-                            <Image
-                                src="/images/headers/contact-header.png"
-                                alt="Contact Us"
-                                fill
-                                className="object-cover"
-                                priority
-                            />
-                        </div>
-
-                        {/* Dark overlay for text readability */}
-                        <div className="absolute inset-0 bg-black/30"></div>
-
-                        {/* Content */}
-                        <div className="relative z-10 text-center px-4 max-w-3xl">
-                            <h1 className="text-4xl md:text-7xl font-black text-white mb-6 drop-shadow-lg">
-                                Get in <span className="text-[#005000]">Touch</span>
-                            </h1>
-                            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
-                                Have a question or need assistance? We're here to help! Reach out to our friendly customer support team.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <HeroSection slides={contactHeroSlides} />
 
             {/* Contact Info Cards */}
-            <section className="container mx-auto px-4 -mt-10 mb-16 max-w-6xl">
+            <section className="container mx-auto px-4 md:px-6 lg:px-8 -mt-10 mb-16 max-w-6xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {contactInfo.map((info, index) => (
                         <div key={index} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -88,7 +71,7 @@ export default function ContactPage() {
             </section>
 
             {/* Contact Form Section */}
-            <section className="container mx-auto px-4 max-w-6xl py-12">
+            <section className="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl py-12">
                 <div className="grid lg:grid-cols-2 gap-12">
                     {/* Left Side - Form */}
                     <div className="bg-white rounded-2xl border border-gray-200 p-8 md:p-10">
@@ -191,7 +174,7 @@ export default function ContactPage() {
 
             {/* Support Hours Banner */}
             <section className="bg-gray-50 py-16 mt-12">
-                <div className="container mx-auto px-4 text-center max-w-4xl">
+                <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center max-w-4xl">
                     <h3 className="text-2xl font-bold text-[#253D4E] mb-4">Customer Support Hours</h3>
                     <p className="text-gray-600 text-lg mb-8">
                         Our dedicated support team is available to assist you during the following hours:

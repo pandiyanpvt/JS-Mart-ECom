@@ -100,13 +100,13 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
+            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
                     My Profile
                 </h1>
             </div>
 
-            <div className="max-w-4xl mx-auto px-4 md:px-8 pb-12">
+            <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 pb-12">
                 <div className="space-y-6">
                     {/* Profile Header */}
                     <div className="bg-white rounded-xl shadow-md p-8">

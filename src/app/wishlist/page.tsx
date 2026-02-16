@@ -24,14 +24,14 @@ export default function WishlistPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
+            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 flex items-center gap-3">
                     <Heart className="w-8 h-8 md:w-10 md:h-10 text-red-500 fill-red-500" />
                     My Wishlist
                 </h1>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-12">
+            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-12">
                 {wishlist.length === 0 ? (
                     // Empty State
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 md:p-16 text-center">

@@ -23,7 +23,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
         localStorage.setItem("cartItems", JSON.stringify(cart));
         onClose();
-        router.push("/cart");
+        router.push("/checkout");
     };
 
     const handleStartShopping = () => {
