@@ -35,7 +35,7 @@ export default function PrivacyPolicy() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-4">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 pb-4">
+            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
                 <Link href="/" className="inline-flex items-center gap-2 text-[#005000] font-semibold mb-6 hover:text-[#006600] transition-colors">
                     <ArrowLeft className="h-5 w-5" /> Back to Home
                 </Link>

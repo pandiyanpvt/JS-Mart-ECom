@@ -89,7 +89,7 @@ export default function BestOfFruitVeg() {
     };
 
     return (
-        <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12">
+        <section className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-12">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h2 className="text-4xl font-extrabold text-[#253D4E]">Best Of Fruit & Veg</h2>

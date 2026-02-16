@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby } from "lucide-react";
+import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,7 +18,36 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import CartModal from "@/components/layout/add-cart-modal";
-import { categoryService } from "@/services";
+import { categoryService, productService } from "@/services";
+import { type Category } from "@/services/category.service";
+import { type Product } from "@/services/product.service";
+
+function buildCategoryTree(categories: Category[]): Category[] {
+    const categoryMap = new Map<number, Category>();
+    // Clone objects to avoid mutation issues and initialize subCategories
+    categories.forEach(cat => {
+        categoryMap.set(cat.id, { ...cat, subCategories: [] });
+    });
+
+    const rootCategories: Category[] = [];
+
+    categoryMap.forEach((cat) => {
+        if (cat.parentId && cat.parentId !== 0) {
+            const parent = categoryMap.get(cat.parentId);
+            if (parent) {
+                parent.subCategories?.push(cat);
+            } else {
+                // If parent not found, maybe treat as root? 
+                // For safety, let's treat top-level ones (level 1 or null parent) as roots
+                if (cat.level === 1) rootCategories.push(cat);
+            }
+        } else {
+            rootCategories.push(cat);
+        }
+    });
+
+    return rootCategories;
+}
 
 export function Navbar() {
     const pathname = usePathname();
@@ -29,7 +58,12 @@ export function Navbar() {
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const [isOpen, setIsOpen] = useState(false);
-    const [categories, setCategories] = useState<Array<{ id: number; name: string; href: string }>>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [allMenuOpen, setAllMenuOpen] = useState(false);
+    const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+    const [activeSubCategory, setActiveSubCategory] = useState<Category | null>(null);
+    const [categoryProducts, setCategoryProducts] = useState<Record<number, Product[]>>({});
+    const [loadingCategories, setLoadingCategories] = useState<Set<number>>(new Set());
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Fetch categories from backend (used in dropdown + green bar)
@@ -37,26 +71,62 @@ export function Navbar() {
         categoryService
             .getActive()
             .then((categoriesData) => {
-                const seenNames = new Set<string>();
-                const transformed = categoriesData
-                    .map((cat) => ({
-                        id: cat.id,
-                        name: cat.category,
-                        href: `/shop?category=${cat.id}`,
-                    }))
-                    .filter((cat) => {
-                        const key = cat.name.trim().toLowerCase();
-                        if (seenNames.has(key)) return false;
-                        seenNames.add(key);
-                        return true;
-                    });
-                setCategories(transformed);
+                const tree = buildCategoryTree(categoriesData);
+                setCategories(tree);
             })
             .catch((error) => {
                 console.error("Error fetching categories:", error);
                 setCategories([]);
             });
     }, []);
+
+    // When category is selected: if it has subcategories, auto-select first so product list shows beside the list
+    useEffect(() => {
+        if (activeCategory?.subCategories && activeCategory.subCategories.length > 0) {
+            setActiveSubCategory(activeCategory.subCategories[0]);
+        } else {
+            setActiveSubCategory(null);
+        }
+    }, [activeCategory]);
+
+    // Fetch products helper
+    const fetchProductsForCategory = (categoryId: number) => {
+        if (!categoryProducts[categoryId] && !loadingCategories.has(categoryId)) {
+            setLoadingCategories(prev => new Set(prev).add(categoryId));
+            productService.getByCategory(categoryId)
+                .then(products => {
+                    setCategoryProducts(prev => ({ ...prev, [categoryId]: products }));
+                })
+                .catch(error => {
+                    console.error(`Error fetching products for category ${categoryId}:`, error);
+                    setCategoryProducts(prev => ({ ...prev, [categoryId]: [] }));
+                })
+                .finally(() => {
+                    setLoadingCategories(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(categoryId);
+                        return newSet;
+                    });
+                });
+        }
+    };
+
+    // Fetch products for active category (if no subs) or active subcategory
+    useEffect(() => {
+        if (activeCategory) {
+            // Case 1: Parent has no subs, fetch parent products
+            if (!activeCategory.subCategories || activeCategory.subCategories.length === 0) {
+                fetchProductsForCategory(activeCategory.id);
+            }
+        }
+    }, [activeCategory, categoryProducts, loadingCategories]);
+
+    useEffect(() => {
+        // Case 2: Subcategory is active, fetch its products
+        if (activeSubCategory) {
+            fetchProductsForCategory(activeSubCategory.id);
+        }
+    }, [activeSubCategory, categoryProducts, loadingCategories]);
 
     useEffect(() => {
         const checkLoginStatus = () => {
@@ -119,75 +189,93 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans bg-white">
             {/* Main Navbar */}
-            <div className="py-3 px-8 md:px-12 lg:px-20 fixed top-0 bg-white w-full z-50 border-b border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between gap-4">
+            <div className="py-2 pl-0 pr-2 md:pr-4 fixed top-0 bg-white w-full z-50 border-b border-gray-100 shadow-sm h-[80px] flex items-center">
+                <div className="flex items-center justify-between gap-6 w-full max-w-[1920px] mx-auto">
                     {/* Hamburger Menu + Logo */}
-                    <div className="flex items-center gap-3">
-                        {/* Hamburger Menu Button */}
+                    <div className="flex items-center gap-2">
+                        {/* Mobile Hamburger Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="md:hidden p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                             aria-label="Toggle menu"
                         >
-                            <svg
-                                className="w-6 h-6 text-gray-700"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                {isMobileMenuOpen ? (
-                                    <path d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path d="M4 6h16M4 12h16M4 18h16" />
-                                )}
-                            </svg>
+                            <Menu className="w-6 h-6 text-gray-700" />
                         </button>
 
                         {/* Logo with Location */}
-                        <Link href="/" className="flex items-center gap-3 flex-shrink-0">
-                            <div className="relative h-10 w-24 md:h-12 md:w-32">
+                        <div className="flex items-center gap-6">
+                            <Link href="/" className="relative h-16 w-40 md:h-20 md:w-48 lg:h-24 lg:w-64 flex-shrink-0">
                                 <Image
                                     src="/logo/Web_Logo_Mart-01%20(1).png"
                                     alt="JS Mart Australia"
                                     fill
-                                    sizes="(max-width: 768px) 96px, 128px"
+                                    sizes="(max-width: 768px) 160px, (max-width: 1024px) 192px, 256px"
                                     className="object-contain"
                                     priority
                                 />
+                            </Link>
+
+                            <div className="hidden lg:flex items-center gap-2 text-sm text-gray-800 font-medium border-l border-gray-300 pl-6 h-10">
+                                <MapPin className="h-5 w-5 text-gray-900" strokeWidth={2} />
+                                <div className="flex flex-col leading-tight">
+                                    <span className="text-gray-900 font-bold">Dubbo</span>
+                                    <span className="text-gray-600 text-xs">AUSTRALIA</span>
+                                </div>
                             </div>
-                            <div className="hidden md:flex items-center gap-1.5 text-xs">
-                                <MapPin className="h-3.5 w-3.5 text-gray-600" />
-                                <span className="text-gray-600">Hello - <span className="font-semibold text-gray-900">AUSTRALIA</span></span>
-                            </div>
-                        </Link>
+                        </div>
                     </div>
 
                     {/* Search Bar */}
-                    <div className="flex-1 max-w-3xl hidden md:flex items-center">
-                        <div className="flex w-full items-center border-2 border-gray-300 rounded-md overflow-hidden focus-within:border-[#005000] transition-all">
+                    <div className="flex-1 max-w-4xl hidden md:flex items-center px-4">
+                        <div className="flex w-full h-11 items-center bg-[#F3F4F6] rounded-md overflow-hidden ring-1 ring-gray-200">
+                            {/* All Dropdown Button */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="h-full px-5 bg-[#E5E7EB] hover:bg-[#D1D5DB] text-gray-800 text-sm font-bold flex items-center gap-2 transition-colors min-w-[80px] justify-between border-r border-gray-300">
+                                        All
+                                        <ChevronDown className="h-3 w-3 fill-current opacity-70" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-56">
+                                    <DropdownMenuLabel className="px-3 py-2 text-gray-700 font-bold text-sm">
+                                        Categories
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="my-1" />
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/shop" className="flex cursor-pointer px-3 py-2 text-sm hover:bg-gray-100">
+                                            All Products
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="my-1" />
+                                    {categories.map((category) => (
+                                        <DropdownMenuItem key={category.id} asChild>
+                                            <Link href={`/shop?category=${category.id}`} className="flex cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                {category.category}
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
                             <Input
-                                className="flex-1 h-9 border-0 focus-visible:ring-0 text-gray-900 placeholder:text-gray-500 px-3 text-sm bg-white"
+                                className="flex-1 h-full border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-base bg-[#F3F4F6] shadow-none"
                                 placeholder="Search Here"
                             />
-
-                            <Button className="h-9 rounded-none bg-[#005000] hover:bg-[#006600] text-white px-5 font-semibold text-sm transition-all">
-                                <Search className="h-4 w-4" />
-                            </Button>
+                            <button className="h-full px-4 text-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center">
+                                <Search className="h-5 w-5" />
+                            </button>
                         </div>
                     </div>
 
                     {/* Right Actions */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         {/* Sign In / User Account */}
                         {isLoggedIn ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="hidden md:flex items-center gap-2 hover:opacity-90 transition-opacity p-1 rounded-full outline-none ring-2 ring-transparent hover:ring-[#005000]/30 focus:ring-2 focus:ring-[#005000]/50">
                                         {userProfileImg ? (
-                                            <span className="relative h-8 w-8 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                                            <span className="relative h-9 w-9 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
                                                 <Image
                                                     src={userProfileImg}
                                                     alt={userName}
@@ -197,24 +285,24 @@ export function Navbar() {
                                                 />
                                             </span>
                                         ) : (
-                                            <span className="h-8 w-8 rounded-full bg-[#005000] flex items-center justify-center flex-shrink-0">
-                                                <User className="h-4 w-4 text-white" />
+                                            <span className="h-9 w-9 rounded-full bg-[#1F5632] flex items-center justify-center flex-shrink-0 text-white shadow-md">
+                                                <User className="h-5 w-5" />
                                             </span>
                                         )}
                                         <ChevronDown className="h-3.5 w-3.5 text-gray-600" />
                                     </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48">
-                                    <DropdownMenuLabel className="font-normal truncate">{userName}</DropdownMenuLabel>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    <DropdownMenuLabel className="font-normal truncate p-2">{userName}</DropdownMenuLabel>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
-                                        <Link href="/account/profile" className="cursor-pointer flex items-center gap-2">
+                                        <Link href="/account/profile" className="cursor-pointer flex items-center gap-2 px-3 py-2">
                                             <User className="h-4 w-4" />
                                             My Account
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/account/orders" className="cursor-pointer flex items-center gap-2">
+                                        <Link href="/account/orders" className="cursor-pointer flex items-center gap-2 px-3 py-2">
                                             <Package className="h-4 w-4" />
                                             Orders
                                         </Link>
@@ -222,7 +310,7 @@ export function Navbar() {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                         onClick={handleLogout}
-                                        className="cursor-pointer text-red-600 focus:text-red-600 flex items-center gap-2"
+                                        className="cursor-pointer text-red-600 focus:text-red-600 flex items-center gap-2 px-3 py-2"
                                     >
                                         <LogOut className="h-4 w-4" />
                                         Logout
@@ -232,17 +320,17 @@ export function Navbar() {
                         ) : (
                             <Link
                                 href="/signin"
-                                className="hidden md:inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold transition-colors"
+                                className="hidden md:inline-flex items-center justify-center gap-2 h-10 px-6 rounded-full bg-[#1F5632] hover:bg-[#174428] text-white text-sm font-bold transition-transform active:scale-95 shadow-md"
                             >
                                 Sign In
                             </Link>
                         )}
 
                         {/* Wishlist */}
-                        <Link href="/wishlist" className="hidden md:flex items-center gap-1.5 hover:text-[#005000] transition-colors relative p-1.5 rounded">
-                            <Heart className={`h-5 w-5 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
+                        <Link href="/wishlist" className="hidden md:flex items-center justify-center h-10 w-10 hover:bg-gray-100 rounded-full transition-colors relative">
+                            <Heart className={`h-6 w-6 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
                             {wishlist.length > 0 && (
-                                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                                <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
                                     {wishlist.length}
                                 </span>
                             )}
@@ -251,11 +339,11 @@ export function Navbar() {
                         {/* Cart */}
                         <button
                             onClick={toggleModal}
-                            className="flex items-center gap-1.5 hover:text-[#005000] transition-colors relative p-1.5 rounded outline-none"
+                            className="flex items-center justify-center h-10 w-10 hover:bg-gray-100 rounded-full transition-colors relative outline-none"
                         >
-                            <ShoppingBag className="h-6 w-6 text-gray-900" />
+                            <ShoppingBag className="h-6 w-6 text-gray-800" />
                             {cart.length > 0 && (
-                                <span className="absolute -top-1 -right-1 h-5 w-5 bg-[#005000] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                <span className="absolute top-0 right-0 h-4 w-4 bg-[#1F5632] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
                                     {cart.length}
                                 </span>
                             )}
@@ -265,104 +353,182 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* Green Category Navigation Bar - hidden on mobile, fixed height on desktop */}
-            <div className="hidden md:flex bg-[#1F5632] text-white min-h-11 py-2 px-8 md:px-12 lg:px-20 fixed top-[60px] left-0 right-0 w-full z-40 shadow-md items-center">
-                <div className="w-full flex flex-wrap items-center justify-start gap-x-2 gap-y-2 min-h-9">
-                    {/* All Categories Dropdown Menu */}
-                    <DropdownMenu>
+            {/* Green Category Navigation Bar - Fixed alignment */}
+            <div className="hidden md:flex bg-[#1F5632] text-white h-12 fixed top-[80px] left-0 right-0 w-full z-40 shadow-md">
+                <div className="flex items-center h-full w-full pl-0 min-w-0">
+                    {/* All Button - Left Side with Hamburger */}
+                    <DropdownMenu open={allMenuOpen} onOpenChange={(open) => {
+                        setAllMenuOpen(open);
+                        if (!open) {
+                            setActiveCategory(null);
+                            setActiveSubCategory(null);
+                        }
+                    }}>
                         <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
-                                className="h-9 min-w-[120px] flex items-center justify-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 rounded text-sm font-semibold whitespace-nowrap transition-colors border-0 text-white leading-none"
+                                className="h-full flex items-center gap-3 bg-[#174428] hover:bg-[#0f3319] px-6 text-base font-bold whitespace-nowrap transition-colors border-r border-[#2a6b40]"
                             >
-                                <Menu className="h-4 w-4 shrink-0" />
-                                All Categories
-                                <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                                <Menu className="h-6 w-6" strokeWidth={2.5} />
+                                All
                             </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="start"
-                            sideOffset={6}
-                            className="w-56 bg-white text-gray-900 border border-gray-200 shadow-lg z-[100] max-h-[min(400px,70vh)] overflow-y-auto rounded-lg py-1"
+                            sideOffset={0}
+                            className="bg-white text-gray-900 border-t-0 p-0 flex h-[500px] w-[1000px] shadow-2xl rounded-b-lg overflow-hidden z-[100]"
                         >
-                            <DropdownMenuLabel className="px-3 py-2 text-gray-700 font-bold text-sm">
-                                Product Categories
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator className="my-1" />
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href="/shop"
-                                    className="flex cursor-pointer px-3 py-2 text-sm font-medium hover:bg-gray-100 focus:bg-gray-100 rounded-none"
-                                >
-                                    All Products
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="my-1" />
-                            {categories.map((category) => (
-                                <DropdownMenuItem key={category.id} asChild>
-                                    <Link
-                                        href={category.href}
-                                        className="flex cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 rounded-none"
-                                    >
-                                        {category.name}
-                                    </Link>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* Pages Dropdown Menu */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button
-                                type="button"
-                                className="h-9 min-w-[80px] flex items-center justify-center gap-2 bg-[#174428] hover:bg-[#0f3319] px-4 rounded text-sm font-semibold whitespace-nowrap transition-colors border-0 text-white leading-none"
-                            >
-                                Pages
-                                <ChevronDown className="h-3.5 w-3.5 shrink-0" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="start"
-                            sideOffset={6}
-                            className="w-56 bg-white text-gray-900 border border-gray-200 shadow-lg z-[100] rounded-lg py-1"
-                        >
-                            <DropdownMenuLabel className="px-3 py-2 text-gray-700 font-bold text-sm">
-                                Main Pages
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator className="my-1" />
-                            {navLinks.map((link) => (
-                                <DropdownMenuItem key={link.href} asChild>
-                                    <Link
-                                        href={link.href}
-                                        className={`flex cursor-pointer px-3 py-2 text-sm rounded-none ${pathname === link.href
-                                            ? "bg-[#005000] text-white font-semibold hover:bg-[#006600] hover:text-white"
-                                            : "text-gray-700 hover:bg-gray-100 focus:bg-gray-100"
+                            {/* Col 1: Parent Categories (Roots) */}
+                            <div className="w-[20%] bg-gray-50 overflow-y-auto py-2 border-r border-gray-100 custom-scrollbar flex-shrink-0">
+                                {categories.map((category) => (
+                                    <div
+                                        key={category.id}
+                                        onMouseEnter={() => setActiveCategory(category)}
+                                        onClick={() => setActiveCategory(category)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === "Enter" && setActiveCategory(category)}
+                                        className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-all ${activeCategory?.id === category.id
+                                                ? "bg-white text-[#1F5632] font-bold border-l-4 border-[#1F5632] shadow-sm"
+                                                : "text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"
                                             }`}
                                     >
-                                        {link.name}
-                                    </Link>
-                                </DropdownMenuItem>
-                            ))}
+                                        <span className="text-sm truncate mr-2">{category.category}</span>
+                                        <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-opacity ${activeCategory?.id === category.id ? "opacity-100 text-[#1F5632]" : "opacity-0"}`} />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Right side (subcategories + products) - shows when cursor hovers over category */}
+                            {activeCategory && activeCategory.subCategories && activeCategory.subCategories.length > 0 ? (
+                                <>
+                                    {/* Col 2: Subcategories List */}
+                                    <div className="w-[25%] bg-white border-r border-gray-100 overflow-y-auto custom-scrollbar p-2 flex-shrink-0">
+                                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 py-2 mb-2">
+                                            {activeCategory.category}
+                                        </h3>
+                                        {activeCategory.subCategories.map((sub) => (
+                                            <div
+                                                key={sub.id}
+                                                onClick={() => setActiveSubCategory(sub)}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => e.key === "Enter" && setActiveSubCategory(sub)}
+                                                className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-all border-l-4 ${activeSubCategory?.id === sub.id
+                                                        ? "bg-green-50 text-[#1F5632] font-bold border-l-[#1F5632]"
+                                                        : "text-gray-700 hover:bg-gray-50 border-l-transparent"
+                                                    }`}
+                                            >
+                                                <span className="text-sm truncate mr-2">{sub.category}</span>
+                                                <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-opacity ${activeSubCategory?.id === sub.id ? "opacity-100 text-[#1F5632]" : "opacity-0"}`} />
+
+                                                {/* Render Sub-Sub Categories inline if needed, or keep simple keys */}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Col 3: Products for Active Subcategory */}
+                                    <div className="w-[55%] bg-white p-6 overflow-y-auto custom-scrollbar">
+                                        {activeSubCategory ? (
+                                            <div className="h-full flex flex-col">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h4 className="text-lg font-bold text-gray-800">{activeSubCategory.category} Products</h4>
+                                                    <Link href={`/shop?category=${activeSubCategory.id}`} className="text-xs font-bold text-[#1F5632] hover:underline">
+                                                        View All
+                                                    </Link>
+                                                </div>
+
+                                                {loadingCategories.has(activeSubCategory.id) ? (
+                                                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
+                                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1F5632] mb-2"></div>
+                                                        <p className="text-sm">Loading products...</p>
+                                                    </div>
+                                                ) : categoryProducts[activeSubCategory.id] && categoryProducts[activeSubCategory.id].length > 0 ? (
+                                                    <div className="space-y-1">
+                                                        {categoryProducts[activeSubCategory.id].slice(0, 9).map((product) => (
+                                                            <Link key={product.id} href={`/product/${product.id}`} className="block py-2 px-2 text-sm font-medium text-gray-700 hover:text-[#1F5632] hover:bg-gray-50 rounded truncate">
+                                                                {product.productName}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
+                                                        <p className="text-sm">No products found in this category.</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                                                    <ChevronRight className="h-6 w-6 text-gray-400" />
+                                                </div>
+                                                <p>Click a subcategory to see products</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : activeCategory ? (
+                                // No Subcategories - Fallback to showing products for the Parent Category directly (only when category clicked)
+                                <div className="w-[80%] bg-white p-6 overflow-y-auto custom-scrollbar">
+                                    <div className="h-full flex flex-col">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h4 className="text-lg font-bold text-gray-800">{activeCategory.category} Products</h4>
+                                                <Link href={`/shop?category=${activeCategory.id}`} className="text-xs font-bold text-[#1F5632] hover:underline">
+                                                    View All
+                                                </Link>
+                                            </div>
+                                            {loadingCategories.has(activeCategory.id) ? (
+                                                <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1F5632] mb-2"></div>
+                                                    <p className="text-sm">Loading products...</p>
+                                                </div>
+                                            ) : categoryProducts[activeCategory.id] && categoryProducts[activeCategory.id].length > 0 ? (
+                                                <div className="space-y-1">
+                                                    {categoryProducts[activeCategory.id].slice(0, 12).map((product) => (
+                                                        <Link key={product.id} href={`/product/${product.id}`} className="block py-2 px-2 text-sm font-medium text-gray-700 hover:text-[#1F5632] hover:bg-gray-50 rounded truncate">
+                                                            {product.productName}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="flex-1 flex flex-col items-center justify-center text-center text-gray-400">
+                                                    <ShoppingBag className="h-12 w-12 mb-3 opacity-20" />
+                                                    <p className="text-sm font-medium">No products found</p>
+                                                    <Link
+                                                        href={`/shop?category=${activeCategory.id}`}
+                                                        className="mt-4 px-6 py-2 bg-[#1F5632] text-white text-sm font-bold rounded-full hover:bg-[#174428] transition-all"
+                                                    >
+                                                        Shop {activeCategory.category}
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                </div>
+                            ) : null}
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    {/* Category Links */}
-                    {categories.map((category, index) => (
-                        <Link
-                            key={index}
-                            href={category.href}
-                            className="h-9 flex items-center px-3 text-sm font-medium hover:bg-[#174428] rounded transition-colors whitespace-nowrap leading-none"
-                        >
-                            {category.name}
-                        </Link>
-                    ))}
+                    {/* Main Navigation Links - Horizontal */}
+                    <div className="flex-1 flex items-center h-full overflow-x-auto scrollbar-hide px-2">
+                        {navLinks.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.href}
+                                className="h-full flex items-center px-6 text-sm font-bold text-white hover:bg-[#174428] transition-colors whitespace-nowrap uppercase tracking-wider"
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
 
+            {/* Spacer to prevent content from being hidden behind fixed header */}
+            <div className="h-[80px] md:h-[92px]" />
+
             {/* Mobile Navigation Dropdown */}
             {isMobileMenuOpen && (
-                <div className="md:hidden fixed top-[60px] left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-30 animate-slide-down">
+                <div className="md:hidden fixed top-[80px] left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-30 animate-slide-down">
                     <div className="px-4 py-3 space-y-1">
                         {navLinks.map((link, index) => (
                             <Link

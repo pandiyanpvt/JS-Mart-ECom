@@ -1,15 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function HeroSection() {
+export interface HeroSlide {
+    id: number;
+    title: string;
+    subtitle: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    image: string;
+}
+
+interface HeroSectionProps {
+    slides?: HeroSlide[];
+}
+
+export default function HeroSection({ slides: customSlides }: HeroSectionProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    const slides = [
+    const defaultSlides: HeroSlide[] = [
         {
             id: 1,
             title: "Fresh Groceries",
@@ -17,7 +29,6 @@ export default function HeroSection() {
             description: "Get the freshest produce and groceries delivered same day",
             buttonText: "Shop Now",
             buttonLink: "/shop?category=fresh",
-            gradient: "from-emerald-500 via-teal-500 to-cyan-500",
             image: "/slider-1.png"
         },
         {
@@ -27,7 +38,6 @@ export default function HeroSection() {
             description: "Farm-fresh organic vegetables at your doorstep",
             buttonText: "Explore",
             buttonLink: "/shop?category=vegetables",
-            gradient: "from-[#006600] via-[#005000] to-[#003d00]",
             image: "/slider-2.png"
         },
         {
@@ -37,10 +47,11 @@ export default function HeroSection() {
             description: "Shop premium products at unbeatable prices",
             buttonText: "Discover",
             buttonLink: "/shop?category=premium",
-            gradient: "from-orange-500 via-amber-500 to-yellow-500",
             image: "/slider-3.png"
         }
     ];
+
+    const slides = customSlides || defaultSlides;
 
     // Auto-play functionality
     useEffect(() => {
@@ -64,7 +75,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section className="w-full pt-[100px]">
+        <section className="w-full">
             <div className="w-full">
                 <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] group">
                     {/* Slides */}
@@ -90,27 +101,6 @@ export default function HeroSection() {
                             {/* Dark overlay for text readability */}
                             <div className="absolute inset-0 bg-black/30"></div>
 
-                            {/* Content */}
-                            <div className="relative h-full flex flex-col justify-center items-center text-center p-8 z-10">
-                                <div className="space-y-4 animate-fade-in">
-                                    <h3 className="text-2xl md:text-4xl font-bold text-white drop-shadow-lg">
-                                        {slide.subtitle}
-                                    </h3>
-                                    <h2 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-xl">
-                                        {slide.title}
-                                    </h2>
-                                    <p className="text-white/90 text-lg md:text-xl font-medium max-w-md mx-auto drop-shadow-md">
-                                        {slide.description}
-                                    </p>
-                                </div>
-
-                                <Link href={slide.buttonLink} className="mt-8">
-                                    <Button className="bg-white text-gray-900 hover:bg-gray-100 font-bold text-lg px-10 py-6 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2">
-                                        {slide.buttonText}
-                                        <ArrowRight className="w-5 h-5" />
-                                    </Button>
-                                </Link>
-                            </div>
                         </div>
                     ))}
 

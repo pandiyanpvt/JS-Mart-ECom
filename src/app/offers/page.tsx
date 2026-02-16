@@ -2,12 +2,25 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { products } from "@/lib/data";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Tag, Percent } from "lucide-react";
-import Image from "next/image";
 import { offerService } from "@/services/offer.service";
+import HeroSection, { HeroSlide } from "@/components/hero-section";
+
+const offersHeroSlides: HeroSlide[] = [
+  {
+    id: 1,
+    title: "Special Offers",
+    subtitle: "Discover Amazing Deals",
+    description: "Save big on your favorite products today.",
+    buttonText: "Shop Now",
+    buttonLink: "/shop",
+    image: "/images/headers/offers-header.png"
+  }
+];
 
 export default function OffersPage() {
   const [offers, setOffers] = useState([]);
@@ -109,39 +122,11 @@ export default function OffersPage() {
 
   return (
     <main className="flex flex-col w-full pb-16 bg-white">
-      {/* Hero Section */}
-      <section className="w-full pt-[100px]">
-        <div className="w-full">
-          <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-start">
-            {/* Background Image */}
-            <div className="absolute inset-0 z-0">
-              <Image
-                src="/images/headers/offers-header.png"
-                alt="Special Offers"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
+      <HeroSection slides={offersHeroSlides} />
 
-            {/* Dark overlay for text readability */}
-            <div className="absolute inset-0 bg-black/30"></div>
-
-            {/* Content */}
-            <div className="relative z-10 text-left px-8 md:px-12 lg:px-20 w-full max-w-[1600px]">
-              <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
-                Special Offers
-              </h1>
-              <p className="text-lg md:text-xl text-white/90 max-w-2xl drop-shadow-md">
-                Discover amazing deals on your favorite products. Save big today!
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Offers Section */}
-      <section className="w-full py-12 px-8 md:px-12 lg:px-20 max-w-[1600px]">
+      <section className="w-full py-12 px-4 md:px-6 lg:px-8 max-w-[1600px]">
 
 
         <div className="flex items-center justify-between mb-8">

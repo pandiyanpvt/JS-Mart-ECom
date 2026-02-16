@@ -74,7 +74,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
 
     return (
         <div className="min-h-screen bg-gray-50 pt-[120px] pb-12">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8">
+            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                 {/* Header */}
                 <div className="bg-white rounded-xl shadow-md p-8 mb-6">
                     <button
