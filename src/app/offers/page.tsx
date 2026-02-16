@@ -25,7 +25,7 @@ export default function OffersPage() {
   }, []);
 
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
 
   // Transform backend offers to Product format
   const offerProducts = useMemo(() => {
@@ -48,22 +48,28 @@ export default function OffersPage() {
         } else if (offer.discountAmount > 0) {
           discountedPrice = Math.max(0, originalPrice - offer.discountAmount);
           // Fixed amount discount will be shown as percentage by ProductCard, or we can add specific badge
-          badges.push(`Rs. ${offer.discountAmount} OFF`);
+          badges.push(`AUD ${offer.discountAmount} OFF`);
         }
       }
       // Type 1: BOGO
       else if (offer.offerTypeId === 1) {
-        badges.push(`Buy ${offer.buyQuantity} Get ${offer.getQuantity}`);
+        const free = offer.freeProduct?.productName ? ` ${offer.freeProduct.productName}` : '';
+        badges.push(`Buy ${offer.buyQuantity} Get ${offer.getQuantity}${free}`);
       }
       // Type 4: Free Gift
       else if (offer.offerTypeId === 4) {
-        badges.push("Free Gift");
+        const gift = offer.freeProduct?.productName || "Gift";
+        if (offer.buyQuantity && offer.buyQuantity > 0) {
+          badges.push(`Buy ${offer.buyQuantity} Get ${offer.getQuantity || 1} ${gift} Free`);
+        } else {
+          badges.push(`Free ${gift}`);
+        }
       }
       // Type 3: Cart Level
       else if (offer.offerTypeId === 3) {
-        badges.push(`Min Order Rs. ${offer.minOrderAmount}`);
+        badges.push(`Min Order AUD ${offer.minOrderAmount}`);
         if (offer.discountPercentage) badges.push(`${offer.discountPercentage}% OFF Cart`);
-        if (offer.discountAmount) badges.push(`Rs. ${offer.discountAmount} OFF Cart`);
+        if (offer.discountAmount) badges.push(`AUD ${offer.discountAmount} OFF Cart`);
       }
 
       // Add Expiry Badge
@@ -86,31 +92,27 @@ export default function OffersPage() {
         badges: badges,
         weight: "1kg", // Default
         inStock: true,
-        brand: "JS Mart"
+        brand: "JS Mart",
+        offerTypeId: offer.offerTypeId, // Added for button logic
+        offerId: offer.id,
       };
-    }).filter((item: any) => item !== null && (offers.find((o: any) => (o.Product?.id || o.product?.id) === item.id)?.isActive !== false));
+    }).filter((item: any) => {
+      if (!item || !item.offerId) return false;
+      const offer = offers.find((o: any) => o.id === item.offerId);
+      if (!offer) return false;
+      const now = new Date();
+      return offer.isActive !== false && new Date(offer.startDate) <= now && new Date(offer.endDate) >= now;
+    });
   }, [offers]);
 
-  const scroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 300;
-      const newScrollLeft =
-        scrollContainerRef.current.scrollLeft +
-        (direction === "left" ? -scrollAmount : scrollAmount);
 
-      scrollContainerRef.current.scrollTo({
-        left: newScrollLeft,
-        behavior: "smooth",
-      });
-    }
-  };
 
   return (
-    <main className="flex flex-col items-center w-full pb-16 bg-white">
+    <main className="flex flex-col w-full pb-16 bg-white">
       {/* Hero Section */}
       <section className="w-full pt-[100px]">
         <div className="w-full">
-          <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-center">
+          <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center justify-start">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -126,11 +128,11 @@ export default function OffersPage() {
             <div className="absolute inset-0 bg-black/30"></div>
 
             {/* Content */}
-            <div className="relative z-10 text-center px-4 max-w-3xl">
+            <div className="relative z-10 text-left px-8 md:px-12 lg:px-20 w-full max-w-[1600px]">
               <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
                 Special Offers
               </h1>
-              <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+              <p className="text-lg md:text-xl text-white/90 max-w-2xl drop-shadow-md">
                 Discover amazing deals on your favorite products. Save big today!
               </p>
             </div>
@@ -139,50 +141,33 @@ export default function OffersPage() {
       </section>
 
       {/* Offers Section */}
-      <section className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12">
-        {/* Header */}
+      <section className="w-full py-12 px-8 md:px-12 lg:px-20 max-w-[1600px]">
+
+
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-4xl font-extrabold text-[#253D4E]">Featured Deals</h2>
-            <p className="text-gray-500 text-sm mt-2">Don't miss out on these incredible savings</p>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-[#253D4E]">Featured Deals</h2>
+            <p className="text-gray-500 text-xs md:text-sm mt-1 md:mt-2">Don't miss out on these incredible savings</p>
           </div>
 
-          {/* Navigation Arrows */}
-          {offerProducts.length > 0 && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => scroll("left")}
-                className="w-8 h-8 rounded bg-[#005000] flex items-center justify-center hover:bg-[#006600] transition-all shadow-sm group"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="w-5 h-5 text-white" />
-              </button>
-              <button
-                onClick={() => scroll("right")}
-                className="w-8 h-8 rounded bg-[#005000] flex items-center justify-center hover:bg-[#006600] transition-all shadow-sm group"
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="w-5 h-5 text-white" />
-              </button>
-            </div>
-          )}
+          {/* Navigation Arrows (Removed as per user request) */}
         </div>
 
-        {/* Scrollable Products */}
+        {/* Offer Items List */}
         {offerProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 gap-4 md:gap-6">
             {offerProducts.map((item: any) => (
-              <Link key={item.id} href={`/shop/${item.id}`} className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full block">
+              <div key={item.offerId || item.id} className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-full">
                 {/* Banner Image */}
-                <div className="relative h-48 w-full bg-gray-100">
+                <div className="relative w-full h-[150px] md:h-[250px] bg-gray-50 p-2 md:p-4">
                   <Image
                     src={item.image || "/images/placeholder.png"}
                     alt={item.offerName || item.name}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain group-hover:scale-105 transition-transform duration-500"
                   />
                   {/* Badges Overlay */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-2">
+                  <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                     {item.badges.map((badge: string, idx: number) => (
                       <span key={idx} className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                         {badge}
@@ -192,30 +177,36 @@ export default function OffersPage() {
                 </div>
 
                 {/* Content */}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="mb-4">
-                    {item.offerName && <h3 className="text-lg font-black text-gray-900 mb-1 leading-tight">{item.offerName}</h3>}
-                    <p className="text-sm font-medium text-gray-500">{item.name}</p>
+                <div className="p-4 md:p-8 flex flex-col justify-center flex-1">
+                  <div className="mb-2 md:mb-4">
+                    {item.offerName && <h3 className="text-lg md:text-2xl font-black text-gray-900 mb-1 leading-tight line-clamp-2">{item.offerName}</h3>}
+                    <p className="text-xs md:text-lg font-medium text-gray-500 line-clamp-1">{item.name}</p>
                   </div>
 
                   {item.description && (
-                    <p className="text-gray-400 text-xs mb-6 line-clamp-2">{item.description}</p>
+                    <p className="text-gray-400 text-sm mb-6 line-clamp-2">{item.description}</p>
                   )}
 
-                  <div className="mt-auto flex items-end justify-between">
+                  <div className="mt-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 md:gap-4">
                     {item.price > 0 ? (
                       <div>
-                        <span className="text-2xl font-black text-[#253D4E]">Rs. {item.price.toLocaleString()}</span>
+                        <span className="text-xl md:text-3xl font-black text-[#005000]">AUD {item.price.toLocaleString()}</span>
                         {item.price < item.originalPrice && (
-                          <span className="block text-xs text-gray-400 line-through font-medium">Rs. {item.originalPrice.toLocaleString()}</span>
+                          <span className="ml-2 md:ml-3 text-[10px] md:text-sm text-gray-400 line-through font-medium block sm:inline">AUD {item.originalPrice.toLocaleString()}</span>
                         )}
                       </div>
                     ) : (
-                      <div className="h-8"></div>
+                      <div className="h-4 md:h-8"></div>
                     )}
+
+                    <Link href={item.offerTypeId === 3 ? "/shop" : `/shop/${item.id}`} className="w-full sm:w-auto">
+                      <Button className="w-full sm:w-auto bg-[#005000] hover:bg-[#006600] text-white font-bold h-10 md:h-12 px-4 md:px-8 rounded-xl shadow-lg transition-all cursor-pointer text-xs md:text-base">
+                        Claim Offer
+                      </Button>
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (

@@ -13,6 +13,7 @@ export interface Product {
     badges?: string[];
     tag?: string;
     brand?: string;
+    offerValidity?: string;
 }
 
 export const categories = [

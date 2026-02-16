@@ -125,6 +125,16 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Global pointer cursor for interactive elements */
+  button,
+  [role="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  a {
+    cursor: pointer;
+  }
 }
 
 /* Custom Animations */

@@ -99,7 +99,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
                                     <div className="flex flex-col items-end gap-1">
                                         <p className="font-medium">
-                                            Rs. {(item.price * (item.quantity || 1)).toFixed(2)}
+                                            AUD {(item.price * (item.quantity || 1)).toFixed(2)}
                                         </p>
                                         <button
                                             onClick={() => removeFromCart(item.id)}
@@ -115,7 +115,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         {/* Footer Buttons */}
                         <div className="p-6 border-t flex flex-col gap-3">
                             <p className="text-right font-bold text-lg">
-                                Total: Rs. {total.toFixed(2)}
+                                Total: AUD {total.toFixed(2)}
                             </p>
                             <div className="flex gap-3">
                                 <Button

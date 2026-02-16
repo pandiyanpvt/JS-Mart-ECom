@@ -4,10 +4,14 @@ export interface Category {
     id: number;
     category: string;
     categoryImg?: string;
+    bannerImg?: string;
+    level: number;
+    parentId?: number;
     isWeightBased: boolean;
     isActive: boolean;
     createdAt?: string;
     updatedAt?: string;
+    subCategories?: Category[];
 }
 
 const categoryService = {
