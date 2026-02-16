@@ -10,9 +10,11 @@ import type { Product as BackendProduct } from "@/services/product.service";
 import { getProductImages, getProductImageUrl } from "@/services/product.service";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus } from "lucide-react";
+import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Product as LibProduct } from "@/lib/data";
+import { offerService } from "@/services/offer.service";
+import { calculateProductDiscount, formatOfferValidity, type Offer } from "@/utils/offerUtils";
 
 function adaptToLibProduct(p: BackendProduct): LibProduct {
     const imgs = getProductImages(p);
@@ -29,7 +31,7 @@ function adaptToLibProduct(p: BackendProduct): LibProduct {
         weight: p.weight ? `${p.weight}g` : "—",
         rating: 4,
         reviews: 45,
-        brand: (p.brand as { brandName?: string })?.brandName ?? "",
+        brand: p.brand?.brand ?? p.brand?.brandName ?? "",
     };
 }
 
@@ -41,6 +43,7 @@ export default function ProductViewPage() {
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
     const [product, setProduct] = useState<BackendProduct | null>(null);
+    const [offers, setOffers] = useState<Offer[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
@@ -52,21 +55,29 @@ export default function ProductViewPage() {
         if (!id) return;
         let cancelled = false;
         setLoading(true);
-        productService
-            .getById(Number(id))
-            .then((data) => {
+
+        Promise.all([
+            productService.getById(Number(id)),
+            offerService.getOffersByProduct(Number(id))
+        ])
+            .then(([productData, offersData]) => {
                 if (!cancelled) {
-                    setProduct(data);
-                    const stock = data.quantity ?? 99;
+                    setProduct(productData);
+                    setOffers(offersData);
+                    const stock = productData.quantity ?? 99;
                     setQuantity((q) => Math.min(Math.max(1, q), Math.max(1, stock)));
                 }
             })
             .catch(() => {
-                if (!cancelled) setProduct(null);
+                if (!cancelled) {
+                    setProduct(null);
+                    setOffers([]);
+                }
             })
             .finally(() => {
                 if (!cancelled) setLoading(false);
             });
+
         return () => {
             cancelled = true;
         };
@@ -140,7 +151,7 @@ export default function ProductViewPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 pt-[100px]">
+            <div className="w-full py-8 pt-[100px]">
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
                         {/* Left: Image gallery */}
@@ -162,9 +173,8 @@ export default function ProductViewPage() {
                                             key={i}
                                             type="button"
                                             onClick={() => setSelectedImage(i)}
-                                            className={`relative w-20 h-20 flex-shrink-0 rounded-lg border-2 overflow-hidden transition-colors ${
-                                                selectedImage === i ? "border-[#005000]" : "border-gray-200 hover:border-gray-300"
-                                            }`}
+                                            className={`relative w-20 h-20 flex-shrink-0 rounded-lg border-2 overflow-hidden transition-colors ${selectedImage === i ? "border-[#005000]" : "border-gray-200 hover:border-gray-300"
+                                                }`}
                                         >
                                             <Image src={url} alt="" fill className="object-cover" />
                                         </button>
@@ -176,23 +186,137 @@ export default function ProductViewPage() {
                         {/* Right: Details from backend */}
                         <div className="space-y-6">
                             <div className="space-y-6">
-                                <span className="inline-block px-4 py-1.5 bg-gray-100 text-[#253D4E] font-semibold text-sm rounded-full">
-                                    {categoryName}
-                                </span>
-                                <h1 className="text-3xl md:text-4xl font-bold text-[#253D4E] leading-tight">
-                                    {product.productName}
-                                </h1>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <span className="inline-block px-4 py-1.5 bg-gray-100 text-[#253D4E] font-semibold text-sm rounded-full mb-4">
+                                            {categoryName}
+                                        </span>
+                                        <h1 className="text-3xl md:text-4xl font-bold text-[#253D4E] leading-tight">
+                                            {product.productName}
+                                        </h1>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleWishlistToggle}
+                                        className={`p-3 rounded-full transition-colors ${inWishlist ? "bg-red-50 text-red-500" : "bg-gray-100 text-gray-400 hover:text-red-500"
+                                            }`}
+                                        title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                                    >
+                                        <Heart className={`w-6 h-6 ${inWishlist ? "fill-current" : ""}`} />
+                                    </button>
+                                </div>
                                 {product.description && (
                                     <p className="text-gray-600 text-sm leading-relaxed">
                                         {product.description}
                                     </p>
                                 )}
-                                {product.brand && (
+                                {product.product_category?.isWeightBased && product.weight && (
                                     <p className="text-sm font-semibold text-gray-600">
-                                        Brand: {(product.brand as { brandName?: string })?.brandName ?? "—"}
+                                        Weight: {product.weight}kg
                                     </p>
                                 )}
-                                <p className="text-2xl font-bold text-[#253D4E]">Rs. {price.toFixed(2)}</p>
+                                {product.brand && (
+                                    <p className="text-sm font-semibold text-gray-600">
+                                        Brand: {product.brand?.brand ?? product.brand?.brandName ?? "—"}
+                                    </p>
+                                )}
+
+                                {/* Price with Offer */}
+                                {(() => {
+                                    const offerInfo = calculateProductDiscount(price, offers);
+                                    const activeOffers = offers.filter(
+                                        (offer) =>
+                                            offer.isActive &&
+                                            new Date(offer.startDate) <= new Date() &&
+                                            new Date(offer.endDate) >= new Date()
+                                    );
+
+                                    return (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-3 flex-wrap">
+                                                <p className="text-3xl font-bold text-[#005000]">
+                                                    AUD {offerInfo.discountedPrice.toFixed(2)}
+                                                </p>
+                                                {offerInfo.hasDiscount && (
+                                                    <>
+                                                        <p className="text-xl font-medium text-gray-400 line-through">
+                                                            AUD {offerInfo.originalPrice.toFixed(2)}
+                                                        </p>
+                                                        {offerInfo.offer && offerInfo.offer.offerTypeId === 2 && (
+                                                            <div className="flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-lg ml-2">
+                                                                <Tag className="w-3 h-3 text-red-600" />
+                                                                <span className="text-xs font-bold text-red-700">
+                                                                    {offerInfo.discountPercentage
+                                                                        ? `${offerInfo.discountPercentage}% OFF`
+                                                                        : `AUD ${Number(offerInfo.offer.discountAmount)} OFF`}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </div>
+
+                                            {/* Offer Validity */}
+                                            {offerInfo.offer && (
+                                                <div className="flex items-center gap-2 text-sm text-green-600 font-semibold">
+                                                    <Clock className="w-4 h-4" />
+                                                    <span>{formatOfferValidity(offerInfo.offer.endDate)}</span>
+                                                </div>
+                                            )}
+
+                                            {/* Active Offers (excluding Type 2 which is now next to price) */}
+                                            {activeOffers.some(o => o.offerTypeId !== 2) && (
+                                                <div className="space-y-2">
+                                                    <p className="text-sm font-bold text-[#253D4E]">Other Offers:</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {activeOffers.map((offer) => {
+                                                            // Type 1: BOGO
+                                                            if (offer.offerTypeId === 1) {
+                                                                const freeItemName = offer.freeProduct?.productName
+                                                                    ? ` ${offer.freeProduct.productName}`
+                                                                    : "";
+                                                                return (
+                                                                    <div
+                                                                        key={offer.id}
+                                                                        className="flex items-center gap-2 px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg"
+                                                                    >
+                                                                        <Gift className="w-4 h-4 text-purple-600" />
+                                                                        <span className="text-sm font-semibold text-purple-700">
+                                                                            Buy {offer.buyQuantity} Get {offer.getQuantity}{freeItemName} Free
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            }
+                                                            // Type 2: Discount - Already shown next to price if it's the active one
+                                                            // However, if there are multiple discount offers and this one wasn't picked as best, we could show it here.
+                                                            // But usually we only want to show non-price offers here.
+
+                                                            // Type 4: Free Gift
+                                                            else if (offer.offerTypeId === 4) {
+                                                                const giftName = offer.freeProduct?.productName || "Gift";
+                                                                const text = offer.buyQuantity && offer.buyQuantity > 0
+                                                                    ? `Buy ${offer.buyQuantity} Get ${offer.getQuantity || 1} ${giftName} Free`
+                                                                    : `Free ${giftName}`;
+                                                                return (
+                                                                    <div
+                                                                        key={offer.id}
+                                                                        className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg"
+                                                                    >
+                                                                        <Gift className="w-4 h-4 text-green-600" />
+                                                                        <span className="text-sm font-semibold text-green-700">
+                                                                            {text}
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            }
+                                                            return null;
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
                             </div>
 
                             {/* Quantity */}
@@ -246,78 +370,13 @@ export default function ProductViewPage() {
                                     type="button"
                                     onClick={handleBuyNow}
                                     disabled={Number(product.quantity) === 0}
-                                    className="flex-1 h-12 bg-[#005000] hover:bg-[#006600] text-white font-bold rounded-xl disabled:opacity-60 transition-colors"
+                                    className="flex-1 h-12 bg-[#005000] hover:bg-[#006600] text-white font-bold rounded-xl disabled:opacity-60 transition-colors cursor-pointer"
                                 >
                                     Buy Now
                                 </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleWishlistToggle}
-                                    className={`h-12 w-12 rounded-xl border-2 flex-shrink-0 flex items-center justify-center ${
-                                        inWishlist ? "bg-[#005000] border-[#005000] text-white" : "border-gray-200 hover:border-[#005000] hover:text-[#005000]"
-                                    }`}
-                                    aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                                >
-                                    <Heart className={`w-5 h-5 ${inWishlist ? "fill-white" : ""}`} />
-                                </Button>
                             </div>
 
-                            {/* Shipping */}
-                            <div className="border border-gray-200 rounded-xl overflow-hidden">
-                                <button
-                                    type="button"
-                                    onClick={() => setOpenShipping(!openShipping)}
-                                    className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors text-left"
-                                >
-                                    <span className="font-bold text-[#253D4E]">Shipping</span>
-                                    {openShipping ? (
-                                        <ChevronUp className="w-5 h-5 text-gray-500" />
-                                    ) : (
-                                        <ChevronDown className="w-5 h-5 text-gray-500" />
-                                    )}
-                                </button>
-                                {openShipping && (
-                                    <div className="p-4 border-t border-gray-100 space-y-6">
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-10 h-10 rounded-full bg-[#253D4E] flex items-center justify-center text-white">
-                                                <Percent className="w-5 h-5" />
-                                            </span>
-                                            <div>
-                                                <p className="font-semibold text-[#253D4E] text-sm">Discount</p>
-                                                <p className="text-gray-600 text-sm">Disc 50%</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-10 h-10 rounded-full bg-[#253D4E] flex items-center justify-center text-white">
-                                                <Package className="w-5 h-5" />
-                                            </span>
-                                            <div>
-                                                <p className="font-semibold text-[#253D4E] text-sm">Package</p>
-                                                <p className="text-gray-600 text-sm">Regular Package</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-10 h-10 rounded-full bg-[#253D4E] flex items-center justify-center text-white">
-                                                <Clock className="w-5 h-5" />
-                                            </span>
-                                            <div>
-                                                <p className="font-semibold text-[#253D4E] text-sm">Delivery Time</p>
-                                                <p className="text-gray-600 text-sm">3-4 Working Days</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-10 h-10 rounded-full bg-[#253D4E] flex items-center justify-center text-white">
-                                                <MapPin className="w-5 h-5" />
-                                            </span>
-                                            <div>
-                                                <p className="font-semibold text-[#253D4E] text-sm">Estimation Arrive</p>
-                                                <p className="text-gray-600 text-sm">10-12 October 2024</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+
                         </div>
                     </div>
                 </div>

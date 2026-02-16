@@ -156,9 +156,9 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                                 </div>
                                 <div className="text-right">
                                     <p className="font-bold text-gray-900">
-                                        Rs. {(detail.pricePerUnit * detail.quantity).toFixed(2)}
+                                        AUD {(detail.pricePerUnit * detail.quantity).toFixed(2)}
                                     </p>
-                                    <p className="text-sm text-gray-600">Rs. {detail.pricePerUnit} each</p>
+                                    <p className="text-sm text-gray-600">AUD {detail.pricePerUnit} each</p>
                                 </div>
                             </div>
                         ))}
@@ -169,19 +169,19 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                         <div className="space-y-3 max-w-md ml-auto">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>Rs. {order.subtotal?.toFixed(2) || '0.00'}</span>
+                                <span>AUD {order.subtotal?.toFixed(2) || '0.00'}</span>
                             </div>
                             <div className="flex justify-between text-gray-600">
                                 <span>Discount</span>
-                                <span className="text-red-500">- Rs. {order.discount?.toFixed(2) || '0.00'}</span>
+                                <span className="text-red-500">- AUD {order.discount?.toFixed(2) || '0.00'}</span>
                             </div>
                             {/* <div className="flex justify-between text-gray-600">
                                 <span>Tax</span>
-                                <span>Rs. {order.tax?.toFixed(2) || '0.00'}</span>
+                                <span>AUD {order.tax?.toFixed(2) || '0.00'}</span>
                             </div> */}
                             <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
                                 <span>Total</span>
-                                <span className="text-[#005000]">Rs. {order.totalAmount?.toFixed(2)}</span>
+                                <span className="text-[#005000]">AUD {order.totalAmount?.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>

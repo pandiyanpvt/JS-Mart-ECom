@@ -191,7 +191,7 @@ export default function OrdersPage() {
                                                 <div className="text-right">
                                                     <p className="text-sm text-gray-600 mb-1">Total</p>
                                                     <p className="text-2xl font-bold text-gray-900">
-                                                        Rs. {typeof order.totalAmount === 'string' ? parseFloat(order.totalAmount).toFixed(2) : Number(order.totalAmount).toFixed(2)}
+                                                        AUD {typeof order.totalAmount === 'string' ? parseFloat(order.totalAmount).toFixed(2) : Number(order.totalAmount).toFixed(2)}
                                                     </p>
                                                 </div>
                                                 <Link href={`/account/orders/${order.id}`}>

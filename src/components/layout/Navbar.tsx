@@ -119,8 +119,8 @@ export function Navbar() {
     return (
         <div className="w-full flex flex-col font-sans bg-white">
             {/* Main Navbar */}
-            <div className="py-3 px-4 md:px-8 fixed top-0 bg-white w-full z-50 border-b border-gray-200 shadow-sm">
-                <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+            <div className="py-3 px-8 md:px-12 lg:px-20 fixed top-0 bg-white w-full z-50 border-b border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between gap-4">
                     {/* Hamburger Menu + Logo */}
                     <div className="flex items-center gap-3">
                         {/* Hamburger Menu Button */}
@@ -265,9 +265,9 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* Green Category Navigation Bar - fixed height, all items same height */}
-            <div className="bg-[#1F5632] text-white min-h-11 py-2 px-4 md:px-8 fixed top-[60px] left-0 right-0 w-full z-40 shadow-md flex items-center">
-                <div className="max-w-[1600px] mx-auto w-full flex flex-wrap items-center justify-start gap-x-2 gap-y-2 min-h-9">
+            {/* Green Category Navigation Bar - hidden on mobile, fixed height on desktop */}
+            <div className="hidden md:flex bg-[#1F5632] text-white min-h-11 py-2 px-8 md:px-12 lg:px-20 fixed top-[60px] left-0 right-0 w-full z-40 shadow-md items-center">
+                <div className="w-full flex flex-wrap items-center justify-start gap-x-2 gap-y-2 min-h-9">
                     {/* All Categories Dropdown Menu */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -335,11 +335,10 @@ export function Navbar() {
                                 <DropdownMenuItem key={link.href} asChild>
                                     <Link
                                         href={link.href}
-                                        className={`flex cursor-pointer px-3 py-2 text-sm rounded-none ${
-                                            pathname === link.href
-                                                ? "bg-[#005000] text-white font-semibold hover:bg-[#006600] hover:text-white"
-                                                : "text-gray-700 hover:bg-gray-100 focus:bg-gray-100"
-                                        }`}
+                                        className={`flex cursor-pointer px-3 py-2 text-sm rounded-none ${pathname === link.href
+                                            ? "bg-[#005000] text-white font-semibold hover:bg-[#006600] hover:text-white"
+                                            : "text-gray-700 hover:bg-gray-100 focus:bg-gray-100"
+                                            }`}
                                     >
                                         {link.name}
                                     </Link>
@@ -363,7 +362,7 @@ export function Navbar() {
 
             {/* Mobile Navigation Dropdown */}
             {isMobileMenuOpen && (
-                <div className="md:hidden fixed top-[100px] left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-30 animate-slide-down">
+                <div className="md:hidden fixed top-[60px] left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-30 animate-slide-down">
                     <div className="px-4 py-3 space-y-1">
                         {navLinks.map((link, index) => (
                             <Link

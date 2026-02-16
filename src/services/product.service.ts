@@ -45,13 +45,18 @@ export interface ProductCategory {
     id: number;
     category: string;
     categoryImg?: string;
+    bannerImg?: string;
+    level: number;
+    parentId?: number;
     isWeightBased: boolean;
     isActive: boolean;
+    subCategories?: ProductCategory[];
 }
 
 export interface Brand {
     id: number;
-    brandName: string;
+    brandName?: string;
+    brand?: string;
     brandImg?: string;
     isActive: boolean;
 }
