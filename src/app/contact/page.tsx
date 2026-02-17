@@ -48,11 +48,11 @@ export default function ContactPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-white">
-            <HeroSection slides={contactHeroSlides} />
+        <div className="min-h-screen bg-gray-50">
+            <HeroSection slides={contactHeroSlides} className="min-h-[300px] md:min-h-[400px]" />
 
-            {/* Contact Info Cards */}
-            <section className="container mx-auto px-4 md:px-6 lg:px-8 -mt-10 mb-16 max-w-6xl">
+            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 -mt-16 relative z-10 mb-12">
+                {/* Contact Info Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {contactInfo.map((info, index) => (
                         <div key={index} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -68,10 +68,10 @@ export default function ContactPage() {
                         </div>
                     ))}
                 </div>
-            </section>
+            </div>
 
             {/* Contact Form Section */}
-            <section className="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl py-12">
+            <section className="container mx-auto px-4 md:px-6 lg:px-8 max-w-[1600px] pb-20">
                 <div className="grid lg:grid-cols-2 gap-12">
                     {/* Left Side - Form */}
                     <div className="bg-white rounded-2xl border border-gray-200 p-8 md:p-10">

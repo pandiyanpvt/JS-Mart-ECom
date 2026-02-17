@@ -10,11 +10,12 @@ import type { Product as BackendProduct } from "@/services/product.service";
 import { getProductImages, getProductImageUrl } from "@/services/product.service";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag } from "lucide-react";
+import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, ChevronRight, Home } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Product as LibProduct } from "@/lib/data";
 import { offerService } from "@/services/offer.service";
 import { calculateProductDiscount, formatOfferValidity, type Offer } from "@/utils/offerUtils";
+import { ProductCard } from "@/components/product-card";
 
 function adaptToLibProduct(p: BackendProduct): LibProduct {
     const imgs = getProductImages(p);
@@ -44,7 +45,9 @@ export default function ProductViewPage() {
 
     const [product, setProduct] = useState<BackendProduct | null>(null);
     const [offers, setOffers] = useState<Offer[]>([]);
+    const [relatedProducts, setRelatedProducts] = useState<BackendProduct[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingRelated, setLoadingRelated] = useState(false);
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [openShipping, setOpenShipping] = useState(true);
@@ -66,6 +69,21 @@ export default function ProductViewPage() {
                     setOffers(offersData);
                     const stock = productData.quantity ?? 99;
                     setQuantity((q) => Math.min(Math.max(1, q), Math.max(1, stock)));
+                    
+                    // Fetch related products from same category
+                    if (productData.productCategoryId) {
+                        setLoadingRelated(true);
+                        productService.getByCategory(productData.productCategoryId)
+                            .then((related) => {
+                                // Filter out current product and limit to 4
+                                const filtered = related
+                                    .filter(p => p.id !== productData.id)
+                                    .slice(0, 4);
+                                setRelatedProducts(filtered);
+                            })
+                            .catch(() => setRelatedProducts([]))
+                            .finally(() => setLoadingRelated(false));
+                    }
                 }
             })
             .catch(() => {
@@ -104,9 +122,7 @@ export default function ProductViewPage() {
 
     const handleBuyNow = () => {
         if (!product) return;
-        const lib = adaptToLibProduct(product);
-        addToCart(lib, quantity);
-        router.push("/checkout");
+        router.push(`/checkout?productId=${product.id}&qty=${quantity}`);
     };
 
     const handleWishlistToggle = () => {
@@ -151,8 +167,40 @@ export default function ProductViewPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="w-full py-8 pt-[100px]">
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Breadcrumbs */}
+            <div className="w-full pt-[100px] pb-4">
+                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                    <nav className="flex items-center gap-2 text-sm text-gray-600">
+                        <Link href="/" className="hover:text-[#005000] transition-colors flex items-center gap-1">
+                            <Home className="w-4 h-4" />
+                            Home
+                        </Link>
+                        <ChevronRight className="w-4 h-4" />
+                        <Link href="/shop" className="hover:text-[#005000] transition-colors">
+                            Shop
+                        </Link>
+                        {categoryName && (
+                            <>
+                                <ChevronRight className="w-4 h-4" />
+                                <Link 
+                                    href={`/shop?category=${product.productCategoryId}`}
+                                    className="hover:text-[#005000] transition-colors"
+                                >
+                                    {categoryName}
+                                </Link>
+                            </>
+                        )}
+                        <ChevronRight className="w-4 h-4" />
+                        <span className="text-[#253D4E] font-semibold truncate max-w-[200px]">
+                            {product.productName}
+                        </span>
+                    </nav>
+                </div>
+            </div>
+
+            <div className="w-full py-8">
+                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
                         {/* Left: Image gallery */}
                         <div className="space-y-4">
@@ -362,7 +410,7 @@ export default function ProductViewPage() {
                                     onClick={handleAddToCart}
                                     disabled={Number(product.quantity) === 0}
                                     variant="outline"
-                                    className="flex-1 h-12 border-2 border-[#005000] text-[#005000] hover:bg-[#005000] hover:text-white font-bold rounded-xl disabled:opacity-60 transition-colors"
+                                    className="flex-1 h-12 sm:h-12 border-2 border-[#005000] text-[#005000] hover:bg-[#005000] hover:text-white font-bold rounded-xl disabled:opacity-60 transition-colors text-sm sm:text-base"
                                 >
                                     Add to Cart
                                 </Button>
@@ -370,15 +418,49 @@ export default function ProductViewPage() {
                                     type="button"
                                     onClick={handleBuyNow}
                                     disabled={Number(product.quantity) === 0}
-                                    className="flex-1 h-12 bg-[#005000] hover:bg-[#006600] text-white font-bold rounded-xl disabled:opacity-60 transition-colors cursor-pointer"
+                                    className="flex-1 h-12 sm:h-12 bg-[#005000] hover:bg-[#006600] text-white font-bold rounded-xl disabled:opacity-60 transition-colors cursor-pointer text-sm sm:text-base"
                                 >
                                     Buy Now
                                 </Button>
                             </div>
-
-
                         </div>
                     </div>
+                    </div>
+
+                    {/* Related Products Section */}
+                    {relatedProducts.length > 0 && (
+                        <div className="mt-12">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl md:text-3xl font-bold text-[#253D4E]">
+                                    Related Products
+                                </h2>
+                                <Link 
+                                    href={`/shop?category=${product.productCategoryId}`}
+                                    className="text-[#005000] hover:text-[#006600] font-semibold text-sm flex items-center gap-1 transition-colors"
+                                >
+                                    View All
+                                    <ChevronRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+                            {loadingRelated ? (
+                                <div className="flex justify-center py-12">
+                                    <Loader2 className="w-8 h-8 animate-spin text-[#005000]" />
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                                    {relatedProducts.map((relatedProduct) => {
+                                        const relatedImgs = getProductImages(relatedProduct);
+                                        const relatedPrimary = relatedImgs.find((img) => img.isPrimary) || relatedImgs[0];
+                                        const relatedImage = relatedPrimary ? getProductImageUrl(relatedPrimary) : "/placeholder.png";
+                                        const relatedLib = adaptToLibProduct(relatedProduct);
+                                        return (
+                                            <ProductCard key={relatedProduct.id} product={relatedLib} />
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -16,9 +16,17 @@ export interface HeroSlide {
 
 interface HeroSectionProps {
     slides?: HeroSlide[];
+    level?: number;
+    className?: string;
+    allowDefaults?: boolean;
 }
 
-export default function HeroSection({ slides: customSlides }: HeroSectionProps) {
+export default function HeroSection({
+    slides: customSlides,
+    level = 1,
+    className,
+    allowDefaults = true
+}: HeroSectionProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const defaultSlides: HeroSlide[] = [
@@ -51,10 +59,46 @@ export default function HeroSection({ slides: customSlides }: HeroSectionProps) 
         }
     ];
 
-    const slides = customSlides || defaultSlides;
+    const [slides, setSlides] = useState<HeroSlide[]>(
+        customSlides || (allowDefaults ? defaultSlides : [])
+    );
+
+    // Fetch promotions on mount
+    useEffect(() => {
+        if (customSlides) return; // Use custom slides if provided
+
+        const fetchBanners = async () => {
+            try {
+                // Dynamic import to avoid circular dependencies
+                const { default: promotionService } = await import("@/services/promotion.service");
+                const promotions = await promotionService.getByLevel(level);
+
+                if (promotions && promotions.length > 0) {
+                    const mappedSlides: HeroSlide[] = promotions
+                        .sort((a: any, b: any) => a.order - b.order)
+                        .map((p: any) => ({
+                            id: p.id,
+                            title: "", // Backend banners are currently images only
+                            subtitle: "",
+                            description: "",
+                            buttonText: "",
+                            buttonLink: "/shop",
+                            image: p.promotionImg
+                        }));
+                    setSlides(mappedSlides);
+                }
+            } catch (error) {
+                console.error("Failed to load hero banners:", error);
+            }
+        };
+
+        fetchBanners();
+    }, [customSlides, level]);
 
     // Auto-play functionality
     useEffect(() => {
+        if (slides.length <= 1) return;
+
         const timer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % slides.length);
         }, 5000); // Change slide every 5 seconds
@@ -74,10 +118,12 @@ export default function HeroSection({ slides: customSlides }: HeroSectionProps) 
         setCurrentSlide(index);
     };
 
+    if (slides.length === 0) return null;
+
     return (
         <section className="w-full">
             <div className="w-full">
-                <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] group">
+                <div className={`relative overflow-hidden group ${className || "min-h-[400px] md:min-h-[500px]"}`}>
                     {/* Slides */}
                     {slides.map((slide, index) => (
                         <div
@@ -105,35 +151,39 @@ export default function HeroSection({ slides: customSlides }: HeroSectionProps) 
                     ))}
 
                     {/* Navigation Arrows */}
-                    <button
-                        onClick={prevSlide}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
-                        aria-label="Previous slide"
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <button
-                        onClick={nextSlide}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
-                        aria-label="Next slide"
-                    >
-                        <ChevronRight className="w-6 h-6" />
-                    </button>
-
-                    {/* Pagination Dots */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                        {slides.map((_, index) => (
+                    {slides.length > 1 && (
+                        <>
                             <button
-                                key={index}
-                                onClick={() => goToSlide(index)}
-                                className={`transition-all rounded-full ${index === currentSlide
-                                    ? "bg-white w-8 h-2"
-                                    : "bg-white/50 hover:bg-white/75 w-2 h-2"
-                                    }`}
-                                aria-label={`Go to slide ${index + 1}`}
-                            />
-                        ))}
-                    </div>
+                                onClick={prevSlide}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
+                                aria-label="Previous slide"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={nextSlide}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
+                                aria-label="Next slide"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+
+                            {/* Pagination Dots */}
+                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                                {slides.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => goToSlide(index)}
+                                        className={`transition-all rounded-full ${index === currentSlide
+                                            ? "bg-white w-8 h-2"
+                                            : "bg-white/50 hover:bg-white/75 w-2 h-2"
+                                            }`}
+                                        aria-label={`Go to slide ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </section>

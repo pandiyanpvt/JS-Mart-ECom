@@ -64,7 +64,7 @@ export default function ShoppingCart() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-[120px]">
+        <div className="min-h-screen bg-gray-50 pt-8">
 
 
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -80,10 +80,9 @@ export default function ShoppingCart() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="bg-white mt-6">
-
-                        <div
-                            className="mt-4 grid grid-cols-[100px_2fr_1fr_1fr_1fr] text-sm font-medium text-gray-500 gap-4 border-b pb-4">
+                    <div className="bg-white mt-6 rounded-lg shadow-sm overflow-hidden">
+                        {/* Desktop Header - Hidden on mobile */}
+                        <div className="hidden md:grid mt-4 grid-cols-[100px_2fr_1fr_1fr_1fr] text-sm font-medium text-gray-500 gap-4 border-b pb-4 px-4">
                             <div className="col-span-2">Product</div>
                             <div className="text-center">Price</div>
                             <div className="text-center">Quantity</div>
@@ -94,84 +93,139 @@ export default function ShoppingCart() {
                             {cartItems.map(item => (
                                 <li
                                     key={item.id}
-                                    className="grid grid-cols-[100px_2fr_1fr_1fr_1fr] gap-4 py-4 items-center"
+                                    className="grid grid-cols-1 md:grid-cols-[100px_2fr_1fr_1fr_1fr] gap-4 py-4 px-4 md:px-0 items-center"
                                 >
-                                    {/* IMAGE */}
-                                    <div className="h-20 w-20 relative">
-                                        <img
-                                            src={
-                                                item.image?.startsWith("http")
-                                                    ? item.image
-                                                    : item.image
-                                                        ? `/${item.image}`
-                                                        : "/placeholder.png"
-                                            }
-                                            alt={item.name}
-                                            className="h-full w-full rounded object-cover border border-gray-100"
-                                        />
+                                    {/* Mobile Layout */}
+                                    <div className="md:hidden flex gap-4 pb-4 border-b border-gray-100">
+                                        <div className="h-20 w-20 relative flex-shrink-0">
+                                            <img
+                                                src={
+                                                    item.image?.startsWith("http")
+                                                        ? item.image
+                                                        : item.image
+                                                            ? `/${item.image}`
+                                                            : "/placeholder.png"
+                                                }
+                                                alt={item.name}
+                                                className="h-full w-full rounded object-cover border border-gray-100"
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-gray-700 mb-2 truncate">
+                                                {item.name}
+                                            </p>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-sm text-gray-600">Price:</span>
+                                                <span className="font-medium text-gray-700">${item.price}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-sm text-gray-600">Total:</span>
+                                                <span className="font-bold text-[#005000]">${(item.price * item.quantity).toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3 mt-3">
+                                                <label className="text-sm text-gray-600">Qty:</label>
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    value={item.quantity}
+                                                    onChange={e =>
+                                                        handleQuantityChange(
+                                                            item.id,
+                                                            Number(e.target.value)
+                                                        )
+                                                    }
+                                                    className="w-20 border rounded text-center h-9 focus:ring-1 focus:ring-[#005000] outline-none"
+                                                />
+                                                <button
+                                                    onClick={() =>
+                                                        handleRemoveItem(item.id)
+                                                    }
+                                                    className="ml-auto text-xs text-red-500 hover:text-red-700 transition-colors"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    {/* NAME */}
-                                    <p className="font-medium text-gray-700">
-                                        {item.name}
-                                    </p>
+                                    {/* Desktop Layout */}
+                                    <div className="hidden md:contents">
+                                        {/* IMAGE */}
+                                        <div className="h-20 w-20 relative">
+                                            <img
+                                                src={
+                                                    item.image?.startsWith("http")
+                                                        ? item.image
+                                                        : item.image
+                                                            ? `/${item.image}`
+                                                            : "/placeholder.png"
+                                                }
+                                                alt={item.name}
+                                                className="h-full w-full rounded object-cover border border-gray-100"
+                                            />
+                                        </div>
 
-                                    {/* PRICE */}
-                                    <p className="font-medium text-center text-gray-600">
-                                        ${item.price}
-                                    </p>
+                                        {/* NAME */}
+                                        <p className="font-medium text-gray-700">
+                                            {item.name}
+                                        </p>
 
-                                    {/* QUANTITY */}
-                                    <div className="flex flex-col items-center">
-                                        <input
-                                            type="number"
-                                            min={1}
-                                            value={item.quantity}
-                                            onChange={e =>
-                                                handleQuantityChange(
-                                                    item.id,
-                                                    Number(e.target.value)
-                                                )
-                                            }
-                                            className="w-16 border rounded text-center h-9 focus:ring-1 focus:ring-[#005000] outline-none"
-                                        />
-                                        <button
-                                            onClick={() =>
-                                                handleRemoveItem(item.id)
-                                            }
-                                            className="mt-1 text-xs text-red-500 hover:text-red-700 transition-colors"
-                                        >
-                                            Remove
-                                        </button>
+                                        {/* PRICE */}
+                                        <p className="font-medium text-center text-gray-600">
+                                            ${item.price}
+                                        </p>
+
+                                        {/* QUANTITY */}
+                                        <div className="flex flex-col items-center">
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                value={item.quantity}
+                                                onChange={e =>
+                                                    handleQuantityChange(
+                                                        item.id,
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                                className="w-16 border rounded text-center h-9 focus:ring-1 focus:ring-[#005000] outline-none"
+                                            />
+                                            <button
+                                                onClick={() =>
+                                                    handleRemoveItem(item.id)
+                                                }
+                                                className="mt-1 text-xs text-red-500 hover:text-red-700 transition-colors"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+
+                                        {/* SUBTOTAL */}
+                                        <p className="font-bold text-end text-[#005000]">
+                                            ${(item.price * item.quantity).toFixed(2)}
+                                        </p>
                                     </div>
-
-                                    {/* SUBTOTAL */}
-                                    <p className="font-bold text-end text-[#005000]">
-                                        ${(item.price * item.quantity).toFixed(2)}
-                                    </p>
                                 </li>
                             ))}
                         </ul>
 
                         {/* SUMMARY */}
-                        <div className="mt-6 flex justify-between items-center gap-6">
-                            <span className="mt-6">
+                        <div className="mt-6 px-4 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t pt-6">
+                            <div>
                                 {cartItems.length > 0 && (
-                                    <Button onClick={handleReturn} className="text-sm ">
+                                    <Button onClick={handleReturn} className="text-sm w-full sm:w-auto">
                                         Return To Shop
                                     </Button>
                                 )}
-                            </span>
+                            </div>
 
-                            <div className="flex flex-col items-end">
-                                <p className="text-lg font-bold">
+                            <div className="flex flex-col items-end w-full sm:w-auto">
+                                <p className="text-lg font-bold mb-3 sm:mb-2">
                                     Total: ${total.toFixed(2)}
                                 </p>
-                                <Button onClick={handleCheckout} className="bg-[#00028C] hover:bg-[#00026e]">
+                                <Button onClick={handleCheckout} className="bg-[#00028C] hover:bg-[#00026e] w-full sm:w-auto">
                                     Checkout
                                 </Button>
                             </div>
-
                         </div>
 
 

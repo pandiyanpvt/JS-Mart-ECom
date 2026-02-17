@@ -8,8 +8,10 @@ const banners = [
 
 export default function AdvertisementSectionTwo() {
   return (
-    <section className="xl:mx-auto xl:max-w-7xl xl:px-8 px-4 sm:px-6 lg:px-8 mt-6">
-      <BannerSlider images={banners} />
+    <section className="w-full">
+      <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+        <BannerSlider images={banners} />
+      </div>
     </section>
   );
 }

@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CreditCard, Plus, Edit, Trash2, Star, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 interface PaymentCard {
     id: number;
@@ -17,19 +20,36 @@ interface PaymentCard {
 }
 
 export default function CardsPage() {
+    const router = useRouter();
     const [userName, setUserName] = useState("User");
 
     useEffect(() => {
-        const user = localStorage.getItem("user");
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/signin?redirect=/account/cards");
+            return;
+        }
+
+        const user = Cookies.get("user");
         if (user) {
             try {
                 const userData = JSON.parse(user);
-                setUserName(userData.name || "User");
+                let fullName = "User";
+                if (userData.firstName && userData.lastName) {
+                    fullName = `${userData.firstName} ${userData.lastName}`;
+                } else if (userData.fullName) {
+                    fullName = userData.fullName;
+                } else if (userData.firstName) {
+                    fullName = userData.firstName;
+                } else if (userData.name) {
+                    fullName = userData.name;
+                }
+                setUserName(fullName);
             } catch (error) {
                 console.error("Error parsing user data:", error);
             }
         }
-    }, []);
+    }, [router]);
 
     const [cards, setCards] = useState<PaymentCard[]>([
         {
