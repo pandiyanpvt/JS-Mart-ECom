@@ -449,14 +449,14 @@ const CheckoutContent = () => {
                                                             const imgs = getProductImages(product);
                                                             const img = imgs.find(i => i.isPrimary) || imgs[0];
                                                             const imageUrl = img ? getProductImageUrl(img) : null;
-                                                            
+
                                                             const newItem = {
                                                                 id: String(product.id),
                                                                 name: product.productName,
                                                                 price: Number(product.price || 0),
                                                                 image: imageUrl || "/placeholder.png",
                                                             };
-                                                            
+
                                                             if (buyNowId && buyNowItem) {
                                                                 const currentItem = {
                                                                     id: buyNowItem.id,
@@ -587,14 +587,13 @@ const CheckoutContent = () => {
                                     <span>Subtotal</span>
                                     <span className="font-semibold">AUD {totals.subtotal.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Shipping</span>
-                                    <span className="font-semibold">AUD {totals.shipping.toFixed(2)}</span>
-                                </div>
                                 {totals.discountTotal > 0 && (
                                     <div className="flex justify-between text-green-600">
                                         <span>Discount</span>
                                         <span className="font-semibold">-AUD {totals.discountTotal.toFixed(2)}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between text-gray-600">
                                     <div className="flex items-center gap-2">
                                         <span>Shipping</span>
                                         {subscription && (

@@ -9,8 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight, Loader2 } from "lucide-react";
-import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight, Bell, MessageSquare, Star, Crown } from "lucide-react";
+import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight, Loader2, Bell, MessageSquare, Star, Crown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
@@ -747,7 +746,6 @@ export function Navbar() {
                                             <div className="space-y-1">
                                                 {categoryProducts[activeCategory.id].slice(0, 12).map((product) => (
                                                     <Link key={product.id} href={`/shop/${product.id}`} className="block py-2 px-2 text-sm font-medium text-gray-700 hover:text-[#1F5632] hover:bg-gray-50 rounded truncate">
-                                                    <Link key={product.id} href={`/product/${product.id}`} className="block py-2 px-2 text-sm font-medium text-gray-700 hover:text-[#1F5632] hover:bg-gray-50 rounded truncate">
                                                         {product.productName}
                                                     </Link>
                                                 ))}
