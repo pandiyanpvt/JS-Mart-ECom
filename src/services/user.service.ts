@@ -75,6 +75,14 @@ const userService = {
         });
         return response.data;
     },
+
+    // Get user points
+    getPoints: async (): Promise<any> => {
+        const id = getCurrentUserId();
+        if (!id) return null;
+        const response = await api.get(`/user-points/user/${id}`);
+        return response.data;
+    },
 };
 
 export default userService;

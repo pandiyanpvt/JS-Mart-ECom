@@ -8,9 +8,12 @@ import { useRouter } from "next/navigation";
 import orderService, { type ShippingAddressBackend } from "@/services/order.service";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
-import { ShoppingBag, Loader2, MapPin, Plus, X, AlertCircle } from "lucide-react";
+import { ShoppingBag, Loader2, MapPin, Plus, X, AlertCircle, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { membershipService, type UserSubscription } from "@/services/membership.service";
+import { settingsService } from "@/services/settings.service";
 
 const CheckoutPage = () => {
     const { cart, clearCart } = useCart();
@@ -22,6 +25,8 @@ const CheckoutPage = () => {
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
     const [showNewAddressForm, setShowNewAddressForm] = useState(false);
     const [showAddressPopup, setShowAddressPopup] = useState(false);
+    const [subscription, setSubscription] = useState<UserSubscription | null>(null);
+    const [baseShippingFee, setBaseShippingFee] = useState(5.0);
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -74,6 +79,13 @@ const CheckoutPage = () => {
             }
         };
         fetchAddresses();
+
+        // Fetch Membership & Shipping Fee
+        membershipService.getMySubscription().then(setSubscription);
+        settingsService.getSettings().then(data => {
+            const shippingSetting = data.storeSettings.find(s => s.configKey === 'SHIPPING_FEE');
+            if (shippingSetting) setBaseShippingFee(parseFloat(shippingSetting.configValue));
+        });
     }, [authChecked]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +93,7 @@ const CheckoutPage = () => {
     };
 
     const subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-    const shipping = 5.0;
+    const shipping = subscription ? 0 : baseShippingFee;
     const total = subtotal + shipping;
 
     const handlePlaceOrder = async () => {
@@ -249,9 +261,24 @@ const CheckoutPage = () => {
                                     <span className="font-semibold">AUD {subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
-                                    <span>Shipping</span>
-                                    <span className="font-semibold">AUD {shipping.toFixed(2)}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span>Shipping</span>
+                                        {subscription && (
+                                            <span className="flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-md uppercase tracking-wider border border-indigo-100 italic">
+                                                <ShieldCheck size={12} /> Member Free Shipping
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className={cn("font-semibold", subscription && "text-emerald-600 line-through opacity-50")}>
+                                        AUD {baseShippingFee.toFixed(2)}
+                                    </span>
                                 </div>
+                                {subscription && (
+                                    <div className="flex justify-between text-emerald-600 font-bold text-sm">
+                                        <span>Membership Discount</span>
+                                        <span>- AUD {baseShippingFee.toFixed(2)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between text-xl font-bold text-[#253D4E] pt-3 border-t border-gray-200">
                                     <span>Total</span>
                                     <span className="text-[#005000]">AUD {total.toFixed(2)}</span>
@@ -277,11 +304,10 @@ const CheckoutPage = () => {
                                         {savedAddresses.map((address) => (
                                             <label
                                                 key={address.id}
-                                                className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                                                    selectedAddressId === address.id
-                                                        ? "border-[#005000] bg-green-50"
-                                                        : "border-gray-200 hover:border-gray-300"
-                                                }`}
+                                                className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${selectedAddressId === address.id
+                                                    ? "border-[#005000] bg-green-50"
+                                                    : "border-gray-200 hover:border-gray-300"
+                                                    }`}
                                             >
                                                 <input
                                                     type="radio"

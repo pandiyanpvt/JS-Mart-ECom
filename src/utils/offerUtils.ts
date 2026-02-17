@@ -14,6 +14,7 @@ export interface Offer {
     endDate: string;
     isActive: boolean;
     bannerImg?: string;
+    targetMembershipLevel?: number;
     freeProduct?: {
         id: number;
         productName: string;
@@ -37,15 +38,26 @@ export interface ProductWithOffer {
  */
 export function calculateProductDiscount(
     productPrice: number,
-    offers: Offer[]
+    offers: Offer[],
+    userLevel: number = 0
 ): ProductWithOffer {
     // Filter active offers that are currently valid
     const now = new Date();
     const activeOffers = offers.filter(
-        (offer) =>
-            offer.isActive &&
-            new Date(offer.startDate) <= now &&
-            new Date(offer.endDate) >= now
+        (offer) => {
+            if (!offer.isActive) return false;
+
+            // Membership level filter
+            if ((offer.targetMembershipLevel || 0) > userLevel) return false;
+
+            const start = new Date(offer.startDate);
+            const end = offer.endDate ? new Date(offer.endDate) : null;
+
+            const hasStarted = isNaN(start.getTime()) || start <= now;
+            const hasnNotEnded = !end || isNaN(end.getTime()) || end >= now;
+
+            return hasStarted && hasnNotEnded;
+        }
     );
 
     if (activeOffers.length === 0) {
@@ -102,7 +114,9 @@ export function calculateProductDiscount(
  * Format the offer validity date
  */
 export function formatOfferValidity(endDate: string): string {
+    if (!endDate) return "Permanent Offer";
     const end = new Date(endDate);
+    if (isNaN(end.getTime())) return "Permanent Offer";
     const now = new Date();
 
     // Calculate days remaining
@@ -133,11 +147,17 @@ export function formatOfferValidity(endDate: string): string {
 export function getBestOffer(offers: Offer[], productPrice: number): Offer | null {
     const now = new Date();
     const activeOffers = offers.filter(
-        (offer) =>
-            offer.isActive &&
-            offer.offerTypeId === 2 && // Only discount type offers
-            new Date(offer.startDate) <= now &&
-            new Date(offer.endDate) >= now
+        (offer) => {
+            if (!offer.isActive || offer.offerTypeId !== 2) return false;
+            const now = new Date();
+            const start = new Date(offer.startDate);
+            const end = offer.endDate ? new Date(offer.endDate) : null;
+
+            const hasStarted = isNaN(start.getTime()) || start <= now;
+            const havenNotEnded = !end || isNaN(end.getTime()) || end >= now;
+
+            return hasStarted && havenNotEnded;
+        }
     );
 
     if (activeOffers.length === 0) return null;

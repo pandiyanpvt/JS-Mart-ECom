@@ -1,15 +1,16 @@
 
-export default function Home() {
+import MembershipPlans from "@/components/membership-plans";
+import PageHeader from "@/components/page-header";
+
+export default function MembershipPage() {
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-      <div className="flex flex-col items-center space-y-4 text-center">
-        <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          JS Mart
-        </h1>
-        <p className="max-w-[700px] text-zinc-500 md:text-xl dark:text-zinc-400">
-          Membership
-        </p>
-      </div>
-    </div>
+    <main className="bg-white">
+      <PageHeader
+        title="JS Mart Membership"
+        subtitle="Exclusive Rewards & Benefits"
+        description="Join thousands of members enjoying free shipping and premium deals every day."
+      />
+      <MembershipPlans />
+    </main>
   );
 }
