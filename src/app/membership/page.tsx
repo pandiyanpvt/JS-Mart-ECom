@@ -171,4 +171,18 @@ export default function MembershipPage() {
             </section>
         </div>
     );
+import MembershipPlans from "@/components/membership-plans";
+import PageHeader from "@/components/page-header";
+
+export default function MembershipPage() {
+  return (
+    <main className="bg-white">
+      <PageHeader
+        title="JS Mart Membership"
+        subtitle="Exclusive Rewards & Benefits"
+        description="Join thousands of members enjoying free shipping and premium deals every day."
+      />
+      <MembershipPlans />
+    </main>
+  );
 }

@@ -11,11 +11,16 @@ import { getProductImages, getProductImageUrl } from "@/services/product.service
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, ChevronRight, Home } from "lucide-react";
+import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, Crown } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Product as LibProduct } from "@/lib/data";
 import { offerService } from "@/services/offer.service";
 import { calculateProductDiscount, formatOfferValidity, type Offer } from "@/utils/offerUtils";
 import { ProductCard } from "@/components/product-card";
+import { ProductReviews } from "./_components/ProductReviews";
+import { membershipService, UserSubscription } from "@/services/membership.service";
+import { Zap, Gem } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function adaptToLibProduct(p: BackendProduct): LibProduct {
     const imgs = getProductImages(p);
@@ -51,6 +56,7 @@ export default function ProductViewPage() {
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [openShipping, setOpenShipping] = useState(true);
+    const [subscription, setSubscription] = useState<UserSubscription | null>(null);
 
     const maxQty = product ? Math.max(1, product.quantity ?? 99) : 99;
 
@@ -61,13 +67,16 @@ export default function ProductViewPage() {
 
         Promise.all([
             productService.getById(Number(id)),
-            offerService.getOffersByProduct(Number(id))
+            offerService.getOffersByProduct(Number(id)),
+            membershipService.getMySubscription()
         ])
-            .then(([productData, offersData]) => {
+            .then(([productData, offersData, subData]) => {
                 if (!cancelled) {
                     setProduct(productData);
-                    setOffers(offersData);
-                    const stock = productData.quantity ?? 99;
+                    setSubscription(subData);
+                    setOffers(offersData || []);
+
+                    const stock = productData.quantity || 99;
                     setQuantity((q) => Math.min(Math.max(1, q), Math.max(1, stock)));
                     
                     // Fetch related products from same category
@@ -271,13 +280,17 @@ export default function ProductViewPage() {
 
                                 {/* Price with Offer */}
                                 {(() => {
-                                    const offerInfo = calculateProductDiscount(price, offers);
+                                    const userLevel = subscription?.plan?.level || 0;
+                                    const offerInfo = calculateProductDiscount(price, offers, userLevel);
                                     const activeOffers = offers.filter(
                                         (offer) =>
                                             offer.isActive &&
+                                            (offer.targetMembershipLevel || 0) <= userLevel && // Keep price affecting ones to active only for THIS user
                                             new Date(offer.startDate) <= new Date() &&
-                                            new Date(offer.endDate) >= new Date()
+                                            (!offer.endDate || new Date(offer.endDate) >= new Date())
                                     );
+
+                                    const otherOffers = offers.filter(o => o.isActive); // All active for display
 
                                     return (
                                         <div className="space-y-3">
@@ -306,58 +319,71 @@ export default function ProductViewPage() {
 
                                             {/* Offer Validity */}
                                             {offerInfo.offer && (
-                                                <div className="flex items-center gap-2 text-sm text-green-600 font-semibold">
-                                                    <Clock className="w-4 h-4" />
-                                                    <span>{formatOfferValidity(offerInfo.offer.endDate)}</span>
+                                                <div className="flex flex-wrap gap-3 items-center">
+                                                    <div className="flex items-center gap-2 text-sm text-green-600 font-semibold">
+                                                        <Clock className="w-4 h-4" />
+                                                        <span>{formatOfferValidity(offerInfo.offer.endDate)}</span>
+                                                    </div>
+                                                    {(offerInfo.offer.targetMembershipLevel || 0) > 0 && (
+                                                        <span className={cn(
+                                                            "px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1 text-white shadow-sm",
+                                                            offerInfo.offer.targetMembershipLevel === 2 ? "bg-amber-500" : "bg-indigo-600"
+                                                        )}>
+                                                            {offerInfo.offer.targetMembershipLevel === 2 ? <Gem size={10} /> : <Zap size={10} />}
+                                                            {offerInfo.offer.targetMembershipLevel === 2 ? "JS Plus Exclusive" : "JS Pro Member"}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             )}
 
-                                            {/* Active Offers (excluding Type 2 which is now next to price) */}
-                                            {activeOffers.some(o => o.offerTypeId !== 2) && (
+                                            {/* All Active Offers List */}
+                                            {otherOffers.some(o => o.offerTypeId !== 2 || o.id !== offerInfo.offer?.id) && (
                                                 <div className="space-y-2">
-                                                    <p className="text-sm font-bold text-[#253D4E]">Other Offers:</p>
+                                                    <p className="text-sm font-bold text-[#253D4E]">Available Promotions:</p>
                                                     <div className="flex flex-wrap gap-2">
-                                                        {activeOffers.map((offer) => {
-                                                            // Type 1: BOGO
-                                                            if (offer.offerTypeId === 1) {
-                                                                const freeItemName = offer.freeProduct?.productName
-                                                                    ? ` ${offer.freeProduct.productName}`
-                                                                    : "";
-                                                                return (
-                                                                    <div
-                                                                        key={offer.id}
-                                                                        className="flex items-center gap-2 px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg"
-                                                                    >
-                                                                        <Gift className="w-4 h-4 text-purple-600" />
-                                                                        <span className="text-sm font-semibold text-purple-700">
-                                                                            Buy {offer.buyQuantity} Get {offer.getQuantity}{freeItemName} Free
-                                                                        </span>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                            // Type 2: Discount - Already shown next to price if it's the active one
-                                                            // However, if there are multiple discount offers and this one wasn't picked as best, we could show it here.
-                                                            // But usually we only want to show non-price offers here.
+                                                        {otherOffers.map((offer) => {
+                                                            const isRestricted = (offer.targetMembershipLevel || 0) > userLevel;
 
-                                                            // Type 4: Free Gift
-                                                            else if (offer.offerTypeId === 4) {
+                                                            let badgeContent = null;
+                                                            let bgClass = "bg-slate-50 border-slate-200";
+                                                            let textClass = "text-slate-700";
+                                                            let icon = <Tag className="w-4 h-4" />;
+
+                                                            if (offer.offerTypeId === 1) {
+                                                                const freeItemName = offer.freeProduct?.productName ? ` ${offer.freeProduct.productName}` : "";
+                                                                badgeContent = `Buy ${offer.buyQuantity} Get ${offer.getQuantity}${freeItemName} Free`;
+                                                                bgClass = isRestricted ? "bg-slate-50 grayscale opacity-70" : "bg-purple-50 border-purple-200";
+                                                                textClass = isRestricted ? "text-slate-400" : "text-purple-700";
+                                                                icon = <Gift className={isRestricted ? "w-4 h-4 text-slate-300" : "w-4 h-4 text-purple-600"} />;
+                                                            } else if (offer.offerTypeId === 4) {
                                                                 const giftName = offer.freeProduct?.productName || "Gift";
-                                                                const text = offer.buyQuantity && offer.buyQuantity > 0
-                                                                    ? `Buy ${offer.buyQuantity} Get ${offer.getQuantity || 1} ${giftName} Free`
-                                                                    : `Free ${giftName}`;
-                                                                return (
-                                                                    <div
-                                                                        key={offer.id}
-                                                                        className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg"
-                                                                    >
-                                                                        <Gift className="w-4 h-4 text-green-600" />
-                                                                        <span className="text-sm font-semibold text-green-700">
-                                                                            {text}
-                                                                        </span>
-                                                                    </div>
-                                                                );
+                                                                badgeContent = offer.buyQuantity && offer.buyQuantity > 0 ? `Buy ${offer.buyQuantity} Get ${offer.getQuantity || 1} ${giftName} Free` : `Free ${giftName}`;
+                                                                bgClass = isRestricted ? "bg-slate-50 grayscale opacity-70" : "bg-green-50 border-green-200";
+                                                                textClass = isRestricted ? "text-slate-400" : "text-green-700";
+                                                                icon = <Gift className={isRestricted ? "w-4 h-4 text-slate-300" : "w-4 h-4 text-green-600"} />;
+                                                            } else if (offer.offerTypeId === 2 && offer.id !== offerInfo.offer?.id) {
+                                                                badgeContent = offer.discountPercentage ? `${offer.discountPercentage}% OFF` : `AUD ${offer.discountAmount} OFF`;
+                                                                bgClass = isRestricted ? "bg-slate-50 grayscale opacity-70" : "bg-red-50 border-red-200";
+                                                                textClass = isRestricted ? "text-slate-400" : "text-red-700";
                                                             }
-                                                            return null;
+
+                                                            if (!badgeContent) return null;
+
+                                                            return (
+                                                                <div key={offer.id} className={cn("relative flex items-center gap-2 px-3 py-2 border rounded-lg", bgClass)}>
+                                                                    {icon}
+                                                                    <div className="flex flex-col">
+                                                                        <span className={cn("text-xs font-bold leading-none", textClass)}>
+                                                                            {badgeContent}
+                                                                        </span>
+                                                                        {isRestricted && (
+                                                                            <span className="text-[9px] font-black uppercase text-amber-600 mt-1 flex items-center gap-1">
+                                                                                <Crown size={8} /> {offer.targetMembershipLevel === 2 ? "JS Plus Only" : "JS Pro Only"}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
                                                         })}
                                                     </div>
                                                 </div>
@@ -462,6 +488,9 @@ export default function ProductViewPage() {
                         </div>
                     )}
                 </div>
+
+                {/* Reviews Section */}
+                <ProductReviews productId={Number(id)} />
             </div>
         </div>
     );

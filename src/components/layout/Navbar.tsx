@@ -10,6 +10,7 @@ import {
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight, Loader2 } from "lucide-react";
+import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight, Bell, MessageSquare, Star, Crown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,7 +19,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import CartModal from "@/components/layout/add-cart-modal";
-import { categoryService, productService } from "@/services";
+import { categoryService, productService, notificationService } from "@/services";
 import { type Category } from "@/services/category.service";
 import { type Product } from "@/services/product.service";
 import { getProductImages, getProductImageUrl } from "@/services/product.service";
@@ -70,6 +71,31 @@ export function Navbar() {
     const [searchResults, setSearchResults] = useState<Product[]>([]);
     const [showSearchResults, setShowSearchResults] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [notifications, setNotifications] = useState<any[]>([]);
+
+    // Fetch unread notifications
+    useEffect(() => {
+        if (isLoggedIn) {
+            notificationService.getMyNotifications(1, 5)
+                .then(data => {
+                    setNotifications(data.items);
+                    const unread = data.items.filter(n => !n.isRead).length;
+                    setUnreadCount(unread);
+                })
+                .catch(err => console.error("Error fetching notifications:", err));
+        }
+    }, [isLoggedIn, pathname]);
+
+    const handleMarkAsRead = async (id: number) => {
+        try {
+            await notificationService.markAsRead(id);
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+            setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (error) {
+            console.error("Failed to mark as read:", error);
+        }
+    };
 
     // Fetch categories from backend (used in dropdown + green bar)
     useEffect(() => {
@@ -220,6 +246,7 @@ export function Navbar() {
         { name: "Home", href: "/" },
         { name: "Shop", href: "/shop" },
         { name: "Offers", href: "/offers" },
+        { name: "Membership", href: "/membership" },
         { name: "About Us", href: "/about" },
         { name: "Contact Us", href: "/contact" },
     ];
@@ -420,28 +447,72 @@ export function Navbar() {
                                         <ChevronDown className="h-3.5 w-3.5 text-gray-600" />
                                     </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
-                                    <DropdownMenuLabel className="font-normal truncate p-2">{userName}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
+                                <DropdownMenuContent align="end" className="w-64 p-2">
+                                    <div className="px-3 py-2 mb-1">
+                                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Signed in as</p>
+                                        <p className="font-bold text-gray-900 truncate mt-0.5">{userName}</p>
+                                    </div>
+                                    <DropdownMenuSeparator className="mx-1" />
+
                                     <DropdownMenuItem asChild>
-                                        <Link href="/account/profile" className="cursor-pointer flex items-center gap-2 px-3 py-2">
-                                            <User className="h-4 w-4" />
-                                            My Account
+                                        <Link href="/account/profile?tab=profile" className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                                            <User className="h-4 w-4 text-gray-500" />
+                                            My Profile
                                         </Link>
                                     </DropdownMenuItem>
+
                                     <DropdownMenuItem asChild>
-                                        <Link href="/account/orders" className="cursor-pointer flex items-center gap-2 px-3 py-2">
-                                            <Package className="h-4 w-4" />
-                                            Orders
+                                        <Link href="/account/profile?tab=orders" className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                                            <Package className="h-4 w-4 text-gray-500" />
+                                            My Orders
                                         </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
+
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/account/profile?tab=reviews" className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                                            <MessageSquare className="h-4 w-4 text-gray-500" />
+                                            My Reviews
+                                        </Link>
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/account/profile?tab=addresses" className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                                            <MapPin className="h-4 w-4 text-gray-500" />
+                                            Shipping Address
+                                        </Link>
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/account/profile?tab=points" className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                                            <Star className="h-4 w-4 text-gray-500" />
+                                            My Loyalty Points
+                                        </Link>
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/account/profile?tab=notifications" className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                                            <div className="relative">
+                                                <Bell className="h-4 w-4 text-gray-500" />
+                                                {unreadCount > 0 && <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>}
+                                            </div>
+                                            Notifications
+                                        </Link>
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/account/profile?tab=membership" className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                                            <Crown className="h-4 w-4 text-gray-500" />
+                                            Membership
+                                        </Link>
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuSeparator className="mx-1" />
                                     <DropdownMenuItem
                                         onClick={handleLogout}
-                                        className="cursor-pointer text-red-600 focus:text-red-600 flex items-center gap-2 px-3 py-2"
+                                        className="cursor-pointer text-red-600 focus:text-red-600 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-red-50 transition-colors"
                                     >
                                         <LogOut className="h-4 w-4" />
-                                        Logout
+                                        Logout Account
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -452,6 +523,68 @@ export function Navbar() {
                             >
                                 Sign In
                             </Link>
+                        )}
+
+                        {/* Notifications */}
+                        {isLoggedIn && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="hidden md:flex items-center justify-center h-10 w-10 hover:bg-gray-100 rounded-full transition-colors relative outline-none">
+                                        <Bell className={`h-6 w-6 ${unreadCount > 0 ? "text-[#1F5632] fill-[#1F5632]/10" : "text-gray-700"}`} />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                                {unreadCount}
+                                            </span>
+                                        )}
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-80 p-0 overflow-hidden rounded-xl shadow-xl">
+                                    <div className="bg-[#1F5632] p-4 text-white flex items-center justify-between">
+                                        <h3 className="font-bold text-sm">Notifications</h3>
+                                        {unreadCount > 0 && (
+                                            <span className="text-[10px] bg-red-500 px-2 py-0.5 rounded-full font-bold">
+                                                {unreadCount} NEW
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                        {notifications.length === 0 ? (
+                                            <div className="p-8 text-center text-gray-400">
+                                                <Bell className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                                                <p className="text-xs">No notifications yet</p>
+                                            </div>
+                                        ) : (
+                                            notifications.map((notif) => (
+                                                <button
+                                                    key={notif.id}
+                                                    onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
+                                                    className={`w-full text-left p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 relative ${!notif.isRead ? "bg-green-50/30" : ""
+                                                        }`}
+                                                >
+                                                    {!notif.isRead && (
+                                                        <span className="absolute left-2 top-4 w-1.5 h-1.5 bg-[#1F5632] rounded-full"></span>
+                                                    )}
+                                                    <h4 className={`text-xs font-bold mb-0.5 ${!notif.isRead ? "text-gray-900" : "text-gray-600"}`}>
+                                                        {notif.title}
+                                                    </h4>
+                                                    <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
+                                                        {notif.message}
+                                                    </p>
+                                                    <span className="text-[9px] text-gray-400 mt-2 block">
+                                                        {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </button>
+                                            ))
+                                        )}
+                                    </div>
+                                    <Link
+                                        href="/account/profile?tab=notifications"
+                                        className="block p-3 text-center text-[11px] font-bold text-[#1F5632] bg-gray-50 hover:bg-gray-100 transition-colors border-t border-gray-100"
+                                    >
+                                        View All Notifications
+                                    </Link>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         )}
 
                         {/* Wishlist */}
@@ -614,6 +747,7 @@ export function Navbar() {
                                             <div className="space-y-1">
                                                 {categoryProducts[activeCategory.id].slice(0, 12).map((product) => (
                                                     <Link key={product.id} href={`/shop/${product.id}`} className="block py-2 px-2 text-sm font-medium text-gray-700 hover:text-[#1F5632] hover:bg-gray-50 rounded truncate">
+                                                    <Link key={product.id} href={`/product/${product.id}`} className="block py-2 px-2 text-sm font-medium text-gray-700 hover:text-[#1F5632] hover:bg-gray-50 rounded truncate">
                                                         {product.productName}
                                                     </Link>
                                                 ))}

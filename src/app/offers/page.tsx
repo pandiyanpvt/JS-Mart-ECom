@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Tag, Percent } from "lucide-react";
 import { offerService } from "@/services/offer.service";
 import HeroSection, { HeroSlide } from "@/components/hero-section";
+import { membershipService, UserSubscription } from "@/services/membership.service";
+import { Crown, Gem, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const offersHeroSlides: HeroSlide[] = [
   {
@@ -24,17 +27,22 @@ const offersHeroSlides: HeroSlide[] = [
 
 export default function OffersPage() {
   const [offers, setOffers] = useState([]);
+  const [subscription, setSubscription] = useState<UserSubscription | null>(null);
 
   useEffect(() => {
-    const fetchOffers = async () => {
+    const loadData = async () => {
       try {
-        const data = await offerService.getAllOffers();
-        setOffers(data);
+        const [offersData, subData] = await Promise.all([
+          offerService.getAllOffers(),
+          membershipService.getMySubscription()
+        ]);
+        setOffers(offersData);
+        setSubscription(subData);
       } catch (err) {
         console.error(err);
       }
     };
-    fetchOffers();
+    loadData();
   }, []);
 
 
@@ -46,9 +54,10 @@ export default function OffersPage() {
 
     return offers.map((offer: any) => {
       const product = offer.Product || offer.product;
-      if (!product) return null;
 
-      const originalPrice = parseFloat(product.productPrice);
+      // If no product and not a storewide/cart level offer, we usually hide it 
+      // but let's be inclusive as the user wants to see all offers.
+      const originalPrice = product ? parseFloat(product.productPrice) : 0;
       let discountedPrice = originalPrice;
       const badges = [];
 
@@ -94,13 +103,13 @@ export default function OffersPage() {
       }
 
       return {
-        id: product.id,
-        name: product.productName,
+        id: product?.id || offer.id,
+        name: product?.productName || "General Offer",
         offerName: offer.name, // Added offer name for banner title
         price: discountedPrice,
         originalPrice: originalPrice,
-        image: offer.bannerImg || product.productImage, // Prioritize Offer Banner
-        description: product.productDescription,
+        image: offer.bannerImg || product?.productImage || "/images/placeholder.png", // Prioritize Offer Banner
+        description: product?.productDescription || offer.description || "Limited time storewide promotion",
         category: "Offers",
         badges: badges,
         weight: "1kg", // Default
@@ -108,15 +117,24 @@ export default function OffersPage() {
         brand: "JS Mart",
         offerTypeId: offer.offerTypeId, // Added for button logic
         offerId: offer.id,
+        targetMembershipLevel: offer.targetMembershipLevel
       };
     }).filter((item: any) => {
       if (!item || !item.offerId) return false;
       const offer = offers.find((o: any) => o.id === item.offerId);
       if (!offer) return false;
+
       const now = new Date();
-      return offer.isActive !== false && new Date(offer.startDate) <= now && new Date(offer.endDate) >= now;
+      const startDate = new Date(offer.startDate);
+      const endDate = offer.endDate ? new Date(offer.endDate) : null;
+
+      const isActive = offer.isActive !== false;
+      const hasStarted = isNaN(startDate.getTime()) || startDate <= now;
+      const notEnded = !endDate || isNaN(endDate.getTime()) || endDate >= now;
+
+      return isActive && hasStarted && notEnded;
     });
-  }, [offers]);
+  }, [offers, subscription]);
 
 
 
@@ -153,8 +171,17 @@ export default function OffersPage() {
                   />
                   {/* Badges Overlay */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                    {item.targetMembershipLevel > 0 && (
+                      <span className={cn(
+                        "flex items-center gap-1.5 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md uppercase tracking-widest",
+                        item.targetMembershipLevel === 2 ? "bg-amber-500" : "bg-indigo-600"
+                      )}>
+                        {item.targetMembershipLevel === 2 ? <Gem size={12} /> : <Zap size={12} />}
+                        {item.targetMembershipLevel === 2 ? "JS Plus Exclusive" : "JS Pro Member"}
+                      </span>
+                    )}
                     {item.badges.map((badge: string, idx: number) => (
-                      <span key={idx} className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                      <span key={idx} className="bg-emerald-600 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg uppercase tracking-widest">
                         {badge}
                       </span>
                     ))}
