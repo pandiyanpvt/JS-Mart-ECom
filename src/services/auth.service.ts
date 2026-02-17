@@ -16,6 +16,15 @@ export const authService = {
         return response.data;
     },
 
+    async googleLogin(data: any) {
+        const response = await api.post('/users/google-login', data);
+        if (response.data.token) {
+            Cookies.set('token', response.data.token, { expires: 1 });
+            Cookies.set('user', JSON.stringify(response.data.user), { expires: 1 });
+        }
+        return response.data;
+    },
+
     async verifyOtp(data: { emailAddress: string; otp: string }) {
         const response = await api.post('/users/verify-email-otp', data);
         return response.data;

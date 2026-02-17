@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -24,26 +24,30 @@ export default function SignInPage() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (status === "authenticated" && session?.user) {
-            console.log("Session authenticated:", session);
+        const syncGoogleLogin = async () => {
+            if (status === "authenticated" && session?.user) {
+                try {
+                    console.log("🔵 Syncing Google login with backend...");
 
-            // Store user data in cookies
-            const userData = {
-                firstName: session.user.name?.split(" ")[0] || "",
-                lastName: session.user.name?.split(" ")[1] || "",
-                fullName: session.user.name || "",
-                email: session.user.email,
-                image: session.user.image,
-            };
+                    await authService.googleLogin({
+                        emailAddress: session.user.email,
+                        fullName: session.user.name,
+                        profileImg: session.user.image,
+                    });
 
-            Cookies.set("user", JSON.stringify(userData), { expires: 7 });
+                    // Dispatch event to update navbar
+                    window.dispatchEvent(new Event("auth-change"));
 
-            // Dispatch event to update navbar
-            window.dispatchEvent(new Event("auth-change"));
+                    toast.success("Login successful!");
+                    router.push("/");
+                } catch (error) {
+                    console.error("Error syncing Google login:", error);
+                    toast.error("Failed to connect with server");
+                }
+            }
+        };
 
-            toast.success("Login successful!");
-            router.push("/account");
-        }
+        syncGoogleLogin();
     }, [session, status, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +77,8 @@ export default function SignInPage() {
             console.log("🔵 Starting Google sign in...");
             await signIn("google", {
                 callbackUrl: "/signin",
-                redirect: true
+                redirect: true,
+                prompt: "select_account"
             });
         } catch (error) {
             console.error("Google sign in error:", error);

@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { authService } from "@/services";
+import toast from "react-hot-toast";
 
 export default function SignUpPage() {
     const router = useRouter();
+    const { data: session, status } = useSession();
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
@@ -21,6 +23,33 @@ export default function SignUpPage() {
     });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const syncGoogleLogin = async () => {
+            if (status === "authenticated" && session?.user) {
+                try {
+                    console.log("🔵 Syncing Google login with backend...");
+
+                    await authService.googleLogin({
+                        emailAddress: session.user.email,
+                        fullName: session.user.name,
+                        profileImg: session.user.image,
+                    });
+
+                    // Dispatch event to update navbar
+                    window.dispatchEvent(new Event("auth-change"));
+
+                    toast.success("Login successful!");
+                    router.push("/");
+                } catch (error) {
+                    console.error("Error syncing Google login:", error);
+                    toast.error("Failed to connect with server");
+                }
+            }
+        };
+
+        syncGoogleLogin();
+    }, [session, status, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,13 +75,16 @@ export default function SignUpPage() {
     };
 
     const handleGoogleLogin = async () => {
-        const res = await signIn("google", {
-            redirect: false,
-        });
-
-        if (res?.ok) {
-            // Handle google session syncing if needed
-            router.push("/account");
+        try {
+            console.log("🔵 Starting Google sign up...");
+            await signIn("google", {
+                callbackUrl: "/signup",
+                redirect: true,
+                prompt: "select_account"
+            });
+        } catch (error) {
+            console.error("Google sign in error:", error);
+            toast.error("Failed to sign in with Google");
         }
     };
 
