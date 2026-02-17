@@ -1,40 +1,37 @@
-
-
-
 "use client";
 
 import React from "react";
 import FeaturedCategories from "@/components/featured-categories";
-import AdvertisementSection from "@/components/advertisement-section";
 import BrandSection from "@/components/brand-section";
-import AdvertisementSection1 from "@/components/advertisement-section-one"
-import AdvertisementSection2 from "@/components/advertisement-section-two";
-import BestOfFruitVeg from "@/components/best-of-fruit-veg";
 import HeroSection from "@/components/hero-section";
-
 import PopularProducts from "@/components/popular-products";
+import MiddleBannerSection from "@/components/middle-banner-section";
+import OfferCardSection from "@/components/offer-card-section";
+import FooterBannerSection from "@/components/footer-banner-section";
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col items-center w-full pb-16">
-      {/* Hero Section */}
+    <main className="flex flex-col w-full min-h-screen bg-white">
+      {/* Hero Slider Section */}
       <HeroSection />
-      {/* Featured Categories - from backend */}
+
+      {/* Featured Categories - Horizontal Scroll */}
       <FeaturedCategories />
-      {/* Popular Products */}
+
+      {/* Popular Products - Horizontal Scroll */}
       <PopularProducts />
-      {/* Advertisement Section 1 */}
-      {/* Advertisement Section */}
-      <AdvertisementSection />
-      {/* Product Card */}
-      <BestOfFruitVeg />
-      {/* Dual Banners */}
-      
-        <AdvertisementSection1 />
-        <AdvertisementSection2 />
-      
+
+      {/* Middle Promotional Banners (Level 3) - Grid Layout */}
+      <MiddleBannerSection />
+
+      {/* Best Deals / Offer Cards Section */}
+      <OfferCardSection />
+
       {/* Brand Section */}
       <BrandSection />
+
+      {/* Footer Promotional Banners (Level 5) */}
+      <FooterBannerSection />
     </main>
   );
 }

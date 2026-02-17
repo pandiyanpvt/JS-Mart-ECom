@@ -21,6 +21,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import HeroSection from "@/components/hero-section";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -185,6 +186,7 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialCategory = searchParams.get("category");
+  const searchQuery = searchParams.get("search");
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -196,14 +198,25 @@ function ShopContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchTerm, setSearchTerm] = useState<string>(searchQuery || "");
 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [productsData, categoriesData, offersData] = await Promise.all([
-          productService.getAll(),
+        let productsData: Product[];
+        
+        // If search query exists, use search API
+        if (searchQuery && searchQuery.trim()) {
+          productsData = await productService.search(searchQuery.trim());
+          setSearchTerm(searchQuery);
+        } else {
+          productsData = await productService.getAll();
+          setSearchTerm("");
+        }
+
+        const [categoriesData, offersData] = await Promise.all([
           categoryService.getActive(),
           offerService.getAllOffers()
         ]);
@@ -237,7 +250,7 @@ function ShopContent() {
     };
 
     fetchData();
-  }, []);
+  }, [searchQuery]);
 
   useEffect(() => {
     setSelectedCategory(initialCategory || "all");
@@ -254,9 +267,11 @@ function ShopContent() {
   };
 
   const filteredProducts = useMemo(() => {
-    let filtered = selectedCategory === "all"
-      ? products
-      : products.filter((p) => {
+    let filtered = products;
+
+    // Apply category filter only if not searching
+    if (!searchQuery && selectedCategory !== "all") {
+      filtered = products.filter((p) => {
         // Find the selected category object to get its descendants
         const categoryObj = categories.find(c => String(c.id) === selectedCategory);
         if (categoryObj) {
@@ -266,11 +281,14 @@ function ShopContent() {
         // Fallback if category object not found (shouldn't happen usually)
         return p.productCategoryId === Number(selectedCategory);
       });
+    }
 
+    // Apply price filter
     filtered = filtered.filter(
       (p) => Number(p.price) >= priceRange[0] && Number(p.price) <= priceRange[1]
     );
 
+    // Sort products
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
         case "low":
@@ -284,7 +302,7 @@ function ShopContent() {
     });
 
     return sorted;
-  }, [products, selectedCategory, sortBy, priceRange]);
+  }, [products, selectedCategory, sortBy, priceRange, searchQuery]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
@@ -293,34 +311,7 @@ function ShopContent() {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
-  const categoryBanners: { [key: string]: { image: string; title: string; description: string } } = {
-    all: {
-      image: "/images/headers/shop-header.png",
-      title: "Our Products",
-      description: "Discover fresh, quality products delivered to your doorstep"
-    },
-    "1": {
-      image: "/slider-1.png",
-      title: "Fresh Vegetables",
-      description: "Farm-fresh vegetables delivered daily to your door"
-    },
-  };
 
-  const selectedCategoryObj = categories.find(c => String(c.id) === selectedCategory);
-
-  let currentBanner = categoryBanners.all;
-
-  if (selectedCategory !== "all") {
-    if (categoryBanners[selectedCategory]) {
-      currentBanner = categoryBanners[selectedCategory];
-    } else if (selectedCategoryObj) {
-      currentBanner = {
-        image: "/images/headers/shop-header.png",
-        title: selectedCategoryObj.category,
-        description: `Explore our premium collection of ${selectedCategoryObj.category.toLowerCase()}`
-      };
-    }
-  }
 
   const maxPrice = products.length > 0 ? Math.max(...products.map(p => Number(p.price))) : 10000;
 
@@ -373,31 +364,35 @@ function ShopContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <section className="w-full pt-[100px] relative overflow-hidden">
-        {/* Background Image Container - Full Width */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={currentBanner.image}
-            alt={currentBanner.title}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-
-        {/* Content Container - Left Aligned with Site Padding */}
-        <div className="relative z-10 w-full min-h-[250px] sm:min-h-[400px] md:min-h-[500px] flex items-center justify-start px-4 md:px-6 lg:px-8">
-          <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
-              {currentBanner.title}
-            </h1>
-            <p className="text-lg md:text-xl text-white/90 max-w-2xl drop-shadow-md">
-              {currentBanner.description}
-            </p>
+      <HeroSection level={2} />
+      
+      {/* Search Results Header */}
+      {searchQuery && (
+        <div className="w-full bg-white border-b border-gray-200 py-4">
+          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-[#253D4E]">
+                  Search Results for &quot;{searchQuery}&quot;
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  router.push("/shop");
+                  setSearchTerm("");
+                }}
+                className="text-sm"
+              >
+                Clear Search
+              </Button>
+            </div>
           </div>
         </div>
-      </section>
+      )}
 
       <div className="w-full px-4 md:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -445,9 +440,15 @@ function ShopContent() {
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
-            <p className="text-sm text-gray-600">
-              Showing {paginatedProducts.length} of {filteredProducts.length} products
-            </p>
+            {searchQuery ? (
+              <p className="text-sm text-gray-600">
+                Found {filteredProducts.length} result{filteredProducts.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600">
+                Showing {paginatedProducts.length} of {filteredProducts.length} products
+              </p>
+            )}
             <select
               className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent"
               value={sortBy}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Package, ShoppingBag, MapPin, CreditCard, TrendingUp } from "lucide-react";
 import Cookies from 'js-cookie';
 import {useSession} from "next-auth/react";
@@ -181,12 +182,12 @@ export default function AccountDashboard() {
                 <div className="bg-white rounded-xl shadow-md p-8">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-bold text-gray-900">Recent Orders</h3>
-                        <a
+                        <Link
                             href="/account/orders"
-                            className="text-[#005000] hover:text-[#006600] font-medium text-sm"
+                            className="text-[#005000] hover:text-[#006600] font-medium text-sm transition-colors"
                         >
                             View All →
-                        </a>
+                        </Link>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -217,12 +218,12 @@ export default function AccountDashboard() {
                                         className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                                     >
                                         <td className="py-4 px-4">
-                                            <a
+                                            <Link
                                                 href={`/account/orders/${order.id}`}
-                                                className="text-[#005000] hover:text-[#006600] font-medium"
+                                                className="text-[#005000] hover:text-[#006600] font-medium transition-colors"
                                             >
                                                 {order.id}
-                                            </a>
+                                            </Link>
                                         </td>
                                         <td className="py-4 px-4 text-gray-600">{order.date}</td>
                                         <td className="py-4 px-4 text-gray-600">

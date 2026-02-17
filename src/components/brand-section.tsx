@@ -28,7 +28,7 @@ export default function BrandSection() {
   }, []);
 
   return (
-    <section className="w-full bg-white py-12 md:py-16">
+    <section className="w-full bg-white py-16 md:py-20">
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-center mb-8">

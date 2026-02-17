@@ -53,12 +53,14 @@ export default function PopularProducts() {
 
     if (loading) {
         return (
-            <section className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-20">
-                <div className="flex items-center justify-between mb-10 md:mb-12">
-                    <h2 className="text-4xl font-extrabold text-[#253D4E]">Popular Products</h2>
-                </div>
-                <div className="flex items-center justify-center py-16">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#005000]" />
+            <section className="w-full py-16 md:py-20 bg-gray-50">
+                <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                    <div className="flex items-center justify-between mb-10 md:mb-12">
+                        <h2 className="text-4xl font-extrabold text-[#253D4E]">Popular Products</h2>
+                    </div>
+                    <div className="flex items-center justify-center py-16">
+                        <Loader2 className="w-10 h-10 animate-spin text-[#005000]" />
+                    </div>
                 </div>
             </section>
         );
@@ -69,36 +71,45 @@ export default function PopularProducts() {
     }
 
     return (
-        <section className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-20">
-            {/* Header - same as Featured Categories */}
-            <div className="flex items-center justify-between mb-10 md:mb-12">
-                <h2 className="text-4xl font-extrabold text-[#253D4E]">Popular Products</h2>
+        <section className="w-full py-16 md:py-20 bg-gray-50">
+            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                {/* Header - same as Featured Categories */}
+                <div className="flex items-center justify-between mb-10 md:mb-12">
+                    <h2 className="text-4xl font-extrabold text-[#253D4E]">Popular Products</h2>
 
-                <Link
-                    href="/shop"
-                    className="shrink-0 px-5 py-2.5 rounded-lg bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold transition-colors"
+                    <Link
+                        href="/shop"
+                        className="shrink-0 px-5 py-2.5 rounded-lg bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold transition-colors"
+                    >
+                        View More
+                    </Link>
+                </div>
+
+                {/* Shop page product cards - horizontal scroll on mobile, grid on desktop */}
+                <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {products.map((product) => (
+                        <ProductCard key={product.id} product={adaptProduct(product)} />
+                    ))}
+                </div>
+                
+                {/* Mobile: Horizontal Scroll */}
+                <div
+                    className="flex md:hidden gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
-                    View More
-                </Link>
-            </div>
+                    {products.map((product) => (
+                        <div key={product.id} className="flex-shrink-0 w-[270px] min-w-[270px]">
+                            <ProductCard product={adaptProduct(product)} />
+                        </div>
+                    ))}
+                </div>
 
-            {/* Shop page product cards - horizontal scroll */}
-            <div
-                className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-                {products.map((product) => (
-                    <div key={product.id} className="flex-shrink-0 w-[270px] min-w-[270px]">
-                        <ProductCard product={adaptProduct(product)} />
-                    </div>
-                ))}
-            </div>
-
-            <style jsx>{`
+                <style jsx>{`
                 .scrollbar-hide::-webkit-scrollbar {
                     display: none;
                 }
             `}</style>
+            </div>
         </section>
     );
 }
