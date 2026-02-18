@@ -123,60 +123,59 @@ export default function HeroSection({
     return (
         <section className="w-full">
             <div className="w-full">
-                <div className={`relative overflow-hidden group ${className || "min-h-[400px] md:min-h-[500px]"}`}>
+                {/* 16:5 aspect, max height ~600px so image stays crisp on wide screens. Recommended image size: 1920×600. */}
+                <div className={`relative overflow-hidden group w-full aspect-[16/5] min-h-[200px] max-h-[600px] ${className ?? ""}`.trim()}>
                     {/* Slides */}
                     {slides.map((slide, index) => (
                         <div
                             key={slide.id}
-                            className={`absolute inset-0 w-full h-full ${index === currentSlide
+                            className={`absolute top-0 left-0 right-0 bottom-0 w-full ${index === currentSlide
                                 ? "opacity-100 z-10"
                                 : "opacity-0 z-0 pointer-events-none"
                                 }`}
                         >
-                            {/* Background Image */}
+                            {/* Background Image - fills hero (nav clearance via layout spacer) */}
                             <div className="absolute inset-0">
                                 <Image
                                     src={slide.image}
                                     alt={slide.title}
                                     fill
-                                    className="object-cover"
+                                    className="object-cover object-bottom"
                                     priority={index === 0}
+                                    sizes="100vw"
                                 />
                             </div>
-
-                            {/* Dark overlay for text readability */}
-                            <div className="absolute inset-0 bg-black/30"></div>
 
                         </div>
                     ))}
 
-                    {/* Navigation Arrows */}
+                    {/* Navigation Arrows - visible on mobile for touch, hover on desktop */}
                     {slides.length > 1 && (
                         <>
                             <button
                                 onClick={prevSlide}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
+                                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/30 md:bg-white/20 md:opacity-0 md:group-hover:opacity-100 backdrop-blur-sm text-white p-3 md:p-3 rounded-full transition-all z-20 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                                 aria-label="Previous slide"
                             >
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
                             <button
                                 onClick={nextSlide}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
+                                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/30 md:bg-white/20 md:opacity-0 md:group-hover:opacity-100 backdrop-blur-sm text-white p-3 md:p-3 rounded-full transition-all z-20 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                                 aria-label="Next slide"
                             >
                                 <ChevronRight className="w-6 h-6" />
                             </button>
 
-                            {/* Pagination Dots */}
-                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                            {/* Pagination - minimal dot design */}
+                            <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
                                 {slides.map((_, index) => (
                                     <button
                                         key={index}
                                         onClick={() => goToSlide(index)}
-                                        className={`transition-all rounded-full ${index === currentSlide
-                                            ? "bg-white w-8 h-2"
-                                            : "bg-white/50 hover:bg-white/75 w-2 h-2"
+                                        className={`rounded-full touch-manipulation min-w-[20px] min-h-[20px] flex items-center justify-center transition-all duration-200 ${index === currentSlide
+                                            ? "bg-white w-1.5 h-1.5 scale-100"
+                                            : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70 border border-white/60"
                                             }`}
                                         aria-label={`Go to slide ${index + 1}`}
                                     />

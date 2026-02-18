@@ -10,8 +10,7 @@ import type { Product as BackendProduct } from "@/services/product.service";
 import { getProductImages, getProductImageUrl } from "@/services/product.service";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, ChevronRight, Home } from "lucide-react";
-import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, Crown } from "lucide-react";
+import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, ChevronRight, Home, Crown, Zap, Gem } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Product as LibProduct } from "@/lib/data";
 import { offerService } from "@/services/offer.service";
@@ -19,7 +18,6 @@ import { calculateProductDiscount, formatOfferValidity, type Offer } from "@/uti
 import { ProductCard } from "@/components/product-card";
 import { ProductReviews } from "./_components/ProductReviews";
 import { membershipService, UserSubscription } from "@/services/membership.service";
-import { Zap, Gem } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function adaptToLibProduct(p: BackendProduct): LibProduct {
@@ -175,9 +173,9 @@ export default function ProductViewPage() {
     const inWishlist = isInWishlist(libProduct.id);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pb-4 md:pb-8">
             {/* Breadcrumbs */}
-            <div className="w-full pt-[100px] pb-4">
+            <div className="w-full pt-0 pb-2 md:pb-4">
                 <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                     <nav className="flex items-center gap-2 text-sm text-gray-600">
                         <Link href="/" className="hover:text-[#005000] transition-colors flex items-center gap-1">
@@ -205,14 +203,14 @@ export default function ProductViewPage() {
                         </span>
                     </nav>
                 </div>
-            </div>
+                </div>
 
-            <div className="w-full py-8">
+            <div className="w-full py-4 md:py-6">
                 <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 p-4 md:p-6 lg:p-8">
                         {/* Left: Image gallery */}
-                        <div className="space-y-4">
+                <div className="space-y-4">
                             <div className="relative w-full aspect-square max-h-[500px] bg-gray-50 rounded-xl overflow-hidden">
                                 <Image
                                     src={allImages[selectedImage] || primaryImage}
@@ -406,9 +404,9 @@ export default function ProductViewPage() {
                                     >
                                         <Minus className="w-4 h-4" />
                                     </button>
-                                    <input
-                                        type="number"
-                                        min={1}
+                        <input
+                            type="number"
+                            min={1}
                                         max={maxQty}
                                         value={quantity}
                                         onChange={(e) => setQuantityClamped(Number(e.target.value))}

@@ -21,7 +21,7 @@ export default function PageHero({
   children,
 }: PageHeroProps) {
   return (
-    <section className="w-full pt-[92px]">
+    <section className="w-full pt-0">
       <div className="w-full">
         <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] group">
           {/* Background Image - same as home hero */}
@@ -36,7 +36,7 @@ export default function PageHero({
           </div>
 
           {/* Dark overlay for text readability - same as home hero */}
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute top-1/3 left-0 right-0 bottom-0 bg-black/30" />
 
           {/* Navigation Arrows - same style as home hero */}
           <button
