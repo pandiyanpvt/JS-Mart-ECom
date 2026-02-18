@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { shippingAddressService } from "@/services";
 import { ShippingAddress } from "@/services/shippingAddress.service";
 import toast from "react-hot-toast";
+import { useModal } from "@/components/providers/ModalProvider";
 
 export function AddressBook() {
+    const { showModal } = useModal();
     const [addresses, setAddresses] = useState<ShippingAddress[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -26,15 +28,22 @@ export function AddressBook() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure?")) return;
-        try {
-            await shippingAddressService.deleteAddress(id);
-            setAddresses(addresses.filter(a => a.id !== id));
-            toast.success("Address removed");
-        } catch {
-            toast.error("Failed to remove address");
-        }
+    const handleDelete = (id: number) => {
+        showModal({
+            title: "Delete Address",
+            message: "Are you sure you want to remove this shipping address?",
+            type: "error",
+            confirmLabel: "Delete",
+            onConfirm: async () => {
+                try {
+                    await shippingAddressService.deleteAddress(id);
+                    setAddresses(addresses.filter(a => a.id !== id));
+                    toast.success("Address removed");
+                } catch {
+                    toast.error("Failed to remove address");
+                }
+            }
+        });
     };
 
     return (

@@ -35,15 +35,15 @@ export default function MembershipPlans() {
     const handleSubscribe = async (plan: MembershipPlan) => {
         setIsProcessing(plan.id);
         try {
-            // In a real app, this would open Stripe checkout
-            // For now, we simulate success
-            await membershipService.subscribe(plan.id, "MOCK_PAYMENT_" + Date.now());
-            router.refresh();
-            const sub = await membershipService.getMySubscription();
-            setCurrentSub(sub);
-            alert(`Welcome to ${plan.name}! Your subscription is now active.`);
+            const data = await membershipService.subscribe(plan.id);
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                throw new Error('Failed to create checkout session');
+            }
         } catch (error: any) {
-            alert(error.message || 'Subscription failed');
+            console.error('Subscription error:', error);
+            alert(error.response?.data?.message || error.message || 'Subscription failed');
         } finally {
             setIsProcessing(null);
         }

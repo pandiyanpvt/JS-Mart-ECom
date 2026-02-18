@@ -24,6 +24,7 @@ export interface Offer {
     maxUsage?: number;
     currentUsage?: number;
     couponCode?: string;
+    offerName?: string; // Added to support various API response formats
     minOrderAmount?: number | null;
     description?: string;
     product?: {
@@ -32,7 +33,6 @@ export interface Offer {
         productImages?: { image: string }[];
         images?: { productImg?: string }[];
     };
-    targetMembershipLevel?: number;
 }
 
 /** Get display image for an offer: admin banner first, then product image, then null (use placeholder) */
@@ -178,12 +178,17 @@ export function getBestOffer(offers: Offer[], productPrice: number): Offer | nul
     });
 }
 
+export interface CartItem {
+    id: string | number;
+    name: string;
+    price: number | string;
+    image: string;
+    quantity: number;
+    weight?: string;
+}
+
 /**
  * Calculate line item total with offers applied
- * Matches backend logic exactly:
- * 1. Type 2 (Percentage) applied first
- * 2. Type 1 (BOGO) applied if Type 2 not found
- * 3. Type 4 (Free product) handled separately
  */
 export function calculateLineItemTotal(
     unitPrice: number,
@@ -191,44 +196,42 @@ export function calculateLineItemTotal(
     offers: Offer[]
 ): number {
     const now = new Date();
-    const activeOffers = offers.filter(
-        o => o.isActive &&
-        new Date(o.startDate) <= now &&
-        new Date(o.endDate) >= now
-    );
+    const activeOffers = offers.filter((offer) => {
+        if (!offer.isActive) return false;
+        const start = new Date(offer.startDate);
+        const end = offer.endDate ? new Date(offer.endDate) : null;
+        return (isNaN(start.getTime()) || start <= now) && (!end || isNaN(end.getTime()) || end >= now);
+    });
 
-    // Step 1: Apply Type 2 (Percentage discount) first
-    const type2Offer = activeOffers.find(o => o.offerTypeId === 2);
-    if (type2Offer && type2Offer.discountPercentage) {
-        const discountPercent = Number(type2Offer.discountPercentage);
-        const discountedUnitPrice = unitPrice - (unitPrice * (discountPercent / 100));
-        return Math.round(discountedUnitPrice * quantity * 100) / 100;
-    }
+    let totalSavings = 0;
 
-    // Step 2: Apply Type 1 (BOGO) if Type 2 not found
-    const type1Offer = activeOffers.find(o => o.offerTypeId === 1);
-    if (type1Offer) {
-        const buyQty = type1Offer.buyQuantity || 1;
-        const getQty = type1Offer.getQuantity || 1;
-        const cycleSize = buyQty + getQty;
+    // Type 2 (Percentage) - Stacked
+    activeOffers.filter(o => o.offerTypeId === 2).forEach(o => {
+        const perc = Number(o.discountPercentage) || 0;
+        totalSavings += (unitPrice * quantity) * (perc / 100);
+    });
 
-        // Backend logic: only apply if quantity >= cycleSize
-        if (quantity >= cycleSize) {
-            const freeGroups = Math.floor(quantity / cycleSize);
+    // Type 1 (BOGO)
+    activeOffers.filter(o => o.offerTypeId === 1).forEach(o => {
+        const buyQty = o.buyQuantity || 1;
+        const getQty = o.getQuantity || 1;
+        const cycle = buyQty + getQty;
+        if (quantity >= cycle) {
+            const freeGroups = Math.floor(quantity / cycle);
             const freeQty = freeGroups * getQty;
-            const payableQty = quantity - freeQty;
-            return Math.round(unitPrice * payableQty * 100) / 100;
+            totalSavings += freeQty * unitPrice;
         }
-    }
+    });
 
-    // No discount
-    return Math.round(unitPrice * quantity * 100) / 100;
+    return Math.max(0, Math.round((unitPrice * quantity - totalSavings) * 100) / 100);
 }
 
 export interface CartCalculationResult {
     subtotal: number;
     shipping: number;
-    discountTotal: number;
+    automaticDiscountTotal: number;
+    itemLevelDiscountTotal: number;
+    couponDiscountTotal: number;
     total: number;
     itemsWithDiscount: {
         id: string;
@@ -236,16 +239,13 @@ export interface CartCalculationResult {
         image: string;
         quantity: number;
         originalPrice: number;
-        unitPrice: number; // After Type 2 discount if any
-        lineTotal: number; // After all item-level offers
+        unitPrice: number;
+        lineTotal: number;
         savings: number;
         appliedOffer?: Offer;
         isFreeItem?: boolean;
-        freeProductInfo?: {
-            productId: number;
-            productName: string;
-            quantity: number;
-        };
+        originalId: string;
+        weight?: string;
     }[];
     suggestedFreeProducts?: {
         productId: number;
@@ -253,225 +253,185 @@ export interface CartCalculationResult {
         quantity: number;
         offerId: number;
     }[];
+    couponError?: string;
+    appliedAutomaticOffer?: Offer;
+    appliedCoupon?: Offer;
+    pointsDiscountTotal: number;
+    pointsRedeemed: number;
 }
 
-/**
- * Calculate cart totals matching backend logic exactly:
- * 1. Apply Type 2 (Percentage) discounts first
- * 2. Apply Type 1 (BOGO) for same product
- * 3. Apply Type 4 (Buy X get Y free) - discount free items if in cart
- * 4. Calculate subtotal after line discounts
- * 5. Apply Type 3 (Cart-level) discount if minOrderAmount met
- */
 export function calculateCartTotals(
-    items: any[],
-    allOffers: Offer[],
-    shippingCost: number = 0,
-    appliedCouponCode?: string
+    items: CartItem[],
+    offers: Offer[],
+    shippingFee: number,
+    couponCode?: string,
+    userLevel: number = 0,
+    redeemPoints: boolean = false,
+    userPointsBalance: number = 0,
+    pointsToAudRatio: number = 0.01
 ): CartCalculationResult {
     const now = new Date();
-    const activeOffers = allOffers.filter(
-        o => o.isActive &&
-        new Date(o.startDate) <= now &&
-        new Date(o.endDate) >= now
-    );
+    const activeOffers = offers.filter((offer) => {
+        if (!offer.isActive) return false;
+        if ((offer.targetMembershipLevel || 0) > userLevel) return false;
+        const start = new Date(offer.startDate);
+        const end = offer.endDate ? new Date(offer.endDate) : null;
+        return (isNaN(start.getTime()) || start <= now) && (!end || isNaN(end.getTime()) || end >= now);
+    });
 
-    // Step 1: Process items with Type 2 (Percentage) discounts first
-    let processedItems = items.map(item => {
-        const itemId = String(item.id);
-        const itemOffers = activeOffers.filter(
-            o => o.productId && String(o.productId) === itemId
-        );
+    const orderItemsMap: Record<string, {
+        paidQty: number;
+        freeQty: number;
+        price: number;
+        appliedOffers: Offer[];
+        item: CartItem;
+        percentageDiscount: number;
+    }> = {};
 
-        const originalPrice = Number(item.price);
-        let unitPrice = originalPrice;
-        let appliedOffer: Offer | undefined;
-        let savings = 0;
-
-        // Apply Type 2 first (takes priority)
-        const type2Offer = itemOffers.find(o => o.offerTypeId === 2);
-        if (type2Offer && type2Offer.discountPercentage) {
-            const discountPercent = Number(type2Offer.discountPercentage);
-            unitPrice = originalPrice - (originalPrice * (discountPercent / 100));
-            appliedOffer = type2Offer;
-            savings = (originalPrice - unitPrice) * (item.quantity || 1);
+    // 1. Initialize
+    items.forEach(item => {
+        const id = String(item.id);
+        if (!orderItemsMap[id]) {
+            orderItemsMap[id] = {
+                paidQty: 0,
+                freeQty: 0,
+                price: Number(item.price),
+                appliedOffers: [],
+                item,
+                percentageDiscount: 0
+            };
         }
+        orderItemsMap[id].paidQty += (item.quantity || 1);
+    });
 
-        const quantity = item.quantity || 1;
-        let lineTotal = unitPrice * quantity;
+    // 2. Item-level (BOGO & Percentage)
+    for (const id in orderItemsMap) {
+        const entry = orderItemsMap[id];
+        activeOffers.filter(o => o.offerTypeId === 2 && String(o.productId) === id).forEach(o => {
+            const disc = (entry.paidQty * entry.price) * ((Number(o.discountPercentage) || 0) / 100);
+            entry.percentageDiscount += disc;
+            entry.appliedOffers.push(o);
+        });
+        activeOffers.filter(o => o.offerTypeId === 1 && String(o.productId) === id).forEach(o => {
+            const cycles = Math.floor(entry.paidQty / (o.buyQuantity || 1));
+            const freeCount = cycles * (o.getQuantity || 1);
+            if (freeCount > 0) {
+                entry.freeQty += freeCount;
+                entry.appliedOffers.push(o);
+            }
+        });
+    }
 
-        // Step 2: Apply Type 1 (BOGO) only if Type 2 not applied
-        if (!type2Offer) {
-            const type1Offer = itemOffers.find(o => o.offerTypeId === 1);
-            if (type1Offer) {
-                const buyQty = type1Offer.buyQuantity || 1;
-                const getQty = type1Offer.getQuantity || 1;
-                const cycleSize = buyQty + getQty;
-
-                // Backend logic: only if quantity >= cycleSize
-                if (quantity >= cycleSize) {
-                    const freeGroups = Math.floor(quantity / cycleSize);
-                    const freeQty = freeGroups * getQty;
-                    const payableQty = quantity - freeQty;
-                    lineTotal = unitPrice * payableQty;
-                    savings = (originalPrice * quantity) - lineTotal;
-                    appliedOffer = type1Offer;
+    // 3. Free Gifts (Type 4)
+    Object.keys(orderItemsMap).forEach(id => {
+        const entry = orderItemsMap[id];
+        const offer = activeOffers.find(o => o.offerTypeId === 4 && String(o.productId) === id);
+        if (offer && offer.freeProduct) {
+            const cycles = Math.floor(entry.paidQty / (offer.buyQuantity || 1));
+            const freeCount = cycles * (offer.getQuantity || 1);
+            if (freeCount > 0) {
+                const freeId = String(offer.freeProductId);
+                if (!orderItemsMap[freeId]) {
+                    orderItemsMap[freeId] = {
+                        paidQty: 0, freeQty: 0, price: Number(offer.freeProduct.price || 0),
+                        appliedOffers: [], item: { id: freeId, name: offer.freeProduct.productName, price: Number(offer.freeProduct.price || 0), image: (offer.freeProduct as any).productImg || '/placeholder.png' } as any,
+                        percentageDiscount: 0
+                    };
                 }
-            }
-        }
-
-        return {
-            ...item,
-            originalPrice,
-            unitPrice: Math.round(unitPrice * 100) / 100,
-            lineTotal: Math.round(lineTotal * 100) / 100,
-            savings: Math.round(savings * 100) / 100,
-            appliedOffer,
-            quantity,
-            isFreeItem: false,
-        };
-    });
-
-    // Step 3: Apply Type 4 (Buy X get Y free) - discount free items if already in cart
-    const type4Offers = activeOffers.filter(o => o.offerTypeId === 4 && o.freeProductId);
-    
-    // Track which items are free products
-    type4Offers.forEach(offer => {
-        if (!offer.productId || !offer.freeProductId) return;
-        
-        const triggerItem = processedItems.find(
-            item => String(item.id) === String(offer.productId)
-        );
-        
-        if (!triggerItem) return;
-
-        const buyQty = offer.buyQuantity || 1;
-        const getQty = offer.getQuantity || 1;
-        const eligibleFreeQty = Math.floor(triggerItem.quantity / buyQty) * getQty;
-
-        // Find free product in cart
-        const freeItem = processedItems.find(
-            item => String(item.id) === String(offer.freeProductId)
-        );
-
-        if (freeItem && eligibleFreeQty > 0) {
-            const discountedQty = Math.min(freeItem.quantity, eligibleFreeQty);
-            const freeDiscount = freeItem.unitPrice * discountedQty;
-            
-            freeItem.lineTotal = Math.max(0, freeItem.lineTotal - freeDiscount);
-            freeItem.savings += freeDiscount;
-            freeItem.appliedOffer = offer;
-            if (freeItem.lineTotal === 0) {
-                freeItem.isFreeItem = true;
+                orderItemsMap[freeId].freeQty += freeCount;
+                orderItemsMap[freeId].appliedOffers.push(offer);
             }
         }
     });
 
-    // Step 4: Calculate subtotal after all line discounts
-    const subtotal = processedItems.reduce((sum, item) => sum + item.lineTotal, 0);
 
-    // Step 5: Apply Type 3 (Cart-level discount) if minOrderAmount met
-    let cartDiscount = 0;
-    let appliedCartOffer: Offer | undefined;
 
-    // Check Type 3 offers (cart-level)
-    const type3Offers = activeOffers.filter(o => o.offerTypeId === 3);
-    for (const offer of type3Offers) {
-        const minAmount = offer.minOrderAmount ? Number(offer.minOrderAmount) : 0;
-        
-        // Backend checks subtotal AFTER line discounts
-        if (subtotal >= minAmount) {
-            if (offer.discountPercentage) {
-                const discountPercent = Number(offer.discountPercentage);
-                cartDiscount = subtotal * (discountPercent / 100);
-                appliedCartOffer = offer;
-                break; // Backend uses first matching offer
-            } else if (offer.discountAmount) {
-                cartDiscount = Number(offer.discountAmount);
-                appliedCartOffer = offer;
-                break;
-            }
+    // 4. Finalize Items and Gross Totals
+    let grossSubtotal = 0;
+    let itemLevelDiscountTotal = 0;
+    const processedItems: CartCalculationResult['itemsWithDiscount'] = [];
+
+    for (const id in orderItemsMap) {
+        const entry = orderItemsMap[id];
+        const totalQty = entry.paidQty + entry.freeQty;
+        grossSubtotal += entry.price * totalQty;
+        itemLevelDiscountTotal += (entry.price * entry.freeQty) + entry.percentageDiscount;
+
+        if (entry.paidQty > 0) {
+            processedItems.push({
+                ...entry.item, id, originalId: id, originalPrice: entry.price, unitPrice: entry.price,
+                lineTotal: (entry.price * entry.paidQty) - entry.percentageDiscount,
+                savings: entry.percentageDiscount, appliedOffer: entry.appliedOffers[0],
+                isFreeItem: false, quantity: entry.paidQty
+            });
+        }
+        if (entry.freeQty > 0) {
+            processedItems.push({
+                ...entry.item, id: `${id}-free`, name: `${entry.item.name} (FREE)`,
+                originalId: id, originalPrice: entry.price, unitPrice: 0, lineTotal: 0,
+                savings: entry.price * entry.freeQty, isFreeItem: true, quantity: entry.freeQty,
+                appliedOffer: entry.appliedOffers.find(o => o.offerTypeId === 1 || o.offerTypeId === 4)
+            });
         }
     }
 
-    // Step 6: Handle coupon code (if provided)
-    if (appliedCouponCode) {
-        const coupon = activeOffers.find(
-            o => (o.couponCode?.toUpperCase() === appliedCouponCode.toUpperCase() ||
-                  o.name?.toUpperCase() === appliedCouponCode.toUpperCase()) &&
-                 (o.offerTypeId === 3 || o.couponCode)
-        );
+    const subtotal = Math.round(grossSubtotal * 100) / 100;
+    let automaticDiscountTotal = 0;
+    let appliedAutomaticOffer: Offer | undefined;
 
-        if (coupon) {
-            const minAmount = coupon.minOrderAmount ? Number(coupon.minOrderAmount) : 0;
-            if (subtotal >= minAmount) {
-                if (coupon.discountPercentage) {
-                    cartDiscount = subtotal * (Number(coupon.discountPercentage) / 100);
-                } else if (coupon.discountAmount) {
-                    cartDiscount = Number(coupon.discountAmount);
-                }
-                appliedCartOffer = coupon;
-            }
-        }
-    }
-
-    // Step 7: Find Type 4 offers where free product is NOT in cart (suggestions)
-    const suggestedFreeProducts: {
-        productId: number;
-        productName: string;
-        quantity: number;
-        offerId: number;
-    }[] = [];
-
-    type4Offers.forEach(offer => {
-        if (!offer.productId || !offer.freeProductId) return;
-        
-        const triggerItem = processedItems.find(
-            item => String(item.id) === String(offer.productId)
-        );
-        
-        if (!triggerItem) return;
-
-        const freeItemInCart = processedItems.find(
-            item => String(item.id) === String(offer.freeProductId)
-        );
-
-        // If free product NOT in cart, suggest it
-        if (!freeItemInCart && offer.freeProduct) {
-            const buyQty = offer.buyQuantity || 1;
-            const getQty = offer.getQuantity || 1;
-            const eligibleFreeQty = Math.floor(triggerItem.quantity / buyQty) * getQty;
-            
-            if (eligibleFreeQty > 0) {
-                suggestedFreeProducts.push({
-                    productId: offer.freeProductId,
-                    productName: offer.freeProduct.productName || 'Free Product',
-                    quantity: eligibleFreeQty,
-                    offerId: offer.id,
-                });
-            }
+    // 5. Order-level (Type 3)
+    let balanceForType3 = subtotal - itemLevelDiscountTotal;
+    activeOffers.filter(o => o.offerTypeId === 3 && (!o.couponCode || o.couponCode === "")).forEach(o => {
+        if (balanceForType3 >= (Number(o.minOrderAmount) || 0)) {
+            const d = o.discountPercentage ? (balanceForType3 * (Number(o.discountPercentage) / 100)) : (Number(o.discountAmount) || 0);
+            automaticDiscountTotal += d;
+            balanceForType3 -= d;
+            if (!appliedAutomaticOffer) appliedAutomaticOffer = o;
         }
     });
 
-    const total = Math.max(0, subtotal + shippingCost - cartDiscount);
+    // 6. Coupon
+    let couponDiscountTotal = 0;
+    let appliedCoupon: Offer | undefined;
+    let couponError: string | undefined;
+
+    if (couponCode) {
+        const coupon = activeOffers.find(o => o.couponCode?.toUpperCase() === couponCode.toUpperCase());
+        const finalBalance = subtotal - itemLevelDiscountTotal - automaticDiscountTotal;
+        if (!coupon) {
+            couponError = "Invalid or expired coupon";
+        } else if (finalBalance < (Number(coupon.minOrderAmount) || 0)) {
+            couponError = `Min order AUD ${coupon.minOrderAmount} required`;
+        } else {
+            couponDiscountTotal = coupon.discountPercentage ? (finalBalance * (Number(coupon.discountPercentage) / 100)) : (Number(coupon.discountAmount) || 0);
+            appliedCoupon = coupon;
+        }
+    }
+
+    const finalShipping = userLevel > 0 ? 0 : shippingFee;
+    let totalBeforePoints = Math.max(0, subtotal + finalShipping - itemLevelDiscountTotal - automaticDiscountTotal - couponDiscountTotal);
+
+    let pointsDiscountTotal = 0;
+    let pointsRedeemed = 0;
+
+    if (redeemPoints && userPointsBalance > 0) {
+        const potentialDiscount = Math.round(userPointsBalance * pointsToAudRatio * 100) / 100;
+        pointsDiscountTotal = Math.min(totalBeforePoints, potentialDiscount);
+        pointsRedeemed = Math.round(pointsDiscountTotal / pointsToAudRatio);
+    }
+
+    const total = Math.round((totalBeforePoints - pointsDiscountTotal) * 100) / 100;
 
     return {
-        subtotal: Math.round(subtotal * 100) / 100,
-        shipping: shippingCost,
-        discountTotal: Math.round(cartDiscount * 100) / 100,
-        total: Math.round(total * 100) / 100,
-        itemsWithDiscount: processedItems.map(item => ({
-            id: String(item.id),
-            name: item.name || '',
-            image: item.image || '/placeholder.png',
-            quantity: item.quantity,
-            originalPrice: item.originalPrice,
-            unitPrice: item.unitPrice,
-            lineTotal: item.lineTotal,
-            savings: item.savings,
-            appliedOffer: item.appliedOffer,
-            isFreeItem: item.isFreeItem,
-        })),
-        suggestedFreeProducts: suggestedFreeProducts.length > 0 ? suggestedFreeProducts : undefined,
+        subtotal, shipping: finalShipping,
+        itemLevelDiscountTotal: Math.round(itemLevelDiscountTotal * 100) / 100,
+        automaticDiscountTotal: Math.round(automaticDiscountTotal * 100) / 100,
+        couponDiscountTotal: Math.round(couponDiscountTotal * 100) / 100,
+        pointsDiscountTotal: Math.round(pointsDiscountTotal * 100) / 100,
+        pointsRedeemed,
+        total,
+        itemsWithDiscount: processedItems.map(item => ({ ...item, id: String(item.id), originalId: String(item.originalId) })),
+        appliedAutomaticOffer, appliedCoupon, couponError,
+        suggestedFreeProducts: []
     };
 }

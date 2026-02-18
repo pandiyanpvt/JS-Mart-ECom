@@ -179,3 +179,20 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
+
+/* Premium Animations */
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(-7%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+  50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 2.5s infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.05); }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 3s infinite;
+}

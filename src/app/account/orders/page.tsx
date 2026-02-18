@@ -52,21 +52,23 @@ export default function OrdersPage() {
     }, []);
 
     const getStatusColor = (status: string) => {
-        const normalizedStatus = status.toUpperCase();
+        const normalizedStatus = status?.toUpperCase() || "";
         switch (normalizedStatus) {
-            case "DELIVERED":
             case "COMPLETED":
-                return "text-green-600 bg-green-50 border-green-200";
-            case "IN TRANSIT":
+            case "DELIVERED":
+                return "text-green-700 bg-green-50 border-green-200";
             case "SHIPPED":
-                return "text-blue-600 bg-blue-50 border-blue-200";
+            case "IN TRANSIT":
+                return "text-indigo-700 bg-indigo-50 border-indigo-200";
             case "PROCESSING":
+                return "text-blue-700 bg-blue-50 border-blue-200";
             case "PENDING":
-                return "text-yellow-600 bg-yellow-50 border-yellow-200";
+                return "text-amber-700 bg-amber-50 border-amber-200";
             case "CANCELLED":
-                return "text-red-600 bg-red-50 border-red-200";
+            case "REFUNDED":
+                return "text-red-700 bg-red-50 border-red-200";
             default:
-                return "text-gray-600 bg-gray-50 border-gray-200";
+                return "text-slate-600 bg-slate-50 border-slate-200";
         }
     };
 
@@ -191,7 +193,7 @@ export default function OrdersPage() {
                                                 <div className="text-right">
                                                     <p className="text-sm text-gray-600 mb-1">Total</p>
                                                     <p className="text-2xl font-bold text-gray-900">
-                                                        AUD {typeof order.totalAmount === 'string' ? parseFloat(order.totalAmount).toFixed(2) : Number(order.totalAmount).toFixed(2)}
+                                                        AUD {Number(order.totalAmount || 0).toFixed(2)}
                                                     </p>
                                                 </div>
                                                 <Link href={`/account/orders/${order.id}`}>

@@ -246,7 +246,7 @@ function ShopContent() {
       try {
         setLoading(true);
         let productsData: Product[];
-        
+
         // If search query exists, use search API
         if (searchQuery && searchQuery.trim()) {
           productsData = await productService.search(searchQuery.trim());
@@ -391,16 +391,24 @@ function ShopContent() {
     // Construct Badges
     const badges: string[] = [];
     productOffersArray.forEach(o => {
-      if (o.isActive && new Date(o.endDate) >= new Date() && new Date(o.startDate) <= new Date()) {
-        if (o.offerTypeId === 1) {
-          const freeItem = o.freeProduct?.productName ? ` ${o.freeProduct.productName}` : '';
-          badges.push(`Buy ${o.buyQuantity} Get ${o.getQuantity}${freeItem}`);
-        } else if (o.offerTypeId === 4) {
-          const gift = o.freeProduct?.productName || "Gift";
-          if (o.buyQuantity && o.buyQuantity > 0) {
-            badges.push(`Buy ${o.buyQuantity} Get ${o.getQuantity || 1} ${gift} Free`);
-          } else {
-            badges.push(`Free ${gift}`);
+      const now = new Date();
+      if (o.isActive) {
+        const start = new Date(o.startDate);
+        const end = o.endDate ? new Date(o.endDate) : null;
+        const hasStarted = isNaN(start.getTime()) || start <= now;
+        const havenNotEnded = !end || isNaN(end.getTime()) || end >= now;
+
+        if (hasStarted && havenNotEnded) {
+          if (o.offerTypeId === 1) {
+            const freeItem = o.freeProduct?.productName ? ` ${o.freeProduct.productName}` : '';
+            badges.push(`Buy ${o.buyQuantity} Get ${o.getQuantity}${freeItem}`);
+          } else if (o.offerTypeId === 4) {
+            const gift = o.freeProduct?.productName || "Gift";
+            if (o.buyQuantity && o.buyQuantity > 0) {
+              badges.push(`Buy ${o.buyQuantity} Get ${o.getQuantity || 1} ${gift} Free`);
+            } else {
+              badges.push(`Free ${gift}`);
+            }
           }
         }
       }
@@ -429,7 +437,7 @@ function ShopContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       <HeroSection level={2} />
-      
+
       {/* Search Results Header */}
       {searchQuery && (
         <div className="w-full bg-white border-b border-gray-200 py-4">

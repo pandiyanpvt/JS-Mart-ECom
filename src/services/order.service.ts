@@ -46,7 +46,8 @@ export interface CreateOrderData {
     shippingAddressId?: number;
     shippingAddress?: AddressData; // In case backend supports creating inline
     couponCode?: string;
-    isPointsRedeemed?: boolean;
+    pointsRedeemed?: number;
+    pointsDiscount?: number;
 }
 
 export const orderService = {
@@ -63,6 +64,11 @@ export const orderService = {
 
     async createOrder(data: CreateOrderData) {
         const response = await api.post('/orders', data);
+        return response.data;
+    },
+
+    async updateOrder(id: string | number, data: any) {
+        const response = await api.put(`/orders/${id}`, data);
         return response.data;
     },
 
@@ -107,12 +113,8 @@ export const orderService = {
 
     // Lookup Data
     async getPaymentTypes() {
-        // Mock or real endpoint
-        return [
-            { id: 1, type: 'Cash on Delivery' },
-            { id: 2, type: 'Bank Transfer' }
-        ];
-        // If backend has endpoint: return (await api.get('/payment-types')).data;
+        const response = await api.get('/payment-types');
+        return response.data;
     }
 };
 

@@ -6,7 +6,7 @@ import { userService, settingsService } from "@/services";
 
 export function PointsSummary() {
     const [pointsData, setPointsData] = useState<any>(null);
-    const [pointsRatio, setPointsRatio] = useState<number>(0.01);
+    const [pointsRatio, setPointsRatio] = useState<number>(1.0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

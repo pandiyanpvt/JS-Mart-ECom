@@ -18,6 +18,8 @@ export interface UserSubscription {
     endDate: string;
     status: 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
     paymentId: string;
+    autoRenew: boolean;
+    stripeSubscriptionId?: string;
     plan?: MembershipPlan;
 }
 
@@ -36,8 +38,18 @@ export const membershipService = {
         }
     },
 
-    subscribe: async (planId: number, paymentId: string): Promise<any> => {
-        const response = await apiClient.post('/membership/subscribe', { planId, paymentId });
+    subscribe: async (planId: number): Promise<any> => {
+        const response = await apiClient.post('/membership/subscribe', { planId });
+        return response.data;
+    },
+
+    toggleAutoRenew: async (autoRenew: boolean): Promise<any> => {
+        const response = await apiClient.post('/membership/toggle-autorenew', { autoRenew });
+        return response.data;
+    },
+
+    verifySession: async (sessionId: string): Promise<any> => {
+        const response = await apiClient.get(`/payment/verify-session?session_id=${sessionId}`);
         return response.data;
     }
 };

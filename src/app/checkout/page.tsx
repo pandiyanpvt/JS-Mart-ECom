@@ -7,12 +7,14 @@ import { useCart } from "@/context/CartContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import orderService, { type ShippingAddressBackend } from "@/services/order.service";
 import toast from "react-hot-toast";
+import userService from "@/services/user.service";
 import Cookies from "js-cookie";
 import { ShoppingBag, Loader2, MapPin, Plus, X, AlertCircle, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import productService, { getProductImageUrl, getProductImages } from "@/services/product.service";
 import { offerService } from "@/services/offer.service";
+import { couponService } from "@/services/coupon.service";
 import { calculateProductDiscount, calculateLineItemTotal, calculateCartTotals } from "@/utils/offerUtils";
 import { cn } from "@/lib/utils";
 import { membershipService, type UserSubscription } from "@/services/membership.service";
@@ -30,6 +32,7 @@ const CheckoutContent = () => {
     const [showAddressPopup, setShowAddressPopup] = useState(false);
     const [subscription, setSubscription] = useState<UserSubscription | null>(null);
     const [baseShippingFee, setBaseShippingFee] = useState(5.0);
+    const [pointsRatio, setPointsRatio] = useState(0.01);
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -41,7 +44,7 @@ const CheckoutContent = () => {
         emailAddress: "",
     });
 
-    const [paymentMethod, setPaymentMethod] = useState("cod");
+    const [paymentMethod, setPaymentMethod] = useState<"cod" | "card">("cod");
     const [discountCode, setDiscountCode] = useState("");
     const [couponInput, setCouponInput] = useState("");
     // const [discountAmount, setDiscountAmount] = useState(0); // Removed: derived from totals
@@ -51,29 +54,46 @@ const CheckoutContent = () => {
 
     const [allOffers, setAllOffers] = useState<any[]>([]);
 
-    // Fetch coupons and offers on mount
+    // Fetch coupons, offers and settings on mount
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const offers = await offerService.getAllOffers();
-                const now = new Date();
+                const [offers, coupons, settings] = await Promise.all([
+                    offerService.getAllOffers(),
+                    couponService.getAllCoupons(),
+                    settingsService.getSettings()
+                ]);
 
-                // Filter active offers
-                const activeOffers = offers.filter((o: any) =>
-                    o.isActive &&
-                    new Date(o.startDate) <= now &&
-                    new Date(o.endDate) >= now
-                );
-                setAllOffers(activeOffers);
+                // Extract Shipping Fee and Points Ratio from settings
+                const shippingSetting = settings.storeSettings.find(s => s.configKey === 'SHIPPING_FEE');
+                if (shippingSetting) {
+                    setBaseShippingFee(Number(shippingSetting.configValue));
+                    console.log("Checkout: Loaded shipping fee from settings", shippingSetting.configValue);
+                }
 
-                // Coupons (Type 3 or has code)
-                const coupons = activeOffers.filter((o: any) =>
-                    o.offerTypeId === 3 || o.couponCode
-                );
-                setAvailableCoupons(coupons);
+                const ratioSetting = settings.storeSettings.find(s => s.configKey === 'POINTS_TO_AUD_RATIO');
+                if (ratioSetting) {
+                    setPointsRatio(Number(ratioSetting.configValue));
+                }
+
+                // Consolidation for calculating logic
+                // Ensure coupons are treated with a compatible shape (Type 3)
+                const consolidatedCoupons = coupons.map((c: any) => ({
+                    ...c,
+                    couponCode: c.code || c.couponCode,
+                    name: c.description || c.code || c.couponCode,
+                    discountPercentage: c.discountType === "PERCENTAGE" ? Number(c.discountValue) : null,
+                    discountAmount: c.discountType === "FIXED" ? Number(c.discountValue) : null,
+                    endDate: c.expiryDate || c.endDate,
+                    offerTypeId: 3 // Treat as cart-level for logic
+                }));
+
+                setAllOffers([...offers, ...consolidatedCoupons]);
+                setAvailableCoupons(coupons.map((c: any) => ({ ...c, couponCode: c.code || c.couponCode })));
+                console.log("Checkout: Consolidated all offers and coupons", { offersCount: offers.length, couponsCount: coupons.length });
 
             } catch (err) {
-                console.error("Failed to fetch offers", err);
+                console.error("Failed to fetch checkout data", err);
             }
         };
         fetchData();
@@ -86,6 +106,8 @@ const CheckoutContent = () => {
     const [buyNowItem, setBuyNowItem] = useState<any>(null);
     // Initialize loading state based on presence of ID to avoid flash of empty state
     const [loadingBuyNow, setLoadingBuyNow] = useState(!!buyNowId);
+    const [redeemPoints, setRedeemPoints] = useState(false);
+    const [userPointsBalance, setUserPointsBalance] = useState(0);
 
     useEffect(() => {
         if (buyNowId) {
@@ -117,8 +139,21 @@ const CheckoutContent = () => {
 
     // Calculate Totals using comprehensive helper
     const totals = useMemo(() => {
-        return calculateCartTotals(checkoutItems, allOffers, 5.0, discountCode);
-    }, [checkoutItems, allOffers, discountCode]);
+        const userLevel = subscription?.plan?.level || 0;
+        return calculateCartTotals(checkoutItems, allOffers, baseShippingFee, discountCode, userLevel, redeemPoints, userPointsBalance, pointsRatio);
+    }, [checkoutItems, allOffers, discountCode, subscription, baseShippingFee, redeemPoints, userPointsBalance, pointsRatio]);
+
+    useEffect(() => {
+        const fetchPoints = async () => {
+            try {
+                const pointsData = await userService.getPoints();
+                setUserPointsBalance(pointsData?.totalPoints || 0);
+            } catch (err) {
+                console.error("Failed to fetch points", err);
+            }
+        };
+        if (authChecked) fetchPoints();
+    }, [authChecked]);
 
     useEffect(() => {
         const token = Cookies.get("token");
@@ -179,38 +214,21 @@ const CheckoutContent = () => {
             return;
         }
 
-        // Find coupon in available coupons
-        const coupon = availableCoupons.find(c =>
-            (c.couponCode?.toUpperCase() === code) ||
-            (c.name?.toUpperCase() === code) ||
-            (c.offerTypeId === 3 && c.name?.toUpperCase() === code) // Fallback for name as code
-        );
+        // Set it first, then let useMemo/calculateCartTotals validate it
+        setDiscountCode(code);
+        setCouponInput(code);
 
-        if (coupon) {
-            // Validate constraints
-            if (coupon.minOrderAmount && totals.subtotal < coupon.minOrderAmount) {
-                toast.error(`Minimum order amount is AUD ${coupon.minOrderAmount}`);
-                return;
-            }
+        // We'll check the result in a useEffect or right after if we can, 
+        // but since totals is useMemo, we can check it in the next render or use a small trick.
+        // For immediate feedback, we can manually check once here too.
+        const userLevel = subscription?.plan?.level || 0;
+        const testTotals = calculateCartTotals(checkoutItems, allOffers, baseShippingFee, code, userLevel, redeemPoints, userPointsBalance, pointsRatio);
 
-            if (coupon.maxUsage && coupon.currentUsage >= coupon.maxUsage) {
-                toast.error("This coupon has reached its usage limit");
-                return;
-            }
-
-            // Valid
-            setDiscountCode(code);
-            setCouponInput(code);
-            toast.success(`Coupon applied: ${coupon.name}`);
+        if (testTotals.couponError) {
+            setDiscountCode("");
+            toast.error(testTotals.couponError);
         } else {
-            // Legacy/Hardcoded check
-            if (code === "JS10" || code === "WELCOME") {
-                setDiscountCode(code);
-                toast.success("Coupon applied!");
-            } else {
-                setDiscountCode("");
-                toast.error("Invalid coupon code");
-            }
+            toast.success("Coupon applied successfully!");
         }
     };
 
@@ -259,15 +277,78 @@ const CheckoutContent = () => {
 
         setLoading(true);
         try {
-            await orderService.createOrder({
-                details: checkoutItems.map((item) => ({ productId: Number(item.id), quantity: item.quantity || 1 })),
+            // Generate Discount Logs
+            const generatedLogs: any[] = [];
+
+            totals.itemsWithDiscount.forEach(item => {
+                if (item.savings > 0) {
+                    generatedLogs.push({
+                        type: 'OFFER',
+                        offerId: item.appliedOffer?.id,
+                        amount: item.savings,
+                        description: item.isFreeItem
+                            ? `Free Item: ${item.name} (${item.appliedOffer?.name || 'BOGO'})`
+                            : `Product Discount: ${item.name} (${item.appliedOffer?.name || 'Percentage'})`
+                    });
+                }
+            });
+
+            if (totals.automaticDiscountTotal > 0) {
+                generatedLogs.push({
+                    type: 'OFFER',
+                    offerId: totals.appliedAutomaticOffer?.id,
+                    amount: totals.automaticDiscountTotal,
+                    description: `Order Discount: ${totals.appliedAutomaticOffer?.name || 'Membership Offer'}`
+                });
+            }
+
+            if (totals.couponDiscountTotal > 0) {
+                generatedLogs.push({
+                    type: 'COUPON',
+                    amount: totals.couponDiscountTotal,
+                    description: `Coupon: ${totals.appliedCoupon?.couponCode || discountCode}`
+                });
+            }
+
+            if (totals.pointsDiscountTotal > 0) {
+                generatedLogs.push({
+                    type: 'POINTS_REDEMPTION',
+                    amount: totals.pointsDiscountTotal,
+                    description: `Points Redeemed: ${totals.pointsRedeemed} pts`
+                });
+            }
+
+            const orderResponse = await orderService.createOrder({
+                details: totals.itemsWithDiscount.map((item) => ({
+                    productId: Number(item.originalId || item.id),
+                    quantity: item.quantity || 1,
+                    unitPrice: item.unitPrice,
+                    totalPrice: item.lineTotal,
+                    discount: item.savings,
+                    isFree: !!item.isFreeItem,
+                    offerId: item.appliedOffer?.id
+                })),
                 paymentTypeId: paymentMethod === "cod" ? 1 : 2,
                 shippingAddressId,
                 tax: 0,
                 subtotal: totals.subtotal,
+                discount: (totals.itemLevelDiscountTotal || 0) + (totals.automaticDiscountTotal || 0),
+                shippingCost: totals.shipping,
                 totalAmount: totals.total,
                 couponCode: discountCode || undefined,
+                couponDiscount: totals.couponDiscountTotal || 0,
+                pointsRedeemed: totals.pointsRedeemed || 0,
+                pointsDiscount: totals.pointsDiscountTotal || 0,
+                isPointsRedeemed: (totals.pointsRedeemed || 0) > 0,
+                discountLogs: generatedLogs,
             } as any);
+
+            // If card payment, redirect to Stripe Checkout
+            if (paymentMethod === "card" && orderResponse?.paymentUrl) {
+                // Don't clear cart yet — it will be cleared on payment-success page
+                window.location.href = orderResponse.paymentUrl;
+                return;
+            }
 
             toast.success("Order placed successfully!");
             if (!buyNowId) {
@@ -490,59 +571,6 @@ const CheckoutContent = () => {
                         <div className="bg-white rounded-xl border border-gray-200 p-6">
                             <h2 className="font-extrabold text-[#253D4E] text-lg mb-4">Bill Summary</h2>
 
-                            {/* Available Coupons UI */}
-                            {availableCoupons.length > 0 && (
-                                <div className="mb-6 pb-6 border-b border-gray-200">
-                                    <h3 className="text-sm font-bold text-[#253D4E] mb-3">Available Coupons</h3>
-                                    <div className="space-y-3">
-                                        {availableCoupons.map((coupon) => (
-                                            <div key={coupon.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                                                <div className="flex justify-between items-start mb-3">
-                                                    <div>
-                                                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Coupon Code</p>
-                                                        <p className="text-lg font-bold text-[#005000]">{coupon.couponCode || coupon.name}</p>
-                                                    </div>
-                                                    <Button
-                                                        size="sm"
-                                                        onClick={() => handleApplyCoupon(coupon.couponCode || coupon.name)}
-                                                        disabled={(coupon.minOrderAmount && totals.subtotal < coupon.minOrderAmount) || discountCode === (coupon.couponCode || coupon.name)}
-                                                        className="h-8 px-4 text-xs bg-[#005000] hover:bg-[#006600]"
-                                                    >
-                                                        {discountCode === (coupon.couponCode || coupon.name) ? "Applied" : "Claim"}
-                                                    </Button>
-                                                </div>
-
-                                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-gray-100 pt-3 mb-3">
-                                                    <div>
-                                                        <p className="text-xs text-gray-500 mb-0.5">Benefit</p>
-                                                        <p className="font-semibold text-[#253D4E]">
-                                                            {coupon.discountPercentage ? `${coupon.discountPercentage}%` : `AUD ${coupon.discountAmount}`}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs text-gray-500 mb-0.5">Threshold</p>
-                                                        <p className="font-semibold text-[#253D4E]">
-                                                            {coupon.minOrderAmount ? `AUD ${parseFloat(coupon.minOrderAmount).toFixed(2)}` : 'None'}
-                                                        </p>
-                                                    </div>
-                                                    {coupon.maxUsage && (
-                                                        <div className="col-span-2">
-                                                            <p className="text-xs text-gray-500 mb-0.5">Usage Limit</p>
-                                                            <p className="font-semibold text-[#253D4E] text-sm">
-                                                                {coupon.currentUsage || 0} / {coupon.maxUsage} REDEEMED
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="text-[10px] font-bold text-gray-400 uppercase border-t border-gray-100 pt-2 tracking-wide">
-                                                    EXPIRES {new Date(coupon.endDate).toLocaleDateString()}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
 
                             {/* Coupon Code Section */}
                             <div className="mb-6 pb-6 border-b border-gray-200">
@@ -573,13 +601,42 @@ const CheckoutContent = () => {
                                         </Button>
                                     )}
                                 </div>
-                                {discountCode && totals.discountTotal > 0 && (
-                                    <p className="text-xs text-green-600 mt-1 font-medium flex items-center gap-1">
+                                {discountCode && totals.couponDiscountTotal > 0 && (
+                                    <div className="text-xs text-green-600 mt-1 font-medium flex items-center gap-1">
                                         <div className="w-1.5 h-1.5 rounded-full bg-green-600"></div>
                                         Coupon &quot;{discountCode}&quot; applied successfully
-                                    </p>
+                                    </div>
                                 )}
                             </div>
+
+                            {/* Loyalty Points Section */}
+                            {userPointsBalance > 0 && (
+                                <div className="mb-6 pb-6 border-b border-gray-200">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex flex-col">
+                                            <h3 className="text-sm font-bold text-[#253D4E]">Redeem Loyalty Points</h3>
+                                            <p className="text-xs text-gray-500">You have {userPointsBalance} points (AUD {(userPointsBalance * pointsRatio).toFixed(2)})</p>
+                                        </div>
+                                        <div
+                                            onClick={() => setRedeemPoints(!redeemPoints)}
+                                            className={cn(
+                                                "w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200",
+                                                redeemPoints ? "bg-[#005000]" : "bg-gray-300"
+                                            )}
+                                        >
+                                            <div className={cn(
+                                                "w-4 h-4 bg-white rounded-full transition-transform duration-200",
+                                                redeemPoints ? "translate-x-6" : "translate-x-0"
+                                            )} />
+                                        </div>
+                                    </div>
+                                    {redeemPoints && (
+                                        <div className="mt-2 text-xs font-medium text-[#005000]">
+                                            Redeeming {totals.pointsRedeemed} points ( - AUD {totals.pointsDiscountTotal.toFixed(2)} )
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Totals */}
                             <div className="space-y-3">
@@ -587,10 +644,28 @@ const CheckoutContent = () => {
                                     <span>Subtotal</span>
                                     <span className="font-semibold">AUD {totals.subtotal.toFixed(2)}</span>
                                 </div>
-                                {totals.discountTotal > 0 && (
-                                    <div className="flex justify-between text-green-600">
-                                        <span>Discount</span>
-                                        <span className="font-semibold">-AUD {totals.discountTotal.toFixed(2)}</span>
+                                {totals.itemLevelDiscountTotal > 0 && (
+                                    <div className="flex justify-between text-orange-600 font-bold">
+                                        <span>Product Discounts</span>
+                                        <span>- AUD {totals.itemLevelDiscountTotal.toFixed(2)}</span>
+                                    </div>
+                                )}
+                                {totals.automaticDiscountTotal > 0 && (
+                                    <div className="flex justify-between text-green-600 font-bold">
+                                        <span>{totals.appliedAutomaticOffer?.name || "Automatic Offer"}</span>
+                                        <span>- AUD {totals.automaticDiscountTotal.toFixed(2)}</span>
+                                    </div>
+                                )}
+                                {totals.appliedCoupon && (
+                                    <div className="flex justify-between text-blue-600 font-bold">
+                                        <span>Coupon: {(totals.appliedCoupon as any).code || totals.appliedCoupon?.couponCode || totals.appliedCoupon?.name || discountCode}</span>
+                                        <span>- AUD {totals.couponDiscountTotal.toFixed(2)}</span>
+                                    </div>
+                                )}
+                                {totals.pointsDiscountTotal > 0 && (
+                                    <div className="flex justify-between text-emerald-600 font-bold">
+                                        <span>Points Redeemed ({totals.pointsRedeemed} pts)</span>
+                                        <span>- AUD {totals.pointsDiscountTotal.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-gray-600">
@@ -606,12 +681,6 @@ const CheckoutContent = () => {
                                         AUD {baseShippingFee.toFixed(2)}
                                     </span>
                                 </div>
-                                {subscription && (
-                                    <div className="flex justify-between text-emerald-600 font-bold text-sm">
-                                        <span>Membership Discount</span>
-                                        <span>- AUD {baseShippingFee.toFixed(2)}</span>
-                                    </div>
-                                )}
                                 <div className="flex justify-between text-xl font-bold text-[#253D4E] pt-3 border-t border-gray-200">
                                     <span>Bill Total</span>
                                     <span className="text-[#005000]">AUD {totals.total.toFixed(2)}</span>
@@ -781,18 +850,8 @@ const CheckoutContent = () => {
                         <div className="bg-white rounded-xl border border-gray-200 p-6">
                             <h3 className="font-extrabold text-[#253D4E] text-lg mb-4">Payment Method</h3>
                             <div className="space-y-3">
-                                <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value="bank"
-                                        checked={paymentMethod === "bank"}
-                                        onChange={() => setPaymentMethod("bank")}
-                                        className="w-4 h-4 text-[#005000] focus:ring-[#005000]"
-                                    />
-                                    <span className="font-semibold text-[#253D4E]">Bank Transfer</span>
-                                </label>
-                                <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <label className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${paymentMethod === "cod" ? "border-[#005000] bg-green-50" : "border-gray-200 hover:border-gray-300"
+                                    }`}>
                                     <input
                                         type="radio"
                                         name="payment"
@@ -801,22 +860,64 @@ const CheckoutContent = () => {
                                         onChange={() => setPaymentMethod("cod")}
                                         className="w-4 h-4 text-[#005000] focus:ring-[#005000]"
                                     />
-                                    <span className="font-semibold text-[#253D4E]">Cash on Delivery</span>
+                                    <div className="flex items-center gap-3 flex-1">
+                                        <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-xl">💵</div>
+                                        <div>
+                                            <p className="font-semibold text-[#253D4E]">Cash on Delivery</p>
+                                            <p className="text-xs text-gray-500">Pay when your order arrives</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${paymentMethod === "card" ? "border-[#635bff] bg-indigo-50" : "border-gray-200 hover:border-gray-300"
+                                    }`}>
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        value="card"
+                                        checked={paymentMethod === "card"}
+                                        onChange={() => setPaymentMethod("card")}
+                                        className="w-4 h-4 text-[#635bff] focus:ring-[#635bff]"
+                                    />
+                                    <div className="flex items-center gap-3 flex-1">
+                                        <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                            <svg viewBox="0 0 60 25" className="w-8 h-4" fill="none">
+                                                <path d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a8.33 8.33 0 0 1-4.56 1.1c-4.01 0-6.83-2.5-6.83-7.48 0-4.19 2.39-7.52 6.3-7.52 3.92 0 5.96 3.28 5.96 7.5 0 .4-.04 1.26-.06 1.48zm-5.92-5.62c-1.03 0-2.17.73-2.17 2.58h4.25c0-1.85-1.07-2.58-2.08-2.58zM40.95 20.3c-1.44 0-2.32-.6-2.9-1.04l-.02 4.63-4.12.87V6.27h3.76l.08 1.02a4.7 4.7 0 0 1 3.23-1.29c2.9 0 5.62 2.6 5.62 7.4 0 5.23-2.7 6.9-5.65 6.9zm-.96-10.36c-.93 0-1.48.35-1.96.8l.04 6.23c.44.4.98.78 1.96.78 1.52 0 2.54-1.7 2.54-3.9 0-2.18-1.04-3.91-2.58-3.91zM28.24 5.07c1.36 0 2.2-1.03 2.2-2.32C30.44 1.5 29.6.5 28.24.5c-1.36 0-2.2 1-2.2 2.25 0 1.29.84 2.32 2.2 2.32zm2.07 15.22h-4.14V6.27h4.14v14.02zm-6.49 0H19.7V.59l4.12-.87v20.57zM14.25 6.27h4.14v14.02h-4.14V6.27zm-2.07-1.2c-1.36 0-2.2-1.03-2.2-2.32 0-1.25.84-2.25 2.2-2.25 1.36 0 2.2 1 2.2 2.25 0 1.29-.84 2.32-2.2 2.32zM9.07 20.3c-1.44 0-2.32-.6-2.9-1.04l-.02 4.63L2.03 24.8V6.27h3.76l.08 1.02A4.7 4.7 0 0 1 9.1 6c2.9 0 5.62 2.6 5.62 7.4 0 5.23-2.7 6.9-5.65 6.9zm-.96-10.36c-.93 0-1.48.35-1.96.8l.04 6.23c.44.4.98.78 1.96.78 1.52 0 2.54-1.7 2.54-3.9 0-2.18-1.04-3.91-2.58-3.91z" fill="#635bff" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-[#253D4E]">Card Payment <span className="text-xs text-indigo-600 font-bold">(Stripe)</span></p>
+                                            <p className="text-xs text-gray-500">Visa, Mastercard, Amex — Secure checkout</p>
+                                        </div>
+                                    </div>
                                 </label>
                             </div>
+                            {paymentMethod === "card" && (
+                                <div className="mt-3 p-3 bg-indigo-50 border border-indigo-100 rounded-lg flex items-start gap-2">
+                                    <ShieldCheck className="w-4 h-4 text-indigo-600 mt-0.5 shrink-0" />
+                                    <p className="text-xs text-indigo-700">You&apos;ll be redirected to Stripe&apos;s secure payment page to complete your purchase. Your card details are never stored on our servers.</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Place Order Button */}
                         <Button
                             onClick={handlePlaceOrder}
                             disabled={loading}
-                            className="w-full h-12 bg-[#005000] hover:bg-[#006600] text-white font-bold text-base rounded-lg disabled:opacity-70 disabled:cursor-not-allowed"
+                            className={`w-full h-14 font-bold text-base rounded-xl disabled:opacity-70 disabled:cursor-not-allowed transition-all shadow-lg ${paymentMethod === "card"
+                                    ? "bg-[#635bff] hover:bg-[#5a52e8] text-white shadow-indigo-200"
+                                    : "bg-[#005000] hover:bg-[#006600] text-white shadow-green-200"
+                                }`}
                         >
                             {loading ? (
                                 <>
                                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                                    Placing Order...
+                                    {paymentMethod === "card" ? "Redirecting to Stripe..." : "Placing Order..."}
                                 </>
+                            ) : paymentMethod === "card" ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <ShieldCheck className="w-5 h-5" />
+                                    Pay AUD {totals.total.toFixed(2)} with Stripe
+                                </span>
                             ) : (
                                 `Place Order - AUD ${totals.total.toFixed(2)}`
                             )}
