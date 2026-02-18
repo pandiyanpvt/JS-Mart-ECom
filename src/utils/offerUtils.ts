@@ -30,8 +30,18 @@ export interface Offer {
         id: number;
         productName: string;
         productImages?: { image: string }[];
+        images?: { productImg?: string }[];
     };
     targetMembershipLevel?: number;
+}
+
+/** Get display image for an offer: admin banner first, then product image, then null (use placeholder) */
+export function getOfferImageUrl(offer: Offer): string | null {
+    if (offer.bannerImg) return offer.bannerImg;
+    const p = offer.product;
+    if (!p) return null;
+    const first = (p.images && p.images[0]?.productImg) ? p.images[0].productImg : (p.productImages && p.productImages[0]?.image) ? p.productImages[0].image : null;
+    return first || null;
 }
 
 export interface ProductWithOffer {
@@ -144,24 +154,14 @@ export function formatOfferValidity(endDate: string): string {
  */
 export function getBestOffer(offers: Offer[], productPrice: number): Offer | null {
     const now = new Date();
-    const activeOffers = offers.filter(
-        (offer) =>
-            offer.isActive &&
-            offer.offerTypeId === 2 &&
-            new Date(offer.startDate) <= now &&
-            new Date(offer.endDate) >= now
-        (offer) => {
-            if (!offer.isActive || offer.offerTypeId !== 2) return false;
-            const now = new Date();
-            const start = new Date(offer.startDate);
-            const end = offer.endDate ? new Date(offer.endDate) : null;
-
-            const hasStarted = isNaN(start.getTime()) || start <= now;
-            const havenNotEnded = !end || isNaN(end.getTime()) || end >= now;
-
-            return hasStarted && havenNotEnded;
-        }
-    );
+    const activeOffers = offers.filter((offer) => {
+        if (!offer.isActive || offer.offerTypeId !== 2) return false;
+        const start = new Date(offer.startDate);
+        const end = offer.endDate ? new Date(offer.endDate) : null;
+        const hasStarted = isNaN(start.getTime()) || start <= now;
+        const havenNotEnded = !end || isNaN(end.getTime()) || end >= now;
+        return hasStarted && havenNotEnded;
+    });
 
     if (activeOffers.length === 0) return null;
 
