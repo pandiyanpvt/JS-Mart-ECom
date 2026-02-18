@@ -9,15 +9,39 @@ import { motion } from "framer-motion";
 
 import { VirtualMembershipCard } from "./VirtualMembershipCard";
 
+import { useSearchParams, useRouter } from "next/navigation";
+
 export function MembershipInfo({ user }: { user: any }) {
     const [subscription, setSubscription] = useState<UserSubscription | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isToggling, setIsToggling] = useState(false);
+    const searchParams = useSearchParams();
+    const router = useRouter();
 
     useEffect(() => {
-        membershipService.getMySubscription()
-            .then(setSubscription)
-            .finally(() => setLoading(false));
-    }, []);
+        const verifyAndLoad = async () => {
+            const sessionId = searchParams.get("session_id");
+            if (sessionId) {
+                try {
+                    await membershipService.verifySession(sessionId);
+                    // Clear query params without full reload
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({ path: newUrl }, '', newUrl);
+                } catch (error) {
+                    console.error("Session verification failed", error);
+                }
+            }
+
+            try {
+                const sub = await membershipService.getMySubscription();
+                setSubscription(sub);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        verifyAndLoad();
+    }, [searchParams]);
 
     if (loading) {
         return (
@@ -73,8 +97,25 @@ export function MembershipInfo({ user }: { user: any }) {
         );
     }
 
+
+
+    const handleToggleAutoRenew = async () => {
+        if (!subscription) return;
+        setIsToggling(true);
+        try {
+            const nextValue = !subscription.autoRenew;
+            await membershipService.toggleAutoRenew(nextValue);
+            setSubscription({ ...subscription, autoRenew: nextValue });
+            alert(`Auto-renewal ${nextValue ? 'enabled' : 'disabled'} successfully.`);
+        } catch (error: any) {
+            console.error('Failed to toggle auto-renew', error);
+            alert(error.response?.data?.message || 'Action failed');
+        } finally {
+            setIsToggling(false);
+        }
+    };
+
     const isPlus = subscription.plan?.level === 2;
-    const features = JSON.parse(subscription.plan?.features || '[]');
 
     return (
         <div className="space-y-16 pb-20">
@@ -149,24 +190,47 @@ export function MembershipInfo({ user }: { user: any }) {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center px-2">
                                 <span className="text-sm font-bold text-gray-500 uppercase tracking-widest text-[10px]">Renewal Status</span>
-                                <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    Active
+                                <div className={cn(
+                                    "flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                    subscription.autoRenew ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                                )}>
+                                    <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", subscription.autoRenew ? "bg-emerald-500" : "bg-amber-500")} />
+                                    {subscription.autoRenew ? "Active" : "Cancelled"}
                                 </div>
                             </div>
                             <div className="space-y-1 px-2">
-                                <p className="text-xs font-black text-gray-900">Next billing cycle on {new Date(subscription.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                                <p className="text-[11px] text-gray-400 font-medium">Automatic renewal is currently enabled.</p>
+                                <p className="text-xs font-black text-gray-900">
+                                    {subscription.autoRenew
+                                        ? `Next billing on ${new Date(subscription.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`
+                                        : `Ends on ${new Date(subscription.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                                </p>
+                                <p className="text-[11px] text-gray-400 font-medium">
+                                    {subscription.autoRenew
+                                        ? "Automatic renewal is currently enabled."
+                                        : "Auto-renew disabled. Plan will not be charged again."}
+                                </p>
                             </div>
                         </div>
 
                         <div className="pt-6 border-t border-gray-50 space-y-3">
-                            <button className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-zinc-800 transition-all shadow-lg">
-                                Manage Payment
+                            <button
+                                onClick={handleToggleAutoRenew}
+                                disabled={isToggling}
+                                className={cn(
+                                    "w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2",
+                                    subscription.autoRenew
+                                        ? "bg-rose-600 text-white hover:bg-rose-700"
+                                        : "bg-emerald-600 text-white hover:bg-emerald-700"
+                                )}
+                            >
+                                {isToggling && <Loader2 className="animate-spin" size={14} />}
+                                {subscription.autoRenew ? "Turn Off Auto-Renew" : "Turn On Auto-Renew"}
                             </button>
-                            <button className="w-full py-4 text-rose-600 hover:bg-rose-50 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
-                                Cancel Subscription
-                            </button>
+                            <Link href="/membership" className="block">
+                                <button className="w-full py-4 text-zinc-900 hover:bg-gray-50 rounded-2xl font-black text-xs uppercase tracking-widest transition-all border border-gray-100">
+                                    Switch Plan
+                                </button>
+                            </Link>
                         </div>
                     </div>
 

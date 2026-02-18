@@ -10,3 +10,4 @@ export { brandService } from './brand.service';
 export { settingsService } from './settings.service';
 export { default as notificationService } from './notification.service';
 export { default as api } from './apiClient';
+export { default as couponService, type Coupon } from './coupon.service';

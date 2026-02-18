@@ -15,7 +15,15 @@ export default function OfferCardSection() {
             try {
                 const allOffers = await offerService.getAllOffers();
                 // Filter for active offers, limit to most recent/relevant
-                const activeOffers = allOffers.filter((o: any) => o.isActive && new Date(o.endDate) >= new Date()).slice(0, 4);
+                const activeOffers = allOffers.filter((offer: any) => {
+                    if (!offer.isActive) return false;
+                    const now = new Date();
+                    const start = new Date(offer.startDate);
+                    const end = offer.endDate ? new Date(offer.endDate) : null;
+                    const hasStarted = isNaN(start.getTime()) || start <= now;
+                    const havenNotEnded = !end || isNaN(end.getTime()) || end >= now;
+                    return hasStarted && havenNotEnded;
+                }).slice(0, 4);
                 setOffers(activeOffers);
             } catch (error) {
                 console.error("Failed to load offers:", error);

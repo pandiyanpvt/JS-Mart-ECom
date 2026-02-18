@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, use } from "react";
+import { useRouter } from "next/navigation";
 
 /**
  * Order detail lives under account. Redirect /orders/[id] -> /account/orders/[id].
  */
-export default function OrderDetailRedirectPage() {
-  const params = useParams();
+export default function OrderDetailRedirectPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const router = useRouter();
-  const id = params?.id as string;
+  const id = params.id;
 
   useEffect(() => {
     if (id) router.replace(`/account/orders/${id}`);
