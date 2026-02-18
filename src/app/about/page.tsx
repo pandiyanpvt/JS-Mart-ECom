@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image"; // Ensuring Image is imported if needed, though HeroSection handles it internally
+import Image from "next/image";
 import { Star, ShieldCheck, Zap, Heart, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import HeroSection, { HeroSlide } from "@/components/hero-section";
 
 const aboutHeroSlides: HeroSlide[] = [
@@ -21,129 +20,148 @@ const aboutHeroSlides: HeroSlide[] = [
 export default function AboutPage() {
   const values = [
     {
-      icon: <Heart className="h-6 w-6 text-rose-500" />,
+      icon: Heart,
       title: "Customer First",
-      description: "We prioritize our customers' needs and satisfaction in every decision we make."
+      description: "We prioritise our customers' needs and satisfaction in every decision we make."
     },
     {
-      icon: <ShieldCheck className="h-6 w-6 text-emerald-500" />,
+      icon: ShieldCheck,
       title: "Quality Guaranteed",
       description: "We source only the freshest and highest quality products for our community."
     },
     {
-      icon: <Zap className="h-6 w-6 text-amber-500" />,
+      icon: Zap,
       title: "Fast Delivery",
       description: "Our efficient logistics ensure your groceries arrive fresh and on time."
     },
     {
-      icon: <Star className="h-6 w-6 text-[#005000]" />,
+      icon: Star,
       title: "Community Focused",
       description: "We believe in supporting local suppliers and building strong community ties."
     }
   ];
 
-
   const stats = [
     { label: "Products", value: "1,000+" },
     { label: "Happy Customers", value: "50,000+" },
     { label: "Support", value: "24/7" },
-    { label: "Cities", value: "15+" }
+    { label: "Locations", value: "15+" }
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <HeroSection slides={aboutHeroSlides} />
 
-      {/* Stats Section */}
-      <section className="py-12 bg-gray-50 border-y border-gray-100">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {/* Stats */}
+      <section className="py-6 sm:py-8 md:py-12 bg-slate-50 border-b border-slate-100">
+        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center group transition-transform hover:-translate-y-1">
-                <div className="text-3xl md:text-4xl font-bold text-[#253D4E] group-hover:text-[#005000] transition-colors">
+              <div key={index} className="text-center">
+                <p className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#253D4E]">
                   {stat.value}
-                </div>
-                <div className="text-sm md:text-base text-gray-500 font-medium uppercase tracking-wider mt-1">
+                </p>
+                <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-0.5 sm:mt-1">
                   {stat.label}
-                </div>
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Our Story Section */}
-      <section className="py-20 lg:py-32 overflow-hidden">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-            <div className="flex-1 space-y-6">
-              <div className="inline-block px-4 py-1.5 bg-[#005000]/10 text-[#005000] rounded-full text-sm font-bold uppercase tracking-wide">
+      {/* Our Story */}
+      <section className="py-6 sm:py-8 md:py-16 bg-white">
+        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-16">
+            <div className="flex-1 space-y-4 sm:space-y-5">
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
                 Our Story
-              </div>
-              <h2 className="text-3xl lg:text-5xl font-bold text-[#253D4E] leading-tight">
-                From a Small Local Store to Your <span className="text-[#005000]">Digital Kitchen</span>
+              </p>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#253D4E] leading-tight">
+                From a small local store to your <span className="text-[#005000]">digital kitchen</span>
               </h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                Founded in 2020, JS Mart began with a simple idea: everyone deserves access
-                to the freshest produce without the hassle of a traditional grocery store run.
-                We started in a small basement with just 50 products and a single delivery van.
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                JS Mart started with a simple idea: everyone deserves access to the freshest produce
+                without the hassle. We began with a small range and a single delivery van.
               </p>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                Today, we partner with local farmers and global suppliers to bring over 1,000
-                premium products directly to you. Our commitment to quality and speed has
-                helped us become the most trusted online grocery app in Sri Lanka.
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                Today we partner with local growers and trusted suppliers to bring you a wide range
+                of premium products. Our focus on quality and reliable delivery has made us a
+                trusted name for online grocery in Australia.
               </p>
-              <div className="pt-4">
-                <Link href="/shop" className="flex items-center gap-2 text-[#005000] hover:text-[#006600] font-bold text-lg group no-underline">
-                  Check out our products <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </div>
+              <Link
+                href="/shop"
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-[#005000] hover:bg-[#006600] text-white text-xs sm:text-sm font-semibold rounded transition-colors min-h-[44px] touch-manipulation"
+              >
+                Shop now
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <div className="flex-1 relative">
-              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl z-10 scale-95 lg:scale-100">
+            <div className="flex-1 relative w-full max-w-lg order-first lg:order-none">
+              <div className="relative aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-slate-100">
                 <Image
                   src="/images/about/story.png"
                   alt="Our Story"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
-              {/* Decorative background elements */}
-              <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#005000] rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
-              <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="py-20 bg-[#253D4E] text-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#005000] rounded-full filter blur-[120px]" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-700 rounded-full filter blur-[120px]" />
-        </div>
-
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6">Our Core Values</h2>
-            <p className="text-lg text-gray-300">
-              These principles guide every action we take to provide you with the best experience possible.
+      {/* Values */}
+      <section className="py-10 md:py-16 bg-slate-50">
+        <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+          <div className="text-center mb-8 md:mb-10">
+            <h2 className="text-xl md:text-2xl font-extrabold text-[#253D4E]">
+              Our core values
+            </h2>
+            <p className="text-slate-500 text-sm mt-2 max-w-xl mx-auto">
+              The principles that guide everything we do.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-[#005000]/50 transition-all duration-300 group">
-                <div className="mb-6 p-4 bg-white/10 rounded-xl inline-block group-hover:bg-[#005000]/20 transition-colors">
-                  {value.icon}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, index) => {
+              const Icon = value.icon;
+              return (
+                <div
+                  key={index}
+                  className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-[#005000]/20 transition-all"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#005000]/10 text-[#005000] flex items-center justify-center mb-3 sm:mb-4">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
+                  </div>
+                  <h3 className="font-bold text-[#253D4E] text-sm sm:text-base mb-1.5 sm:mb-2">{value.title}</h3>
+                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                    {value.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold mb-4">{value.title}</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  {value.description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-6 sm:py-8 md:py-12 bg-white border-t border-slate-100">
+        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#253D4E] mb-1.5 sm:mb-2">
+            Ready to shop?
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm mb-4 sm:mb-6">
+            Explore our range of fresh produce and everyday essentials.
+          </p>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#005000] hover:bg-[#006600] text-white text-xs sm:text-sm font-semibold rounded transition-colors min-h-[44px] touch-manipulation"
+          >
+            Visit shop
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
     </div>

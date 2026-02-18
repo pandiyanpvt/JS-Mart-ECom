@@ -131,14 +131,11 @@ export default function FAQPage() {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-[#005000] opacity-10 rounded-full blur-3xl -mr-20 -mt-20" />
                     <h2 className="text-3xl font-bold mb-4">Still have questions?</h2>
                     <p className="text-gray-400 mb-8 max-w-lg mx-auto">
-                        Cant find the answer you looking for? Please chat to our friendly team.
+                        Can't find the answer you're looking for? Please contact our friendly team.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="flex justify-center">
                         <Button className="h-12 px-8 bg-[#005000] hover:bg-[#006600] text-white font-bold" asChild>
                             <Link href="/contact" className="no-underline text-white">Contact Us <ArrowRight className="ml-2 h-5 w-5" /></Link>
-                        </Button>
-                        <Button variant="outline" className="h-12 px-8 border-white text-white hover:bg-white hover:text-black font-bold">
-                            Live Chat
                         </Button>
                     </div>
                 </div>

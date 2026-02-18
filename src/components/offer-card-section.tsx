@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Tag } from "lucide-react";
 import { offerService } from "@/services/offer.service";
-import { Offer } from "@/utils/offerUtils";
+import { Offer, getOfferImageUrl } from "@/utils/offerUtils";
 
 export default function OfferCardSection() {
     const [offers, setOffers] = useState<Offer[]>([]);
@@ -38,55 +39,95 @@ export default function OfferCardSection() {
     if (loading || offers.length === 0) return null;
 
     return (
-        <section className="w-full py-16 md:py-20 bg-gray-50">
+        <section className="w-full py-10 md:py-12 bg-white">
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-                    <h2 className="text-3xl font-extrabold text-[#253D4E]">Best Deals</h2>
-                    <Link href="/offers" className="px-5 py-2.5 rounded-lg bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold transition-colors whitespace-nowrap">
-                        View All Offers
+                <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 mb-4 md:mb-8">
+                    <h2 className="text-lg md:text-2xl font-extrabold text-[#253D4E] leading-tight">Best Deals</h2>
+                    <Link
+                        href="/offers"
+                        className="shrink-0 px-3 py-2 md:px-5 md:py-3 md:min-h-[44px] flex items-center bg-[#005000] hover:bg-[#006600] text-white text-xs md:text-sm font-semibold transition-colors touch-manipulation rounded"
+                    >
+                        View More
                     </Link>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {offers.map((offer) => (
-                        <div key={offer.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col h-full group">
-                            {/* Offer Image/Product Image */}
-                            <div className="relative h-48 w-full bg-gray-50">
-                                <Image
-                                    src={offer.product?.productImages?.[0]?.image || "/placeholder.png"}
-                                    alt={offer.name || "Offer"}
-                                    fill
-                                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
-                                />
-                                <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                                    {offer.discountPercentage ? `-${offer.discountPercentage}%` : "OFFER"}
+                {/* Mobile: horizontal scroll - smaller cards */}
+                <div
+                    className="flex md:hidden gap-3 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-4 px-4"
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                >
+                    {offers.map((offer) => {
+                        const imgUrl = getOfferImageUrl(offer);
+                        return (
+                            <Link
+                                key={offer.id}
+                                href={offer.productId ? `/shop/${offer.productId}` : "/shop"}
+                                className="flex-shrink-0 w-[56vw] max-w-[200px] block bg-white overflow-hidden rounded-lg border border-slate-200 shadow-sm active:shadow-md active:scale-[0.98] transition-all"
+                            >
+                                <div className="border-t-4 border-[#005000] relative h-24 w-full bg-slate-50 overflow-hidden">
+                                    {imgUrl ? (
+                                        <Image src={imgUrl} alt={offer.name || "Offer"} fill className="object-cover" sizes="(max-width: 768px) 56vw, 200px" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-[#005000]/5">
+                                            <Tag className="w-10 h-10 text-[#005000]/40" strokeWidth={1.5} />
+                                        </div>
+                                    )}
+                                    <span className="absolute top-1 right-1 px-1.5 py-0.5 bg-[#005000] text-white text-[9px] font-bold rounded">
+                                        {offer.discountPercentage ? `−${offer.discountPercentage}%` : "DEAL"}
+                                    </span>
                                 </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="p-4 md:p-6 flex flex-col flex-1">
-                                <h3 className="font-bold text-[#253D4E] text-base md:text-lg mb-1 line-clamp-1">{offer.name}</h3>
-                                <p className="text-xs md:text-sm text-gray-500 mb-3 line-clamp-2">{offer.description}</p>
-
-                                <div className="mt-auto">
-                                    <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-3">
-                                        <span className="text-lg md:text-xl font-bold text-[#005000]">
-                                            {offer.couponCode ? "Use Code:" : "Special Price"}
-                                        </span>
-                                        {offer.couponCode && (
-                                            <span className="text-sm md:text-lg font-mono bg-green-50 text-[#005000] px-2 py-0.5 rounded border border-green-200 inline-block">
-                                                {offer.couponCode}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <Link href={offer.productId ? `/shop/${offer.productId}` : "/shop"}>
-                                        <button className="w-full py-2 md:py-2.5 rounded-lg border border-[#005000] text-[#005000] font-semibold hover:bg-[#005000] hover:text-white transition-colors text-sm md:text-base">
-                                            Shop Now
-                                        </button>
-                                    </Link>
+                                <div className="p-2">
+                                    <h3 className="font-semibold text-[#253D4E] text-[11px] line-clamp-1">{offer.name}</h3>
+                                    {offer.couponCode && (
+                                        <div className="mt-1 py-0.5 px-1.5 bg-[#005000]/5 border border-dashed border-[#005000]/25 rounded text-center">
+                                            <span className="font-mono text-[10px] font-bold text-[#005000]">{offer.couponCode}</span>
+                                        </div>
+                                    )}
+                                    <span className="mt-1.5 inline-block w-full py-1.5 text-center text-[10px] font-semibold text-[#005000] border border-[#005000] rounded">
+                                        Shop Now
+                                    </span>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
+                            </Link>
+                        );
+                    })}
+                </div>
+                {/* Desktop: grid with image */}
+                <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {offers.map((offer) => {
+                        const imgUrl = getOfferImageUrl(offer);
+                        return (
+                            <Link
+                                key={offer.id}
+                                href={offer.productId ? `/shop/${offer.productId}` : "/shop"}
+                                className="group bg-white flex flex-col h-full rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-[#005000]/30 transition-all duration-200 overflow-hidden"
+                            >
+                                <div className="border-t-4 border-[#005000] relative h-40 w-full bg-slate-50 overflow-hidden">
+                                    {imgUrl ? (
+                                        <Image src={imgUrl} alt={offer.name || "Offer"} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 1024px) 50vw, 25vw" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-[#005000]/5">
+                                            <Tag className="w-12 h-12 text-[#005000]/40" strokeWidth={1.5} />
+                                        </div>
+                                    )}
+                                    <span className="absolute top-3 right-3 px-2.5 py-1 bg-[#005000] text-white text-[10px] font-bold rounded">
+                                        {offer.discountPercentage ? `−${offer.discountPercentage}%` : "DEAL"}
+                                    </span>
+                                </div>
+                                <div className="p-5 flex flex-col flex-1">
+                                    <h3 className="font-semibold text-[#253D4E] text-base line-clamp-1 group-hover:text-[#005000] transition-colors">{offer.name}</h3>
+                                    {offer.description && <p className="text-sm text-slate-500 line-clamp-2 mt-1">{offer.description}</p>}
+                                    {offer.couponCode && (
+                                        <div className="mt-4 py-2 px-3 bg-[#005000]/5 border border-dashed border-[#005000]/25 rounded-lg text-center">
+                                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Use at checkout</span>
+                                            <span className="block font-mono text-sm font-bold text-[#005000] tracking-widest mt-0.5">{offer.couponCode}</span>
+                                        </div>
+                                    )}
+                                    <span className="mt-4 inline-block w-full py-2.5 text-center text-sm font-semibold text-[#005000] border-2 border-[#005000] rounded-lg group-hover:bg-[#005000] group-hover:text-white transition-colors">
+                                        Shop Now
+                                    </span>
+                                </div>
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </section>

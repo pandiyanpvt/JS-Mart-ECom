@@ -9,6 +9,8 @@ import { ProductCard } from "@/components/product-card";
 import { ProductListCard } from "@/components/product-list-card";
 import { Input } from "@/components/ui/input";
 import { productService, categoryService } from "@/services";
+import { brandService } from "@/services/brand.service";
+import type { Brand } from "@/services/brand.service";
 import { offerService } from "@/services/offer.service";
 import type { Product } from "@/services/product.service";
 import { getProductImages, getProductImageUrl } from "@/services/product.service";
@@ -85,20 +87,28 @@ interface FilterSidebarContentProps {
   categories: Category[];
   selectedCategory: string;
   handleCategoryChange: (id: string) => void;
+  brands: Brand[];
+  selectedBrand: string;
+  handleBrandChange: (id: string) => void;
   priceRange: number[];
   setPriceRange: (range: number[]) => void;
   maxPrice: number;
   loading: boolean;
+  onClearAll: () => void;
 }
 
 const FilterSidebarContent = ({
   categories,
   selectedCategory,
   handleCategoryChange,
+  brands,
+  selectedBrand,
+  handleBrandChange,
   priceRange,
   setPriceRange,
   maxPrice,
-  loading
+  loading,
+  onClearAll
 }: FilterSidebarContentProps) => (
   <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 lg:sticky lg:top-8">
     <div>
@@ -132,6 +142,36 @@ const FilterSidebarContent = ({
             ))}
         </ul>
       )}
+    </div>
+
+    <div>
+      <h3 className="font-extrabold text-[#253D4E] text-lg mb-4">Filter by Brand</h3>
+      <ul className="space-y-2 max-h-48 overflow-y-auto">
+        <li>
+          <button
+            onClick={() => handleBrandChange("all")}
+            className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedBrand === "all"
+              ? "bg-[#005000] text-white"
+              : "text-[#253D4E] hover:bg-gray-50"
+              }`}
+          >
+            All Brands
+          </button>
+        </li>
+        {brands.map((b) => (
+          <li key={b.id}>
+            <button
+              onClick={() => handleBrandChange(String(b.id))}
+              className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedBrand === String(b.id)
+                ? "bg-[#005000] text-white"
+                : "text-[#253D4E] hover:bg-gray-50"
+                }`}
+            >
+              {b.brand}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
 
     <div>
@@ -170,10 +210,7 @@ const FilterSidebarContent = ({
     </div>
 
     <Button
-      onClick={() => {
-        handleCategoryChange("all");
-        setPriceRange([0, maxPrice]);
-      }}
+      onClick={onClearAll}
       variant="outline"
       className="w-full border-[#005000] text-[#005000] hover:bg-[#005000] hover:text-white"
     >
@@ -186,14 +223,17 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialCategory = searchParams.get("category");
+  const initialBrand = searchParams.get("brand");
   const searchQuery = searchParams.get("search");
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [productOffers, setProductOffers] = useState<Map<number, Offer[]>>(new Map());
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || "all");
+  const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand || "all");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 10000]);
@@ -216,13 +256,15 @@ function ShopContent() {
           setSearchTerm("");
         }
 
-        const [categoriesData, offersData] = await Promise.all([
+        const [categoriesData, brandsData, offersData] = await Promise.all([
           categoryService.getActive(),
+          brandService.getActive(),
           offerService.getAllOffers()
         ]);
 
         setProducts(productsData);
         setCategories(categoriesData);
+        setBrands(brandsData);
         setOffers(offersData);
 
         // Create a map of productId -> offers for efficient lookup
@@ -258,12 +300,31 @@ function ShopContent() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, sortBy]);
+  }, [selectedCategory, selectedBrand, sortBy]);
+
+  const buildShopUrl = (category: string, brand: string) => {
+    const params = new URLSearchParams();
+    if (category !== "all") params.set("category", category);
+    if (brand !== "all") params.set("brand", brand);
+    const q = params.toString();
+    return q ? `/shop?${q}` : "/shop";
+  };
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    const url = categoryId === "all" ? "/shop" : `/shop?category=${categoryId}`;
-    router.replace(url, { scroll: false });
+    router.replace(buildShopUrl(categoryId, selectedBrand), { scroll: false });
+  };
+
+  const handleBrandChange = (brandId: string) => {
+    setSelectedBrand(brandId);
+    router.replace(buildShopUrl(selectedCategory, brandId), { scroll: false });
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedCategory("all");
+    setSelectedBrand("all");
+    setPriceRange([0, maxPrice]);
+    router.replace("/shop", { scroll: false });
   };
 
   const filteredProducts = useMemo(() => {
@@ -272,15 +333,18 @@ function ShopContent() {
     // Apply category filter only if not searching
     if (!searchQuery && selectedCategory !== "all") {
       filtered = products.filter((p) => {
-        // Find the selected category object to get its descendants
         const categoryObj = categories.find(c => String(c.id) === selectedCategory);
         if (categoryObj) {
           const allowedIds = getAllCategoryIds(categoryObj);
           return allowedIds.includes(p.productCategoryId);
         }
-        // Fallback if category object not found (shouldn't happen usually)
         return p.productCategoryId === Number(selectedCategory);
       });
+    }
+
+    // Apply brand filter
+    if (selectedBrand !== "all") {
+      filtered = filtered.filter((p) => p.brandId === Number(selectedBrand));
     }
 
     // Apply price filter
@@ -302,7 +366,7 @@ function ShopContent() {
     });
 
     return sorted;
-  }, [products, selectedCategory, sortBy, priceRange, searchQuery]);
+  }, [products, selectedCategory, selectedBrand, sortBy, priceRange, searchQuery, categories]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
@@ -377,10 +441,10 @@ function ShopContent() {
       {/* Search Results Header */}
       {searchQuery && (
         <div className="w-full bg-white border-b border-gray-200 py-4">
-          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
-            <div className="flex items-center justify-between">
+          <div className="max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-bold text-[#253D4E]">
+                <h2 className="text-lg sm:text-xl font-bold text-[#253D4E]">
                   Search Results for &quot;{searchQuery}&quot;
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
@@ -402,8 +466,8 @@ function ShopContent() {
         </div>
       )}
 
-      <div className="w-full px-4 md:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">
               <button
@@ -437,28 +501,32 @@ function ShopContent() {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     handleCategoryChange={handleCategoryChange}
+                    brands={brands}
+                    selectedBrand={selectedBrand}
+                    handleBrandChange={handleBrandChange}
                     priceRange={priceRange}
                     setPriceRange={setPriceRange}
                     maxPrice={maxPrice}
                     loading={loading}
+                    onClearAll={handleClearAllFilters}
                   />
                 </div>
               </SheetContent>
             </Sheet>
           </div>
 
-          <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
             {searchQuery ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 Found {filteredProducts.length} result{filteredProducts.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
               </p>
             ) : (
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 Showing {paginatedProducts.length} of {filteredProducts.length} products
               </p>
             )}
             <select
-              className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent"
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-200 rounded-lg bg-white text-xs sm:text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -469,16 +537,20 @@ function ShopContent() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           <aside className="hidden lg:block lg:w-[20%] lg:min-w-[250px]">
             <FilterSidebarContent
               categories={categories}
               selectedCategory={selectedCategory}
               handleCategoryChange={handleCategoryChange}
+              brands={brands}
+              selectedBrand={selectedBrand}
+              handleBrandChange={handleBrandChange}
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               maxPrice={maxPrice}
               loading={loading}
+              onClearAll={handleClearAllFilters}
             />
           </aside>
 
@@ -492,8 +564,8 @@ function ShopContent() {
               </div>
             ) : paginatedProducts.length > 0 ? (
               <>
-                <div className={`grid gap-3 md:gap-6 ${viewMode === "grid"
-                  ? "grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                <div className={`grid gap-2 sm:gap-3 md:gap-6 ${viewMode === "grid"
+                  ? "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                   : "grid-cols-1"
                   }`}>
                   {paginatedProducts.map(product => (
@@ -506,7 +578,7 @@ function ShopContent() {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-2 mt-12">
+                  <div className="flex flex-wrap justify-center items-center gap-2 mt-8 sm:mt-12">
                     <Button
                       variant="outline"
                       size="sm"
@@ -559,9 +631,9 @@ function ShopContent() {
                 )}
               </>
             ) : (
-              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                <p className="text-lg font-semibold text-gray-600 mb-2">No products found</p>
-                <p className="text-sm text-gray-500">Try adjusting your filters</p>
+              <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-12 text-center">
+                <p className="text-base sm:text-lg font-semibold text-gray-600 mb-2">No products found</p>
+                <p className="text-xs sm:text-sm text-gray-500">Try adjusting your filters</p>
               </div>
             )}
           </main>

@@ -173,9 +173,9 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
     const inWishlist = isInWishlist(libProduct.id);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pb-4 md:pb-8">
             {/* Breadcrumbs */}
-            <div className="w-full pt-[100px] pb-4">
+            <div className="w-full pt-0 pb-2 md:pb-4">
                 <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                     <nav className="flex items-center gap-2 text-sm text-gray-600">
                         <Link href="/" className="hover:text-[#005000] transition-colors flex items-center gap-1">
@@ -205,7 +205,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                 </div>
             </div>
 
-            <div className="w-full py-8">
+            <div className="w-full py-4 md:py-6">
                 <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
@@ -428,7 +428,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                                 </div>
 
                                 {/* Actions: Add to Cart, Buy Now, Wishlist */}
-                                <div className="flex flex-col sm:flex-row gap-3">
+                                < div className="flex flex-col sm:flex-row gap-3" >
                                     <Button
                                         type="button"
                                         onClick={handleAddToCart}
@@ -446,50 +446,52 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                                     >
                                         Buy Now
                                     </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </div >
+                            </div >
+                        </div >
+                    </div >
 
                     {/* Related Products Section */}
-                    {relatedProducts.length > 0 && (
-                        <div className="mt-12">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl md:text-3xl font-bold text-[#253D4E]">
-                                    Related Products
-                                </h2>
-                                <Link
-                                    href={`/shop?category=${product.productCategoryId}`}
-                                    className="text-[#005000] hover:text-[#006600] font-semibold text-sm flex items-center gap-1 transition-colors"
-                                >
-                                    View All
-                                    <ChevronRight className="w-4 h-4" />
-                                </Link>
+                    {
+                        relatedProducts.length > 0 && (
+                            <div className="mt-12">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-[#253D4E]">
+                                        Related Products
+                                    </h2>
+                                    <Link
+                                        href={`/shop?category=${product.productCategoryId}`}
+                                        className="text-[#005000] hover:text-[#006600] font-semibold text-sm flex items-center gap-1 transition-colors"
+                                    >
+                                        View All
+                                        <ChevronRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
+                                {loadingRelated ? (
+                                    <div className="flex justify-center py-12">
+                                        <Loader2 className="w-8 h-8 animate-spin text-[#005000]" />
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                                        {relatedProducts.map((relatedProduct) => {
+                                            const relatedImgs = getProductImages(relatedProduct);
+                                            const relatedPrimary = relatedImgs.find((img) => img.isPrimary) || relatedImgs[0];
+                                            const relatedImage = relatedPrimary ? getProductImageUrl(relatedPrimary) : "/placeholder.png";
+                                            const relatedLib = adaptToLibProduct(relatedProduct);
+                                            return (
+                                                <ProductCard key={relatedProduct.id} product={relatedLib} />
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
-                            {loadingRelated ? (
-                                <div className="flex justify-center py-12">
-                                    <Loader2 className="w-8 h-8 animate-spin text-[#005000]" />
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                                    {relatedProducts.map((relatedProduct) => {
-                                        const relatedImgs = getProductImages(relatedProduct);
-                                        const relatedPrimary = relatedImgs.find((img) => img.isPrimary) || relatedImgs[0];
-                                        const relatedImage = relatedPrimary ? getProductImageUrl(relatedPrimary) : "/placeholder.png";
-                                        const relatedLib = adaptToLibProduct(relatedProduct);
-                                        return (
-                                            <ProductCard key={relatedProduct.id} product={relatedLib} />
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
+                        )
+                    }
+                </div >
 
                 {/* Reviews Section */}
-                <ProductReviews productId={Number(id)} />
-            </div>
-        </div>
+                < ProductReviews productId={Number(id)} />
+            </div >
+        </div >
     );
 }

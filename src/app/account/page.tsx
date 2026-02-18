@@ -134,43 +134,43 @@ export default function AccountDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+            <div className="max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-4 sm:pt-6 md:pt-8 pb-3 sm:pb-4">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
                     My Account
                 </h1>
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pb-12 space-y-8">
+            <div className="max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-8 sm:pb-10 md:pb-12 space-y-4 sm:space-y-6 md:space-y-8">
                 {/* Welcome Section */}
-                <div className="bg-white rounded-xl shadow-md p-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 md:p-8">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
                         Welcome back, {userName}! 👋
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-sm sm:text-base text-gray-600">
                         Here's what's happening with your account today.
                     </p>
                 </div>
 
                 {/* Statistics Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                     {stats.map((stat) => {
                         const Icon = stat.icon;
                         return (
                             <div
                                 key={stat.label}
-                                className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow"
+                                className="bg-white rounded-xl shadow-md p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow"
                             >
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className={`${stat.color} p-3 rounded-lg`}>
-                                        <Icon className="h-6 w-6 text-white" />
+                                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                                    <div className={`${stat.color} p-2 sm:p-3 rounded-lg`}>
+                                        <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                                     </div>
                                 </div>
-                                <div className="text-3xl font-bold text-gray-900 mb-1">
+                                <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-0.5 sm:mb-1">
                                     {stat.value}
                                 </div>
-                                <div className="text-sm text-gray-600 mb-2">{stat.label}</div>
-                                <div className="flex items-center gap-1 text-xs text-gray-500">
-                                    <TrendingUp className="h-3 w-3" />
+                                <div className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">{stat.label}</div>
+                                <div className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-500">
+                                    <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                                     {stat.trend}
                                 </div>
                             </div>
@@ -247,23 +247,23 @@ export default function AccountDashboard() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-[#005000] to-[#006600] rounded-xl shadow-md p-8 text-white">
-                        <h3 className="text-xl font-bold mb-2">Need Help?</h3>
-                        <p className="text-green-100 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="bg-gradient-to-br from-[#005000] to-[#006600] rounded-xl shadow-md p-5 sm:p-6 md:p-8 text-white">
+                        <h3 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2">Need Help?</h3>
+                        <p className="text-green-100 text-sm sm:text-base mb-3 sm:mb-4">
                             Our support team is ready to assist you
                         </p>
-                        <button className="bg-white text-[#005000] px-6 py-2 rounded-lg font-semibold hover:bg-[#005000]/10 transition-colors">
+                        <button className="bg-white text-[#005000] px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-[#005000]/10 transition-colors min-h-[44px] touch-manipulation">
                             Contact Support
                         </button>
                     </div>
 
-                    <div className="bg-gradient-to-br from-[#005000] to-[#006600] rounded-xl shadow-md p-8 text-white">
-                        <h3 className="text-xl font-bold mb-2">Track Your Order</h3>
-                        <p className="text-purple-100 mb-4">
+                    <div className="bg-gradient-to-br from-[#005000] to-[#006600] rounded-xl shadow-md p-5 sm:p-6 md:p-8 text-white">
+                        <h3 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2">Track Your Order</h3>
+                        <p className="text-green-100 text-sm sm:text-base mb-3 sm:mb-4">
                             Get real-time updates on your deliveries
                         </p>
-                        <button className="bg-white text-purple-600 px-6 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors">
+                        <button className="bg-white text-[#005000] px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-[#005000]/10 transition-colors min-h-[44px] touch-manipulation">
                             Track Package
                         </button>
                     </div>

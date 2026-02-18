@@ -27,7 +27,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1a1e24] text-gray-400 pt-16 pb-8 relative overflow-hidden">
+    <footer className="bg-[#1a1e24] text-gray-400 pt-8 md:pt-16 pb-6 md:pb-8 relative overflow-hidden">
       {/* Background Decoration */}
       <div className="absolute bottom-0 left-0 w-full h-full opacity-15 pointer-events-none z-0">
         <Image
@@ -39,11 +39,11 @@ export default function Footer() {
       </div>
 
       <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-8 md:mb-12">
           {/* Column 1: Company Info */}
           <div>
-            <Link href="/" className="inline-block mb-8">
-              <div className="relative h-16 w-44">
+            <Link href="/" className="inline-block mb-4 md:mb-8">
+              <div className="relative h-12 w-36 md:h-16 md:w-44">
                 <Image
                   src="/logo/Web_Logo_Mart-01%20(1).png"
                   alt="JS Mart Australia"
@@ -53,35 +53,35 @@ export default function Footer() {
               </div>
             </Link>
 
-            <ul className="space-y-6 text-sm">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
-                <span className="border-b border-gray-700 pb-4 w-full">
+            <ul className="space-y-3 md:space-y-6 text-xs md:text-sm">
+              <li className="flex items-start gap-2 md:gap-3">
+                <MapPin className="w-4 h-4 md:w-5 md:h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span className="border-b border-gray-700 pb-3 md:pb-4 w-full text-xs md:text-sm">
                   ABC Town Luton Street, New York 226688
                 </span>
               </li>
-              <li className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
-                <span className="border-b border-gray-700 pb-4 w-full">
+              <li className="flex items-start gap-2 md:gap-3">
+                <Phone className="w-4 h-4 md:w-5 md:h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span className="border-b border-gray-700 pb-3 md:pb-4 w-full text-xs md:text-sm">
                   + 0800 567 345
                 </span>
               </li>
-              <li className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
-                <span>
+              <li className="flex items-start gap-2 md:gap-3">
+                <Mail className="w-4 h-4 md:w-5 md:h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span className="text-xs md:text-sm">
                   abc@example.com
                 </span>
               </li>
             </ul>
 
-            <div className="flex gap-2 mt-8">
+            <div className="flex gap-1.5 md:gap-2 mt-6 md:mt-8">
               {[Facebook, Twitter, Dribbble, Youtube, Linkedin].map((Icon, idx) => (
                 <a
                   key={idx}
                   href="#"
-                  className="w-8 h-8 bg-[#84CC16] rounded-full flex items-center justify-center text-white hover:bg-[#65a30d] transition-colors"
+                  className="w-7 h-7 md:w-8 md:h-8 bg-[#84CC16] rounded-full flex items-center justify-center text-white hover:bg-[#65a30d] transition-colors"
                 >
-                  <Icon className="w-4 h-4 fill-current" />
+                  <Icon className="w-3.5 h-3.5 md:w-4 md:h-4 fill-current" />
                 </a>
               ))}
             </div>
@@ -89,8 +89,8 @@ export default function Footer() {
 
           {/* Column 2: Quick Links */}
           <div>
-            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Quick Links</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="text-[#84CC16] font-semibold mb-4 md:mb-6 uppercase tracking-wider text-xs md:text-sm">Quick Links</h3>
+            <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
               <li>
                 <Link href="/offers" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
                   <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
@@ -120,8 +120,8 @@ export default function Footer() {
 
           {/* Column 3: My Account */}
           <div>
-            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">My Account</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="text-[#84CC16] font-semibold mb-4 md:mb-6 uppercase tracking-wider text-xs md:text-sm">My Account</h3>
+            <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
               <li>
                 <Link href="/account/profile" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
                   <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
@@ -151,8 +151,8 @@ export default function Footer() {
 
           {/* Column 4: Information */}
           <div>
-            <h3 className="text-[#84CC16] font-semibold mb-6 uppercase tracking-wider text-sm">Information</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="text-[#84CC16] font-semibold mb-4 md:mb-6 uppercase tracking-wider text-xs md:text-sm">Information</h3>
+            <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
               <li>
                 <Link href="/about" className="hover:text-[#84CC16] transition-colors flex items-center gap-2">
                   <span className="w-1 h-1 bg-gray-600 rounded-full"></span>

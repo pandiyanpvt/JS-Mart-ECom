@@ -36,7 +36,7 @@ export default function FooterBannerSection() {
 
     if (loading) {
         return (
-            <section className="w-full py-8 md:py-12 bg-gray-50">
+            <section className="w-full py-8 md:py-12 bg-slate-50">
                 <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                     <div className="flex items-center justify-center py-8">
                         <Loader2 className="w-8 h-8 animate-spin text-[#005000]" />
@@ -50,13 +50,13 @@ export default function FooterBannerSection() {
         return null;
     }
 
-    // Footer banners: Full width single banner or grid layout for multiple
+    // Single banner: no heading
     if (banners.length === 1) {
         return (
-            <section className="w-full py-8 md:py-12 bg-gray-50">
+            <section className="w-full py-8 md:py-12 bg-slate-50">
                 <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                     <Link href="/shop" className="block group">
-                        <div className="relative w-full h-[200px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                        <div className="relative w-full h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100 hover:shadow-xl transition-all">
                             <Image
                                 src={banners[0].promotionImg}
                                 alt="Promotional Banner"
@@ -71,31 +71,41 @@ export default function FooterBannerSection() {
         );
     }
 
-    // Multiple banners: Grid layout
-    let gridClass = "grid-cols-1";
-    if (banners.length === 2) gridClass = "grid-cols-1 sm:grid-cols-2";
-    if (banners.length === 3) gridClass = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
-    if (banners.length >= 4) gridClass = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
+    // Multiple banners: one image at a time, change every 5 sec (carousel, no heading)
+    return (
+        <FooterBannerCarousel banners={banners} />
+    );
+}
+
+const ROTATE_INTERVAL_MS = 5000;
+
+function FooterBannerCarousel({ banners }: { banners: Promotion[] }) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % banners.length);
+        }, ROTATE_INTERVAL_MS);
+        return () => clearInterval(timer);
+    }, [banners.length]);
 
     return (
-        <section className="w-full py-8 md:py-12 bg-gray-50">
+        <section className="w-full py-8 md:py-12 bg-slate-50">
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
-                <div className={`grid ${gridClass} gap-4 md:gap-6`}>
-                    {banners.map((banner) => (
+                <div className="relative w-full h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100">
+                    {banners.map((banner, index) => (
                         <Link
                             key={banner.id}
                             href="/shop"
-                            className="block group"
+                            className={`absolute inset-0 block transition-opacity duration-500 ${index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"}`}
                         >
-                            <div className="relative w-full h-[180px] md:h-[250px] lg:h-[300px] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                                <Image
-                                    src={banner.promotionImg}
-                                    alt="Promotional Banner"
-                                    fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                />
-                            </div>
+                            <Image
+                                src={banner.promotionImg}
+                                alt="Promotional Banner"
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"
+                            />
                         </Link>
                     ))}
                 </div>
