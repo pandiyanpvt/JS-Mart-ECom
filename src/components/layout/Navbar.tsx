@@ -244,11 +244,21 @@ export function Navbar() {
         };
     }, [pathname]);
 
-    const handleLogout = () => {
-        Cookies.remove("user");
-        Cookies.remove("token");
-        setIsLoggedIn(false);
-        router.push("/");
+    const handleLogout = async () => {
+        try {
+            const { signOut } = await import("next-auth/react");
+            await signOut({ redirect: false });
+            Cookies.remove("user");
+            Cookies.remove("token");
+            setIsLoggedIn(false);
+            router.push("/");
+            window.location.reload();
+        } catch (error) {
+            console.error("Logout error:", error);
+            Cookies.remove("user");
+            Cookies.remove("token");
+            window.location.href = "/";
+        }
     };
 
     const toggleModal = () => setIsOpen(!isOpen);
@@ -298,7 +308,7 @@ export function Navbar() {
                                 placeholder="Search products..."
                                 autoFocus
                             />
-                            <button 
+                            <button
                                 onClick={() => {
                                     if (searchQuery.trim()) {
                                         router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
@@ -476,7 +486,7 @@ export function Navbar() {
                                 className="flex-1 h-full border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-base bg-[#F3F4F6] shadow-none"
                                 placeholder="Search products..."
                             />
-                            <button 
+                            <button
                                 onClick={() => {
                                     if (searchQuery.trim()) {
                                         router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
@@ -926,11 +936,10 @@ export function Navbar() {
 
             {/* Spacer so content starts below fixed nav - phone: 64/72px, desktop: 96px, + search bar when open on mobile */}
             <div
-                className={`md:h-[96px] ${
-                    isMobileSearchOpen
+                className={`md:h-[96px] ${isMobileSearchOpen
                         ? 'h-[144px] sm:h-[152px]'
                         : 'h-16 sm:h-[72px]'
-                }`}
+                    }`}
             />
 
             {/* Mobile menu backdrop */}
