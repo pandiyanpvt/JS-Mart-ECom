@@ -76,7 +76,7 @@ export default function SignInPage() {
         try {
             console.log("🔵 Starting Google sign in...");
             await signIn("google", {
-                callbackUrl: "/signin",
+                callbackUrl: "/",
                 redirect: true,
                 prompt: "select_account"
             });

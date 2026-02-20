@@ -2,14 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Zap, Crown, ShieldCheck, Truck, Percent, Gift, ArrowRight, Loader2 } from 'lucide-react';
+import { Check, Zap, Crown, ShieldCheck, Truck, Percent, Gift, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { membershipService, MembershipPlan, UserSubscription } from '@/services/membership.service';
+import userService, { User } from '@/services/user.service';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function MembershipPlans() {
     const [plans, setPlans] = useState<MembershipPlan[]>([]);
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
     const [currentSub, setCurrentSub] = useState<UserSubscription | null>(null);
     const [isProcessing, setIsProcessing] = useState<number | null>(null);
     const router = useRouter();
@@ -17,12 +20,14 @@ export default function MembershipPlans() {
     useEffect(() => {
         const load = async () => {
             try {
-                const [plansData, subData] = await Promise.all([
+                const [plansData, subData, userData] = await Promise.all([
                     membershipService.getPlans(),
-                    membershipService.getMySubscription()
+                    membershipService.getMySubscription(),
+                    userService.getProfile()
                 ]);
                 setPlans(plansData.sort((a, b) => a.level - b.level));
                 setCurrentSub(subData);
+                setUser(userData);
             } catch (error) {
                 console.error('Failed to load membership data', error);
             } finally {
@@ -32,7 +37,28 @@ export default function MembershipPlans() {
         load();
     }, []);
 
+    const isProfileComplete = (u: User | null) => {
+        if (!u) return false;
+        const required = [
+            'fullName', 'phoneNumber', 'profileImg', 'dateOfBirth', 'gender',
+            'occupation', 'preferredLanguage', 'maritalStatus', 'address',
+            'city', 'state', 'zipCode', 'interests', 'referralSource'
+        ];
+        return required.every(field => !!(u as any)[field]);
+    };
+
     const handleSubscribe = async (plan: MembershipPlan) => {
+        if (!user) {
+            router.push('/signin');
+            return;
+        }
+
+        if (!isProfileComplete(user)) {
+            toast.error("Please complete your profile details before subscribing to a membership plan.");
+            router.push('/account/profile');
+            return;
+        }
+
         setIsProcessing(plan.id);
         try {
             const data = await membershipService.subscribe(plan.id);
@@ -43,7 +69,7 @@ export default function MembershipPlans() {
             }
         } catch (error: any) {
             console.error('Subscription error:', error);
-            alert(error.response?.data?.message || error.message || 'Subscription failed');
+            toast.error(error.response?.data?.message || error.message || 'Subscription failed');
         } finally {
             setIsProcessing(null);
         }
@@ -58,8 +84,32 @@ export default function MembershipPlans() {
         );
     }
 
+    const profileComplete = isProfileComplete(user);
+
     return (
         <section className="py-20 px-4 max-w-7xl mx-auto">
+            {!profileComplete && user && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-12 p-4 rounded-2xl bg-amber-50 border border-amber-100 flex flex-col md:flex-row items-center justify-between gap-4 max-w-4xl mx-auto"
+                >
+                    <div className="flex items-center gap-3">
+                        <AlertCircle className="text-amber-600 h-6 w-6" />
+                        <div>
+                            <p className="font-bold text-amber-900">Incomplete Profile</p>
+                            <p className="text-sm text-amber-700 font-medium">You need to complete your profile at 100% to subscribe to any membership plan.</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => router.push('/account/profile')}
+                        className="px-6 py-2 bg-amber-600 text-white rounded-xl font-bold text-sm hover:bg-amber-700 transition-colors whitespace-now/wrap"
+                    >
+                        Complete My Profile
+                    </button>
+                </motion.div>
+            )}
+
             <div className="text-center mb-16">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

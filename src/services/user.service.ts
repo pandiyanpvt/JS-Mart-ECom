@@ -22,6 +22,18 @@ export interface User {
     isVerified: boolean;
     verifiedAt?: string;
     isActive: boolean;
+    dateOfBirth?: string;
+    gender?: string;
+    occupation?: string;
+    preferredLanguage?: string;
+    maritalStatus?: string;
+    secondaryPhone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    interests?: string;
+    referralSource?: string;
     createdAt?: string;
     updatedAt?: string;
     user_role?: UserRole;
@@ -37,6 +49,18 @@ export interface UpdateProfileData {
     fullName?: string;
     phoneNumber?: string;
     profileImg?: string;
+    dateOfBirth?: string;
+    gender?: string;
+    occupation?: string;
+    preferredLanguage?: string;
+    maritalStatus?: string;
+    secondaryPhone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    interests?: string;
+    referralSource?: string;
 }
 
 const userService = {
