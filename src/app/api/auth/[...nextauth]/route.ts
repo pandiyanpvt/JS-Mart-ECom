@@ -7,7 +7,7 @@ const handler = NextAuth({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
             profile(profile) {
-                console.log(" Google profile() raw:", profile);
+
 
                 return {
                     id: profile.sub,
@@ -21,9 +21,9 @@ const handler = NextAuth({
 
     callbacks: {
         async signIn({ user, account, profile }) {
-            console.log(" signIn user:", user);
-            console.log(" signIn account:", account);
-            console.log(" signIn profile:", profile);
+
+
+
             return true;
         },
 
@@ -40,7 +40,7 @@ const handler = NextAuth({
                 t.provider = account.provider;
                 t.accessToken = account.access_token ?? undefined;
 
-                console.log(" jwt account.access_token:", account.access_token);
+
             }
 
             // profile is "unknown-like" here, safely read picture
@@ -55,7 +55,7 @@ const handler = NextAuth({
                 if (u.id) t.userId = u.id;
             }
 
-            console.log(" jwt token:", t);
+
             return t;
         },
 
@@ -76,7 +76,7 @@ const handler = NextAuth({
             s.user.id = t.userId;
             if (t.picture) s.user.image = t.picture;
 
-            console.log(" session:", s);
+
             return s;
         },
     },

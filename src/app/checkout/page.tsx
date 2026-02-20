@@ -68,7 +68,7 @@ const CheckoutContent = () => {
                 const shippingSetting = settings.storeSettings.find(s => s.configKey === 'SHIPPING_FEE');
                 if (shippingSetting) {
                     setBaseShippingFee(Number(shippingSetting.configValue));
-                    console.log("Checkout: Loaded shipping fee from settings", shippingSetting.configValue);
+
                 }
 
                 const ratioSetting = settings.storeSettings.find(s => s.configKey === 'POINTS_TO_AUD_RATIO');
@@ -90,7 +90,7 @@ const CheckoutContent = () => {
 
                 setAllOffers([...offers, ...consolidatedCoupons]);
                 setAvailableCoupons(coupons.map((c: any) => ({ ...c, couponCode: c.code || c.couponCode })));
-                console.log("Checkout: Consolidated all offers and coupons", { offersCount: offers.length, couponsCount: coupons.length });
+
 
             } catch (err) {
                 console.error("Failed to fetch checkout data", err);
@@ -904,8 +904,8 @@ const CheckoutContent = () => {
                             onClick={handlePlaceOrder}
                             disabled={loading}
                             className={`w-full h-14 font-bold text-base rounded-xl disabled:opacity-70 disabled:cursor-not-allowed transition-all shadow-lg ${paymentMethod === "card"
-                                    ? "bg-[#635bff] hover:bg-[#5a52e8] text-white shadow-indigo-200"
-                                    : "bg-[#005000] hover:bg-[#006600] text-white shadow-green-200"
+                                ? "bg-[#635bff] hover:bg-[#5a52e8] text-white shadow-indigo-200"
+                                : "bg-[#005000] hover:bg-[#006600] text-white shadow-green-200"
                                 }`}
                         >
                             {loading ? (

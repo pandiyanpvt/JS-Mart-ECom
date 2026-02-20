@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Handle forgot password logic here
-        console.log("Reset password for:", email);
+
         // Navigate to OTP page
         router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
     };

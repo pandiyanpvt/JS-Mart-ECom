@@ -73,6 +73,7 @@ export function Navbar() {
     const [unreadCount, setUnreadCount] = useState(0);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+    const [selectedSearchCategory, setSelectedSearchCategory] = useState<Category | null>(null);
 
     // Fetch unread notifications
     useEffect(() => {
@@ -163,6 +164,18 @@ export function Navbar() {
         }
     };
 
+    const executeSearch = (query: string, category?: Category | null) => {
+        const params = new URLSearchParams();
+        if (query.trim()) params.set("search", query.trim());
+        if (category && category.id) params.set("category", String(category.id));
+
+        const q = params.toString();
+        router.push(q ? `/shop?${q}` : "/shop");
+        setShowSearchResults(false);
+        setSearchQuery("");
+        setIsMobileSearchOpen(false);
+    };
+
     // Fetch products for active category (if no subs) or active subcategory
     useEffect(() => {
         if (activeCategory) {
@@ -206,7 +219,8 @@ export function Navbar() {
     useEffect(() => {
         const checkLoginStatus = () => {
             const user = Cookies.get("user");
-            if (user) {
+            const token = Cookies.get("token");
+            if (user && token) {
                 try {
                     const userData = JSON.parse(user);
                     setIsLoggedIn(true);
@@ -297,11 +311,8 @@ export function Navbar() {
                                     }
                                 }}
                                 onKeyDown={(e) => {
-                                    if (e.key === "Enter" && searchQuery.trim()) {
-                                        router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-                                        setShowSearchResults(false);
-                                        setSearchQuery("");
-                                        setIsMobileSearchOpen(false);
+                                    if (e.key === "Enter") {
+                                        executeSearch(searchQuery, selectedSearchCategory);
                                     }
                                 }}
                                 className="flex-1 h-10 border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-sm bg-[#F3F4F6] shadow-none"
@@ -309,14 +320,7 @@ export function Navbar() {
                                 autoFocus
                             />
                             <button
-                                onClick={() => {
-                                    if (searchQuery.trim()) {
-                                        router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-                                        setShowSearchResults(false);
-                                        setSearchQuery("");
-                                        setIsMobileSearchOpen(false);
-                                    }
-                                }}
+                                onClick={() => executeSearch(searchQuery, selectedSearchCategory)}
                                 className="h-full px-3 text-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center"
                             >
                                 {searchLoading ? (
@@ -378,17 +382,13 @@ export function Navbar() {
                                     );
                                 })}
                                 {searchQuery.trim() && (
-                                    <Link
-                                        href={`/shop?search=${encodeURIComponent(searchQuery.trim())}`}
-                                        onClick={() => {
-                                            setShowSearchResults(false);
-                                            setSearchQuery("");
-                                            setIsMobileSearchOpen(false);
-                                        }}
-                                        className="block p-3 text-center text-sm font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2"
+                                    <button
+                                        onClick={() => executeSearch(searchQuery, selectedSearchCategory)}
+                                        className="w-full p-3 text-center text-sm font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2 block"
                                     >
                                         View all results for "{searchQuery}"
-                                    </Link>
+                                        {selectedSearchCategory && <span className="text-gray-400 font-normal"> in {selectedSearchCategory.category}</span>}
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -427,37 +427,21 @@ export function Navbar() {
                         </Link>
                     </div>
 
+                    {/* Desktop Location - Restored */}
+                    <div className="hidden xl:flex items-center gap-3 px-4 py-2 border-l border-r border-gray-100/80 group cursor-pointer hover:bg-gray-50 transition-all rounded-sm flex-shrink-0">
+                        <div className="p-2 bg-green-50 rounded-full group-hover:bg-[#1F5632] group-hover:text-white transition-colors duration-300">
+                            <MapPin className="h-5 w-5 text-[#1F5632] group-hover:text-white" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none mb-1">From</span>
+                            <span className="text-xs font-black text-[#1F5632] whitespace-nowrap">Dubbo, AUSTRALIA</span>
+                        </div>
+                        <ChevronDown className="h-3 w-3 text-gray-400 group-hover:text-[#1F5632] transition-colors ml-1" />
+                    </div>
+
                     {/* Search Bar */}
                     <div className="flex-1 max-w-4xl hidden md:flex items-center px-4 search-container relative">
-                        <div className="flex w-full h-11 items-center bg-[#F3F4F6] rounded-md overflow-hidden ring-1 ring-gray-200">
-                            {/* All Dropdown Button */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="h-full px-5 bg-[#E5E7EB] hover:bg-[#D1D5DB] text-gray-800 text-sm font-bold flex items-center gap-2 transition-colors min-w-[80px] justify-between border-r border-gray-300">
-                                        All
-                                        <ChevronDown className="h-3 w-3 fill-current opacity-70" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start" className="w-56">
-                                    <DropdownMenuLabel className="px-3 py-2 text-gray-700 font-bold text-sm">
-                                        Categories
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="my-1" />
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/shop" className="flex cursor-pointer px-3 py-2 text-sm hover:bg-gray-100">
-                                            All Products
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="my-1" />
-                                    {categories.map((category) => (
-                                        <DropdownMenuItem key={category.id} asChild>
-                                            <Link href={`/shop?category=${category.id}`} className="flex cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                {category.category}
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                        <div className="flex w-full h-11 items-center bg-[#F3F4F6] rounded-md overflow-hidden ring-1 ring-gray-200 focus-within:ring-2 focus-within:ring-[#1F5632]/50 transition-all">
 
                             <Input
                                 type="text"
@@ -477,23 +461,15 @@ export function Navbar() {
                                     }
                                 }}
                                 onKeyDown={(e) => {
-                                    if (e.key === "Enter" && searchQuery.trim()) {
-                                        router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-                                        setShowSearchResults(false);
-                                        setSearchQuery("");
+                                    if (e.key === "Enter") {
+                                        executeSearch(searchQuery, selectedSearchCategory);
                                     }
                                 }}
                                 className="flex-1 h-full border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-base bg-[#F3F4F6] shadow-none"
                                 placeholder="Search products..."
                             />
                             <button
-                                onClick={() => {
-                                    if (searchQuery.trim()) {
-                                        router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-                                        setShowSearchResults(false);
-                                        setSearchQuery("");
-                                    }
-                                }}
+                                onClick={() => executeSearch(searchQuery, selectedSearchCategory)}
                                 className="h-full px-4 text-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center"
                             >
                                 {searchLoading ? (
@@ -543,16 +519,13 @@ export function Navbar() {
                                         );
                                     })}
                                     {searchQuery.trim() && (
-                                        <Link
-                                            href={`/shop?search=${encodeURIComponent(searchQuery.trim())}`}
-                                            onClick={() => {
-                                                setShowSearchResults(false);
-                                                setSearchQuery("");
-                                            }}
-                                            className="block p-3 text-center text-sm font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2"
+                                        <button
+                                            onClick={() => executeSearch(searchQuery, selectedSearchCategory)}
+                                            className="w-full block p-3 text-center text-sm font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2"
                                         >
                                             View all results for "{searchQuery}"
-                                        </Link>
+                                            {selectedSearchCategory && <span className="text-gray-400 font-normal"> in {selectedSearchCategory.category}</span>}
+                                        </button>
                                     )}
                                 </div>
                             </div>
@@ -937,8 +910,8 @@ export function Navbar() {
             {/* Spacer so content starts below fixed nav - phone: 64/72px, desktop: 96px, + search bar when open on mobile */}
             <div
                 className={`md:h-[96px] ${isMobileSearchOpen
-                        ? 'h-[144px] sm:h-[152px]'
-                        : 'h-16 sm:h-[72px]'
+                    ? 'h-[144px] sm:h-[152px]'
+                    : 'h-16 sm:h-[72px]'
                     }`}
             />
 

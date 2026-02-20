@@ -18,6 +18,7 @@ const PaymentSuccessContent = () => {
 
     const [status, setStatus] = useState<"loading" | "success" | "failed">("loading");
     const [orderDetails, setOrderDetails] = useState<{ amount?: number; currency?: string } | null>(null);
+    const [verifiedOrderId, setVerifiedOrderId] = useState<string | null>(null);
 
     useEffect(() => {
         const verify = async () => {
@@ -39,6 +40,7 @@ const PaymentSuccessContent = () => {
                 if (data.status === "paid") {
                     setStatus("success");
                     setOrderDetails({ amount: data.amount, currency: data.currency });
+                    if (data.orderId) setVerifiedOrderId(data.orderId.toString());
                     clearCart(); // Clear cart only after confirmed payment
                 } else {
                     setStatus("failed");
@@ -132,10 +134,10 @@ const PaymentSuccessContent = () => {
                     {/* Details */}
                     <div className="px-8 pt-10 pb-6">
                         <div className="space-y-4">
-                            {orderId && (
+                            {(verifiedOrderId || orderId) && (
                                 <div className="flex items-center justify-between py-4 border-b border-gray-50 group hover:bg-gray-50/50 transition-colors px-2 rounded-lg">
                                     <span className="text-gray-500 font-medium">Order Number</span>
-                                    <span className="font-bold text-[#253D4E] text-lg">#{orderId}</span>
+                                    <span className="font-bold text-[#253D4E] text-lg">#{verifiedOrderId || orderId}</span>
                                 </div>
                             )}
                             {orderDetails?.amount && (

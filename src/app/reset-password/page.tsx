@@ -40,7 +40,7 @@ export default function ResetPasswordPage() {
             return;
         }
         // Handle reset password logic here
-        console.log("Reset password:", formData.password);
+
         router.push("/password-reset-success");
     };
 
