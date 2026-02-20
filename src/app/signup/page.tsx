@@ -28,7 +28,7 @@ export default function SignUpPage() {
         const syncGoogleLogin = async () => {
             if (status === "authenticated" && session?.user) {
                 try {
-                    console.log("🔵 Syncing Google login with backend...");
+
 
                     await authService.googleLogin({
                         emailAddress: session.user.email,
@@ -76,7 +76,7 @@ export default function SignUpPage() {
 
     const handleGoogleLogin = async () => {
         try {
-            console.log("🔵 Starting Google sign up...");
+
             await signIn("google", {
                 callbackUrl: "/signup",
                 redirect: true,

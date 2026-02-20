@@ -330,9 +330,9 @@ function ShopContent() {
   const filteredProducts = useMemo(() => {
     let filtered = products;
 
-    // Apply category filter only if not searching
-    if (!searchQuery && selectedCategory !== "all") {
-      filtered = products.filter((p) => {
+    // Apply category filter
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((p) => {
         const categoryObj = categories.find(c => String(c.id) === selectedCategory);
         if (categoryObj) {
           const allowedIds = getAllCategoryIds(categoryObj);

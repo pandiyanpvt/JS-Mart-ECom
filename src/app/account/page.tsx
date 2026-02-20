@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Package, ShoppingBag, MapPin, CreditCard, TrendingUp } from "lucide-react";
 import Cookies from 'js-cookie';
-import {useSession} from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 export default function AccountDashboard() {
     // ... (keep state and effects)
@@ -27,7 +27,7 @@ export default function AccountDashboard() {
                 "", // (optional)
         };
 
-        console.log("Google user stored:", userToStore);
+
 
         // Keep your existing "user" localStorage key (so your UI logic still works)
         localStorage.setItem("user", JSON.stringify(userToStore));
