@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo, useEffect } from "react";
+import Image from "next/image";
 import { User, Mail, Phone, Calendar, Camera, Save, Briefcase, MapPin, CheckCircle2, AlertCircle, ChevronRight, ChevronLeft, Globe, Heart, Users, Compass, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -270,7 +271,13 @@ export function ProfileDetails({ user, onUpdate }: ProfileDetailsProps) {
                                 {user.profileImg ? (
                                     <img src={user.profileImg} alt="Profile" className="h-full w-full object-cover" />
                                 ) : (
-                                    <User className="h-16 w-16 text-gray-200" />
+                                    <Image
+                                        src="/logo/Web_Logo_Mart-01%20(1).png"
+                                        alt="JS Mart"
+                                        width={120}
+                                        height={120}
+                                        className="h-full w-full object-contain"
+                                    />
                                 )}
                             </div>
                         </div>

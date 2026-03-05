@@ -2,21 +2,25 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import React, { useEffect } from "react";
-import type { PaymentType } from "react-svg-credit-card-payment-icons";
+import { PaymentIcon, type PaymentType } from "react-svg-credit-card-payment-icons";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { Radio, RadioField, RadioGroup } from "@/components/ui/radio";
 
 import { useRouter } from "next/navigation";
-import {Heading} from "@/components/ui/heading";
+import { Heading } from "@/components/ui/heading";
 
 type PaymentBrand =
   | "Visa"
   | "Mastercard"
+  | "AmericanExpress"
   | "Amex"
   | "Discover"
   | "Diners"
+  | "DinersClub"
   | "Jcb"
+  | "JCB"
   | "Unionpay"
+  | "UnionPay"
   | "Maestro"
   | "Alipay"
   | "Code"
@@ -26,6 +30,7 @@ type PaymentBrand =
   | "Hiper"
   | "Hipercard"
   | "Mir"
+  | "PayPal"
   | "Paypal";
 
 export default function PaymentMethodList({
@@ -183,11 +188,10 @@ export default function PaymentMethodList({
                     }}
                   >
                     <div
-                      className={`sm:p-1 p-4 border rounded-lg transition-transform ${
-                        expired
-                          ? "bg-red-50 border-red-200 opacity-60 cursor-not-allowed"
-                          : "bg-gray-50 border-gray-200 hover:shadow-lg hover:scale-100"
-                      } duration-300`}
+                      className={`sm:p-1 p-4 border rounded-lg transition-transform ${expired
+                        ? "bg-red-50 border-red-200 opacity-60 cursor-not-allowed"
+                        : "bg-gray-50 border-gray-200 hover:shadow-lg hover:scale-100"
+                        } duration-300`}
                     >
                       <RadioField className="">
                         <div className="rounded-md  flex items-center pl-2 ">
@@ -243,5 +247,18 @@ export default function PaymentMethodList({
         </div>
       </div>
     </>
+  );
+}
+
+function PaymentMethodsSkeleton() {
+  return (
+    <div className="space-y-6">
+      {[1, 2].map((i) => (
+        <div
+          key={i}
+          className="h-20 bg-gray-100 border border-gray-200 rounded-lg animate-pulse"
+        ></div>
+      ))}
+    </div>
   );
 }

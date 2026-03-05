@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Star, Heart, Eye, ShoppingCart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
-import { useCart } from "@/context/CartContext"; // ✅ Import cart context
-import { Product } from "@/lib/data";
+import { useCart, type Product as CartProduct } from "@/context/CartContext"; // ✅ Import cart context and type
+import { type Product as DataProduct } from "@/lib/data";
 
 type LocalProduct = {
     id: number;
@@ -55,7 +55,7 @@ export default function BestOfFruitVeg() {
     );
 
     const handleWishlistToggle = (product: LocalProduct) => {
-        const wishlistProduct: Product = {
+        const wishlistProduct: DataProduct = {
             id: String(product.id),
             name: product.name,
             category: "fruits", // Adjust category if needed
@@ -76,7 +76,7 @@ export default function BestOfFruitVeg() {
     };
 
     const handleAddToCart = (product: LocalProduct) => {
-        const cartProduct: Product = {
+        const cartProduct: CartProduct = {
             id: String(product.id),
             name: product.name,
             price: product.price,
@@ -148,7 +148,7 @@ export default function BestOfFruitVeg() {
                                         className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all group/icon ${isInWishlist(String(product.id))
                                             ? "bg-[#005000] text-white"
                                             : "bg-white hover:bg-[#005000] hover:text-white"
-                                        }`}
+                                            }`}
                                         title={isInWishlist(String(product.id)) ? "Remove from wishlist" : "Add to wishlist"}
                                     >
                                         <Heart className={`w-4 h-4 ${isInWishlist(String(product.id)) ? "fill-white text-white" : "text-gray-700 group-hover/icon:text-white"}`} />

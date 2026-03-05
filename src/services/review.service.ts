@@ -10,6 +10,10 @@ export interface UserReview {
     is_approved: boolean;
     createdAt?: string;
     product?: any;
+    user?: {
+        fullName?: string;
+        profileImg?: string;
+    };
 }
 
 const reviewService = {

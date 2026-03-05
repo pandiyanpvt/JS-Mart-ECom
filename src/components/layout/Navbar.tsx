@@ -561,8 +561,14 @@ export function Navbar() {
                                                 />
                                             </span>
                                         ) : (
-                                            <span className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-[#1F5632] flex items-center justify-center flex-shrink-0 text-white shadow-md">
-                                                <User className="h-4 w-4 md:h-5 md:w-5" />
+                                            <span className="relative h-8 w-8 md:h-9 md:w-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
+                                                <Image
+                                                    src="/logo/Web_Logo_Mart-01%20(1).png"
+                                                    alt="JS Mart"
+                                                    fill
+                                                    sizes="36px"
+                                                    className="object-contain"
+                                                />
                                             </span>
                                         )}
                                         <ChevronDown className="hidden md:block h-3.5 w-3.5 text-gray-600" />
@@ -892,15 +898,25 @@ export function Navbar() {
 
                     {/* Main Navigation Links - Horizontal */}
                     <div className="flex-1 flex items-center h-full overflow-x-auto scrollbar-hide px-2">
-                        {navLinks.map((link, index) => (
-                            <Link
-                                key={index}
-                                href={link.href}
-                                className="h-full flex items-center px-6 text-sm font-bold text-white hover:bg-[#174428] transition-colors whitespace-nowrap uppercase tracking-wider"
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
+                        {navLinks.map((link, index) => {
+                            const isActive =
+                                link.href === "/"
+                                    ? pathname === "/"
+                                    : pathname.startsWith(link.href);
+                            return (
+                                <Link
+                                    key={index}
+                                    href={link.href}
+                                    className={`h-full flex items-center px-6 text-sm font-bold whitespace-nowrap uppercase tracking-wider transition-colors ${
+                                        isActive
+                                            ? "bg-[#174428] text-white"
+                                            : "text-white/90 hover:bg-[#174428]/80 hover:text-white"
+                                    }`}
+                                >
+                                    {link.name}
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     User,
@@ -112,11 +113,17 @@ export default function ProfilePage() {
             <div className="bg-[#005000] text-white pt-6 sm:pt-8 md:pt-12 pb-16 sm:pb-20 md:pb-24 px-3 sm:px-4 md:px-8 lg:px-12">
                 <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
                     <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
-                        <div className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 rounded-full border-2 sm:border-3 md:border-4 border-white/20 overflow-hidden bg-white/10 flex items-center justify-center shadow-xl flex-shrink-0">
+                        <div className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 rounded-full border-2 sm:border-3 md:border-4 border-white/20 overflow-hidden bg-white flex items-center justify-center shadow-xl flex-shrink-0">
                             {user?.profileImg ? (
                                 <img src={user.profileImg} alt="Profile" className="h-full w-full object-cover" />
                             ) : (
-                                <User className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 text-white" />
+                                <Image
+                                    src="/logo/Web_Logo_Mart-01%20(1).png"
+                                    alt="JS Mart"
+                                    width={80}
+                                    height={80}
+                                    className="h-full w-full object-contain"
+                                />
                             )}
                         </div>
                         <div className="min-w-0 flex-1">
