@@ -167,20 +167,7 @@ export default function HeroSection({
                                 <ChevronRight className="w-6 h-6" />
                             </button>
 
-                            {/* Pagination - minimal dot design */}
-                            <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
-                                {slides.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => goToSlide(index)}
-                                        className={`rounded-full touch-manipulation min-w-[20px] min-h-[20px] flex items-center justify-center transition-all duration-200 ${index === currentSlide
-                                            ? "bg-white w-1.5 h-1.5 scale-100"
-                                            : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70 border border-white/60"
-                                            }`}
-                                        aria-label={`Go to slide ${index + 1}`}
-                                    />
-                                ))}
-                            </div>
+                            {/* Pagination removed as requested */}
                         </>
                     )}
                 </div>

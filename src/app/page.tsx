@@ -7,7 +7,6 @@ import HeroSection from "@/components/hero-section";
 import PopularProducts from "@/components/popular-products";
 import MiddleBannerSection from "@/components/middle-banner-section";
 import OfferCardSection from "@/components/offer-card-section";
-import HomeMembershipSection from "@/components/home-membership-section";
 import FooterBannerSection from "@/components/footer-banner-section";
 import PromoStatsStrip from "@/components/promo/PromoStatsStrip";
 import FlashSaleBanner from "@/components/promo/FlashSaleBanner";
@@ -77,9 +76,6 @@ export default function HomePage() {
 
       {/* Best Deals / Offer Cards - with images from admin (bannerImg or product) */}
       <OfferCardSection />
-
-      {/* Membership - plan highlights */}
-      <HomeMembershipSection />
 
       {/* Brand Section */}
       <BrandSection />
