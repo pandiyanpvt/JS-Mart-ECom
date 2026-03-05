@@ -15,7 +15,8 @@ import {
     Wallet,
     Banknote,
     X,
-    Loader2
+    Loader2,
+    User
 } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -23,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import orderService from "@/services/order.service";
 import toast from "react-hot-toast";
 import { useModal } from "@/components/providers/ModalProvider";
+import { cn } from "@/lib/utils";
 
 export default function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
@@ -103,6 +105,26 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
         }
     };
 
+    const handleCompleteOrder = () => {
+        showModal({
+            title: "Complete Order",
+            message: "Have you received all items in good condition? Marking as completed will finalize this order in our system.",
+            type: "info",
+            confirmLabel: "Yes, Complete",
+            cancelLabel: "Not Yet",
+            onConfirm: async () => {
+                try {
+                    await orderService.updateOrder(id, { status: 'COMPLETED' });
+                    toast.success("Order marked as completed");
+                    await fetchOrder();
+                } catch (error: any) {
+                    toast.error(error.response?.data?.message || "Failed to complete order");
+                    throw error;
+                }
+            }
+        });
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen pt-[120px] flex justify-center items-center bg-gray-50">
@@ -127,19 +149,22 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
         const orderStatus = currentStatus.toUpperCase();
         if (orderStatus === 'CANCELLED') {
             return [
-                { status: 'Order Placed', completed: true, date: new Date(order.createdAt).toLocaleDateString() },
-                { status: 'Cancelled', completed: true, date: new Date(order.updatedAt).toLocaleDateString(), isCancelled: true }
+                { status: 'Order Placed', completed: true, date: new Date(order.createdAt).toLocaleDateString(), color: 'emerald' },
+                { status: 'Cancelled', completed: true, date: new Date(order.updatedAt).toLocaleDateString(), isCancelled: true, color: 'rose' }
             ];
         }
 
         const statusOrder = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
-        const currentIndex = statusOrder.indexOf(orderStatus);
+        const colors = ['amber', 'blue', 'indigo', 'emerald'];
+
+        const currentIndex = orderStatus === 'COMPLETED' ? 3 : statusOrder.indexOf(orderStatus);
 
         return statusOrder.map((status, index) => ({
             status: status.charAt(0) + status.slice(1).toLowerCase(), // Capitalize
             completed: index <= currentIndex,
             date: index === currentIndex ? new Date(order.updatedAt).toLocaleDateString() : '',
-            isCancelled: false
+            isCancelled: false,
+            color: colors[index]
         }));
     };
 
@@ -164,9 +189,18 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                 <h2 className="text-2xl font-bold text-gray-900">
                                     Order #{order.id}
                                 </h2>
-                                {order.status === 'CANCELLED' && (
-                                    <span className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-bold border border-red-200">
-                                        CANCELLED
+                                {order.status && (
+                                    <span className={cn(
+                                        "px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest border transition-all",
+                                        order.status.toUpperCase() === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                            order.status.toUpperCase() === 'PROCESSING' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                order.status.toUpperCase() === 'SHIPPED' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                                                    order.status.toUpperCase() === 'DELIVERED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                        order.status.toUpperCase() === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-200 shadow-sm shadow-green-100' :
+                                                            order.status.toUpperCase() === 'CANCELLED' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                                                                'bg-gray-50 text-gray-500 border-gray-100'
+                                    )}>
+                                        {order.status}
                                     </span>
                                 )}
                             </div>
@@ -184,7 +218,16 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                     Cancel Order
                                 </Button>
                             )}
-                            {order.status !== 'CANCELLED' && (
+                            {order.status === 'DELIVERED' && (
+                                <Button
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                    onClick={handleCompleteOrder}
+                                >
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Complete Order
+                                </Button>
+                            )}
+                            {!['CANCELLED', 'COMPLETED'].includes(order.status?.toUpperCase()) && (
                                 <Button className="bg-[#00028C] hover:bg-[#00026e]">
                                     <Truck className="h-4 w-4 mr-2" />
                                     Track Order
@@ -204,18 +247,78 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                 <div key={index} className="flex flex-1 flex-col items-center relative">
                                     {/* Line connecting steps - hidden on last item */}
                                     {index < trackingSteps.length - 1 && (
-                                        <div className={`hidden md:block absolute top-[20px] left-[50%] right-[-50%] h-1 ${step.completed && trackingSteps[index + 1].completed ? 'bg-[#005000]' : 'bg-gray-200'} z-0`} />
+                                        <div className={cn(
+                                            "hidden md:block absolute top-[20px] left-[50%] right-[-50%] h-1 bg-gray-100 z-0",
+                                            step.completed && trackingSteps[index + 1].completed ? (
+                                                step.color === 'emerald' ? 'bg-emerald-500' :
+                                                    step.color === 'indigo' ? 'bg-indigo-500' :
+                                                        step.color === 'blue' ? 'bg-blue-500' :
+                                                            'bg-amber-500'
+                                            ) : 'bg-gray-100'
+                                        )} />
                                     )}
 
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${step.completed ? 'bg-[#005000] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                                    <div className={cn(
+                                        "w-12 h-12 rounded-2xl flex items-center justify-center z-10 transition-all duration-500 border-2 shadow-sm",
+                                        step.completed ? (
+                                            step.color === 'emerald' ? 'bg-emerald-500 text-white border-emerald-200' :
+                                                step.color === 'indigo' ? 'bg-indigo-500 text-white border-indigo-200' :
+                                                    step.color === 'blue' ? 'bg-blue-500 text-white border-blue-200' :
+                                                        step.color === 'rose' ? 'bg-rose-500 text-white border-rose-200' :
+                                                            'bg-amber-500 text-white border-amber-200'
+                                        ) : 'bg-white text-gray-300 border-gray-100'
+                                    )}>
                                         {step.completed ? <CheckCircle className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
                                     </div>
-                                    <p className={`mt-2 font-semibold ${step.completed ? 'text-gray-900' : 'text-gray-400'}`}>{step.status}</p>
-                                    {step.date && <p className="text-xs text-gray-500 mt-1">{step.date}</p>}
+                                    <p className={cn(
+                                        "mt-3 text-[10px] font-black uppercase tracking-widest transition-all",
+                                        step.completed ? 'text-gray-900' : 'text-gray-300'
+                                    )}>
+                                        {step.status}
+                                    </p>
+                                    {step.date && <p className="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-tighter opacity-70">{step.date}</p>}
                                 </div>
                             ))}
                         </div>
                     </div>
+
+                    {order.status?.toUpperCase() === 'SHIPPED' && order.deliveryOtp && (
+                        <div className="mt-12 p-6 bg-green-50 rounded-2xl border border-green-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-[#005000] rounded-xl flex items-center justify-center text-white shrink-0">
+                                    <Truck className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-gray-900">Delivery Verification Code</h4>
+                                    <p className="text-sm text-gray-600">Share this OTP with our delivery partner once they arrive at your door.</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center md:items-end">
+                                <span className="text-3xl font-black text-[#005000] tracking-[0.2em] bg-white px-6 py-2 rounded-xl border-2 border-green-200 shadow-sm">
+                                    {order.deliveryOtp}
+                                </span>
+                                <p className="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-widest">Confidential Code</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {order.deliveryAgent && (order.status?.toUpperCase() === 'SHIPPED' || order.status?.toUpperCase() === 'DELIVERED') && (
+                        <div className={cn(
+                            "mt-6 p-6 rounded-2xl border flex items-center gap-5 transition-all animate-in fade-in slide-in-from-top-4 duration-1000",
+                            "bg-indigo-50/30 border-indigo-100 shadow-sm"
+                        )}>
+                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-50">
+                                <User className="w-7 h-7" />
+                            </div>
+                            <div>
+                                <h4 className="font-black text-gray-900 uppercase tracking-widest text-[10px] mb-1 opacity-50">Delivery Partner</h4>
+                                <p className="text-lg font-bold text-indigo-900">
+                                    {order.deliveryAgent.fullName} <span className="text-indigo-600 font-medium">is assigned to your delivery.</span>
+                                </p>
+                                <p className="text-xs text-indigo-500 font-medium mt-0.5 opacity-80">Our partner will reach out to you if needed.</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Order Items */}

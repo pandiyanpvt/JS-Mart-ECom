@@ -554,12 +554,10 @@ export function Navbar() {
                                     <button className="flex items-center gap-1 md:gap-2 hover:opacity-90 transition-opacity p-1 rounded-full outline-none ring-2 ring-transparent hover:ring-[#005000]/30 focus:ring-2 focus:ring-[#005000]/50">
                                         {userProfileImg ? (
                                             <span className="relative h-8 w-8 md:h-9 md:w-9 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                                                <Image
+                                                <img
                                                     src={userProfileImg}
                                                     alt={userName}
-                                                    fill
-                                                    className="object-cover"
-                                                    sizes="(max-width: 768px) 32px, 36px"
+                                                    className="h-full w-full object-cover"
                                                 />
                                             </span>
                                         ) : (
