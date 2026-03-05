@@ -67,6 +67,8 @@ export default function ProfilePage() {
                     setUser(userData);
                     // Standardize user cookie
                     Cookies.set("user", JSON.stringify(userData), { expires: 1 });
+                    // Dispatch event to update navbar
+                    window.dispatchEvent(new Event("auth-change"));
                 }
             })
             .catch(() => toast.error("Failed to load profile"))
