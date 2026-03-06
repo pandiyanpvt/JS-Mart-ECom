@@ -23,7 +23,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import HeroSection from "@/components/hero-section";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -436,7 +435,21 @@ function ShopContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <HeroSection level={2} />
+      {/* Shop default header image */}
+      <section className="w-full bg-white">
+        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="relative w-full aspect-[16/5] min-h-[180px] max-h-[360px] overflow-hidden rounded-none md:rounded-xl">
+            <Image
+              src="/images/headers/shop-header.png"
+              alt="Shop header"
+              fill
+              sizes="100vw"
+              className="object-cover object-center"
+              priority
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Search Results Header */}
       {searchQuery && (

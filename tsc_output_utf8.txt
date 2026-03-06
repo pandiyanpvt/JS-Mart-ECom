@@ -1,0 +1,4 @@
+src/app/shop/[id]/_components/ProductReviews.tsx(83,49): error TS2339: Property 'user' does not exist on type 'UserReview'.
+src/app/shop/[id]/_components/ProductReviews.tsx(84,62): error TS2339: Property 'user' does not exist on type 'UserReview'.
+src/app/shop/[id]/_components/ProductReviews.tsx(90,102): error TS2339: Property 'user' does not exist on type 'UserReview'.
+src/components/best-of-fruit-veg.tsx(86,13): error TS2353: Object literal may only specify known properties, and 'quantity' does not exist in type 'Product'.

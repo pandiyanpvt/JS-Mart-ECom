@@ -144,7 +144,7 @@ export default function OffersPage() {
 
 
       {/* Offers Section */}
-      <section className="w-full py-12 px-4 md:px-6 lg:px-8 max-w-[1600px]">
+      <section className="w-full max-w-[1600px] mx-auto py-12 px-4 md:px-6 lg:px-8">
 
 
         <div className="flex items-center justify-between mb-8">
@@ -158,11 +158,11 @@ export default function OffersPage() {
 
         {/* Offer Items List */}
         {offerProducts.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {offerProducts.map((item: any) => (
               <div key={item.offerId || item.id} className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-full">
-                {/* Banner Image */}
-                <div className="relative w-full h-[150px] md:h-[250px] bg-gray-50 p-2 md:p-4">
+                {/* Banner Image - match home card sizing */}
+                <div className="relative w-full bg-gray-50 flex items-center justify-center h-[140px] md:h-[180px]">
                   <Image
                     src={item.image || "/images/placeholder.png"}
                     alt={item.offerName || item.name}
