@@ -66,7 +66,10 @@ export default function OrdersPage() {
                 return "text-amber-700 bg-amber-50 border-amber-200";
             case "CANCELLED":
             case "REFUNDED":
+            case "RETURNED":
                 return "text-red-700 bg-red-50 border-red-200";
+            case "RETURN_REQUESTED":
+                return "text-emerald-700 bg-emerald-50 border-emerald-200";
             default:
                 return "text-slate-600 bg-slate-50 border-slate-200";
         }

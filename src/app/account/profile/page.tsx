@@ -65,9 +65,7 @@ export default function ProfilePage() {
             .then((userData) => {
                 if (userData) {
                     setUser(userData);
-                    // Standardize user cookie
                     Cookies.set("user", JSON.stringify(userData), { expires: 1 });
-                    // Dispatch event to update navbar
                     window.dispatchEvent(new Event("auth-change"));
                 }
             })
