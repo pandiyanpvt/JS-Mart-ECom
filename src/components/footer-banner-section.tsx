@@ -54,14 +54,14 @@ export default function FooterBannerSection() {
     // Single banner: no heading
     if (banners.length === 1) {
         return (
-            <section className="w-full py-8 md:py-12 bg-slate-50">
+            <section className="w-full py-6 md:py-12 bg-slate-50">
                 <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
                     <Link
                         href={banners[0].redirectLink || "/shop"}
                         target={banners[0].redirectLink?.startsWith('http') ? "_blank" : undefined}
                         className="block group"
                     >
-                        <div className="relative w-full h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100 hover:shadow-xl transition-all">
+                        <div className="relative w-full h-[180px] sm:h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100 hover:shadow-xl transition-all rounded-lg md:rounded-none">
                             <Image
                                 src={banners[0].promotionImg}
                                 alt="Promotional Banner"
@@ -95,9 +95,9 @@ function FooterBannerCarousel({ banners }: { banners: Promotion[] }) {
     }, [banners.length]);
 
     return (
-        <section className="w-full py-8 md:py-12 bg-slate-50">
+        <section className="w-full py-6 md:py-12 bg-slate-50">
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
-                <div className="relative w-full h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100">
+                <div className="relative w-full h-[180px] sm:h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100 rounded-lg md:rounded-none">
                     {banners.map((banner, index) => (
                         <Link
                             key={banner.id}

@@ -107,10 +107,11 @@ export default function CouponDealsStrip() {
                                             e.stopPropagation();
                                             if (offer.couponCode) copyCode(offer.couponCode);
                                         }}
-                                        className="p-2 bg-white/20 hover:bg-white/30 transition-colors"
+                                        className="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 bg-white/20 hover:bg-white/30 active:bg-white/40 transition-colors touch-manipulation rounded"
                                         title="Copy code"
+                                        aria-label="Copy code"
                                     >
-                                        <Copy size={16} />
+                                        <Copy size={18} />
                                     </button>
                                 </div>
                                 <div className="mt-2 inline-flex items-center px-2.5 py-1 bg-white/20 text-xs font-bold backdrop-blur-sm">
