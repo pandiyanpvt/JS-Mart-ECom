@@ -63,7 +63,7 @@ export default function FlashSaleBanner() {
                             </p>
                         </div>
                     </div>
-                    <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-rose-600 font-bold text-sm shadow-lg group-hover:bg-rose-50 transition-colors">
+                    <span className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 bg-white text-rose-600 font-bold text-sm shadow-lg group-hover:bg-rose-50 active:bg-rose-100 transition-colors touch-manipulation rounded">
                         View Offers
                         <ChevronRight size={18} />
                     </span>

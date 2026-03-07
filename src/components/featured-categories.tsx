@@ -78,9 +78,9 @@ export default function FeaturedCategories() {
                     ))}
                 </div>
 
-                {/* Mobile: Horizontal Scroll - smaller tiles */}
+                {/* Mobile: horizontal scroll edge-to-edge, same as other sections */}
                 <div
-                    className="flex md:hidden gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 pt-1"
+                    className="flex md:hidden gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 pt-1 -mx-4 px-4"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {displayCategories.map((category) => (

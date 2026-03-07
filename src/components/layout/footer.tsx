@@ -29,7 +29,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0f141a] text-gray-300 pt-4 md:pt-6 pb-3 md:pb-4 relative overflow-hidden">
+    <footer className="bg-[#0f141a] text-gray-300 pt-4 md:pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:pb-4 relative overflow-hidden">
       {/* Background Decoration */}
       <div className="absolute bottom-0 left-0 w-full h-full opacity-15 pointer-events-none z-0">
         <Image

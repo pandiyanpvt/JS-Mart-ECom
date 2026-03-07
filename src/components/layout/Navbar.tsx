@@ -284,13 +284,14 @@ export function Navbar() {
         { name: "Membership", href: "/membership" },
         { name: "About Us", href: "/about" },
         { name: "Contact Us", href: "/contact" },
+        { name: "Product Offers", href: "/product-offers", highlight: true },
     ];
 
     return (
         <div className="w-full flex flex-col font-sans bg-white">
-            {/* Mobile Search Bar - Full Width */}
+            {/* Mobile Search Bar - Full Width (below navbar, respect safe-area) */}
             {isMobileSearchOpen && (
-                <div className="md:hidden fixed top-[64px] sm:top-[72px] left-0 right-0 bg-white border-b border-gray-200 shadow-md z-40 p-3 search-container">
+                <div className="md:hidden fixed left-0 right-0 bg-white border-b border-gray-200 shadow-md z-40 p-3 search-container top-[calc(4rem+env(safe-area-inset-top,0px))] sm:top-[calc(72px+env(safe-area-inset-top,0px))]">
                     <div className="flex items-center gap-2">
                         <div className="flex-1 flex items-center bg-[#F3F4F6] rounded-lg overflow-hidden ring-1 ring-gray-200">
                             <Input
@@ -396,8 +397,8 @@ export function Navbar() {
                 </div>
             )}
 
-            {/* Main Navbar */}
-            <div className="py-2 pl-2 pr-2 md:pl-0 md:pr-4 fixed top-0 left-0 right-0 md:bg-white w-full z-50 border-b border-gray-100/50 md:border-gray-100 shadow-sm h-16 sm:h-[72px] md:h-[80px] flex items-center min-h-[56px] pt-[env(safe-area-inset-top)] backdrop-blur-md bg-white/80 md:backdrop-blur-none md:bg-white">
+            {/* Main Navbar (safe-area for notched phones) */}
+            <div className="py-2 pl-2 pr-2 md:pl-0 md:pr-4 fixed top-0 left-0 right-0 md:bg-white w-full z-50 border-b border-gray-100/50 md:border-gray-100 shadow-sm min-h-[64px] h-16 sm:h-[72px] md:h-[80px] flex items-center pt-[env(safe-area-inset-top,0px)] backdrop-blur-md bg-white/80 md:backdrop-blur-none md:bg-white">
                 <div className="flex items-center justify-between gap-2 md:gap-6 w-full max-w-[1920px] mx-auto px-1 sm:px-2">
                     {/* Hamburger Menu + Logo */}
                     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 min-w-0">
@@ -903,17 +904,25 @@ export function Navbar() {
                                 link.href === "/"
                                     ? pathname === "/"
                                     : pathname.startsWith(link.href);
+                            const isHighlight = "highlight" in link && link.highlight;
                             return (
                                 <Link
                                     key={index}
                                     href={link.href}
-                                    className={`h-full flex items-center px-6 text-sm font-bold whitespace-nowrap uppercase tracking-wider transition-colors ${
+                                    className={`h-full flex items-center gap-2 px-6 text-sm font-bold whitespace-nowrap uppercase tracking-wider transition-colors ${
                                         isActive
                                             ? "bg-[#174428] text-white"
-                                            : "text-white/90 hover:bg-[#174428]/80 hover:text-white"
+                                            : isHighlight
+                                                ? "text-amber-200 hover:bg-amber-500/30 hover:text-white"
+                                                : "text-white/90 hover:bg-[#174428]/80 hover:text-white"
                                     }`}
                                 >
                                     {link.name}
+                                    {isHighlight && (
+                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-400/90 text-[#174428]">
+                                            Deals
+                                        </span>
+                                    )}
                                 </Link>
                             );
                         })}
@@ -921,11 +930,11 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* Spacer so content starts below fixed nav - phone: 64/72px, desktop: 96px, + search bar when open on mobile */}
+            {/* Spacer so content starts below fixed nav (includes safe-area on mobile) */}
             <div
                 className={`md:h-[96px] ${isMobileSearchOpen
-                    ? 'h-[144px] sm:h-[152px]'
-                    : 'h-16 sm:h-[72px]'
+                    ? 'h-[calc(4rem+80px+env(safe-area-inset-top,0px))] sm:h-[calc(72px+80px+env(safe-area-inset-top,0px))]'
+                    : 'h-[calc(4rem+env(safe-area-inset-top,0px))] sm:h-[calc(72px+env(safe-area-inset-top,0px))]'
                     }`}
             />
 
@@ -939,10 +948,10 @@ export function Navbar() {
                 />
             )}
 
-            {/* Mobile Navigation Dropdown */}
+            {/* Mobile Navigation Dropdown (safe-area aware) */}
             {isMobileMenuOpen && (
-                <div className="md:hidden fixed top-[64px] sm:top-[72px] left-0 right-0 bottom-0 bg-white/75 backdrop-blur-2xl border-b border-white/20 shadow-2xl z-30 overflow-y-auto max-h-[calc(100vh-64px)] sm:max-h-[calc(100vh-72px)]">
-                    <div className="px-4 py-3 space-y-1">
+                <div className="md:hidden fixed left-0 right-0 bottom-0 bg-white/75 backdrop-blur-2xl border-b border-white/20 shadow-2xl z-30 overflow-y-auto top-[calc(4rem+env(safe-area-inset-top,0px))] sm:top-[calc(72px+env(safe-area-inset-top,0px))] max-h-[calc(100vh-4rem-env(safe-area-inset-top,0px))] sm:max-h-[calc(100vh-72px-env(safe-area-inset-top,0px))] pb-[env(safe-area-inset-bottom,0px)]">
+                    <div className="px-4 py-3 space-y-1 pb-4">
                         {/* Location Info - Mobile */}
                         <div className="flex items-center gap-2 px-4 py-3 mb-2 text-sm text-gray-800 border-b border-white/20">
                             <MapPin className="h-4 w-4 text-gray-600" />
@@ -959,19 +968,31 @@ export function Navbar() {
                         </div>
 
                         {/* Navigation Links */}
-                        {navLinks.map((link, index) => (
-                            <Link
-                                key={index}
-                                href={link.href}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className={`block px-4 py-3 rounded-lg text-sm font-semibold transition-all ${pathname === link.href
-                                    ? "bg-[#005000]/90 backdrop-blur-sm text-white shadow-lg"
-                                    : "text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm"
+                        {navLinks.map((link, index) => {
+                            const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                            const isHighlight = "highlight" in link && link.highlight;
+                            return (
+                                <Link
+                                    key={index}
+                                    href={link.href}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`flex items-center justify-between gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
+                                        isActive
+                                            ? "bg-[#005000]/90 backdrop-blur-sm text-white shadow-lg"
+                                            : isHighlight
+                                                ? "text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200"
+                                                : "text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm"
                                     }`}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
+                                >
+                                    <span>{link.name}</span>
+                                    {isHighlight && (
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-[#174428]">
+                                            Deals
+                                        </span>
+                                    )}
+                                </Link>
+                            );
+                        })}
 
                         {/* Divider */}
                         <div className="border-t border-white/20 my-2"></div>

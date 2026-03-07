@@ -298,6 +298,10 @@ function ShopContent() {
   }, [initialCategory]);
 
   useEffect(() => {
+    setSelectedBrand(initialBrand || "all");
+  }, [initialBrand]);
+
+  useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, selectedBrand, sortBy]);
 
@@ -528,18 +532,29 @@ function ShopContent() {
             </Sheet>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full md:w-auto flex-wrap">
             {searchQuery ? (
-              <p className="text-xs sm:text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600 order-first w-full sm:w-auto">
                 Found {filteredProducts.length} result{filteredProducts.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
               </p>
             ) : (
-              <p className="text-xs sm:text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600 order-first w-full sm:w-auto">
                 Showing {paginatedProducts.length} of {filteredProducts.length} products
               </p>
             )}
             <select
-              className="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-200 rounded-lg bg-white text-xs sm:text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent"
+              className="min-h-[44px] sm:min-h-0 px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-200 rounded-lg bg-white text-xs sm:text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent w-full sm:w-auto min-w-[140px]"
+              value={selectedBrand}
+              onChange={(e) => handleBrandChange(e.target.value)}
+              aria-label="Filter by brand"
+            >
+              <option value="all">Brand: All</option>
+              {brands.map((b) => (
+                <option key={b.id} value={String(b.id)}>{b.brand}</option>
+              ))}
+            </select>
+            <select
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-200 rounded-lg bg-white text-xs sm:text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent min-w-[160px]"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >

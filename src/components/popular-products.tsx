@@ -91,8 +91,8 @@ export default function PopularProducts() {
                     ))}
                 </div>
 
-                {/* Mobile: 2-column grid (2 products per line) */}
-                <div className="grid grid-cols-2 md:hidden gap-3">
+                {/* Mobile: 2-column grid, compact cards, touch-friendly */}
+                <div className="grid grid-cols-2 md:hidden gap-2 sm:gap-3">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={adaptProduct(product)} compact />
                     ))}

@@ -7,6 +7,7 @@ import HeroSection from "@/components/hero-section";
 import PopularProducts from "@/components/popular-products";
 import MiddleBannerSection from "@/components/middle-banner-section";
 import OfferCardSection from "@/components/offer-card-section";
+import CategoryBannersSection from "@/components/category-banners-section";
 import FooterBannerSection from "@/components/footer-banner-section";
 import PromoStatsStrip from "@/components/promo/PromoStatsStrip";
 import FlashSaleBanner from "@/components/promo/FlashSaleBanner";
@@ -55,13 +56,16 @@ export default function HomePage() {
         redemptionsLabel="Save More"
       />
 
+      {/* Flash Sale / Flash Offers - before Featured Categories */}
+      <FlashSaleBanner />
+
       {/* Featured Categories */}
       <section className="bg-white">
         <FeaturedCategories />
       </section>
 
-      {/* Flash Sale / Urgency Banner */}
-      <FlashSaleBanner />
+      {/* Shop by Category banners - before Popular Products */}
+      <CategoryBannersSection />
 
       {/* Popular Products */}
       <section className="bg-slate-50">

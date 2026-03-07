@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
 
 interface Promotion {
     id: number;
@@ -20,7 +19,6 @@ export default function MiddleBannerSection() {
     useEffect(() => {
         const fetchBanners = async () => {
             try {
-                // Dynamic import to avoid circular dependencies
                 const { default: promotionService } = await import("@/services/promotion.service");
                 const promotions = await promotionService.getByLevel(3);
                 setBanners(promotions.sort((a, b) => a.order - b.order));
@@ -37,61 +35,47 @@ export default function MiddleBannerSection() {
     if (loading) return null;
     if (banners.length === 0) return null;
 
-    // Determine grid columns based on number of banners (responsive)
-    let gridClass = "grid-cols-1";
-    if (banners.length === 2) gridClass = "grid-cols-1 sm:grid-cols-2";
-    if (banners.length === 3) gridClass = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
-    if (banners.length === 4) gridClass = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
-    if (banners.length >= 5) gridClass = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5";
+    // Duplicate for seamless infinite scroll (same pattern as Shop by Category banners)
+    const duplicatedBanners = [...banners, ...banners];
 
     return (
-        <section className="w-full py-10 md:py-12 bg-emerald-50">
-            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
-                <div className="mb-6 md:mb-8">
-                    <h2 className="text-xl md:text-2xl font-extrabold text-[#253D4E] leading-tight">Curated picks and seasonal offers</h2>
-                </div>
-                {/* Mobile: horizontal scroll card banners */}
-                <div
-                    className="flex md:hidden gap-3 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-4 px-4"
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                >
-                    {banners.map((banner) => (
+        <section className="w-full py-6 sm:py-8 md:py-12 bg-slate-50 overflow-hidden">
+            <div className="middle-banners-scroll-wrap w-full overflow-hidden">
+                <div className="flex gap-4 md:gap-6 animate-middle-banners-scroll" style={{ width: "max-content" }}>
+                    {duplicatedBanners.map((banner, index) => (
                         <Link
-                            key={banner.id}
+                            key={`${banner.id}-${index}`}
                             href="/shop"
-                            className="flex-shrink-0 w-[58vw] max-w-[220px] block relative overflow-hidden group aspect-[4/5] shadow-md border border-slate-100 active:shadow-xl transition-all rounded-lg"
+                            className="flex-shrink-0 w-[300px] md:w-[360px] block relative overflow-hidden group rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-[#005000]/30 transition-all duration-300 aspect-[3/2] bg-white"
                         >
                             <Image
                                 src={banner.promotionImg}
                                 alt="Promotional Banner"
                                 fill
-                                className="object-cover transition-transform duration-300 group-active:scale-[1.02]"
-                                sizes="(max-width: 768px) 72vw, 320px"
+                                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                sizes="(max-width: 768px) 300px, 360px"
                             />
                         </Link>
                     ))}
                 </div>
-                {/* Desktop: grid */}
-                <div className={`hidden md:grid ${gridClass} gap-6 md:gap-8`}>
-                    {banners.map((banner) => (
-                        <div
-                            key={banner.id}
-                            className="relative w-full overflow-hidden group aspect-[4/5] shadow-md border border-slate-100 hover:shadow-xl transition-all rounded-lg"
-                        >
-                            <Image
-                                src={banner.promotionImg}
-                                alt="Promotional Banner"
-                                fill
-                                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            />
-                            <Link href="/shop" className="absolute inset-0 z-10">
-                                <span className="sr-only">View Offer</span>
-                            </Link>
-                        </div>
-                    ))}
-                </div>
             </div>
+
+            <style jsx global>{`
+                @keyframes middleBannersScrollLeft {
+                    0% {
+                        transform: translateX(-50%);
+                    }
+                    100% {
+                        transform: translateX(0);
+                    }
+                }
+                .animate-middle-banners-scroll {
+                    animation: middleBannersScrollLeft 50s linear infinite;
+                }
+                .middle-banners-scroll-wrap:hover .animate-middle-banners-scroll {
+                    animation-play-state: paused;
+                }
+            `}</style>
         </section>
     );
 }

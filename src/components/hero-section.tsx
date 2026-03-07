@@ -123,8 +123,8 @@ export default function HeroSection({
     return (
         <section className="w-full">
             <div className="w-full">
-                {/* 16:5 aspect, max height ~600px so image stays crisp on wide screens. Recommended image size: 1920×600. */}
-                <div className={`relative overflow-hidden group w-full aspect-[16/5] min-h-[200px] max-h-[600px] ${className ?? ""}`.trim()}>
+                {/* 16:5 aspect; on phone min height for readability. Recommended image: 1920×600. */}
+                <div className={`relative overflow-hidden group w-full aspect-[16/5] min-h-[180px] sm:min-h-[200px] max-h-[600px] ${className ?? ""}`.trim()}>
                     {/* Slides */}
                     {slides.map((slide, index) => (
                         <div

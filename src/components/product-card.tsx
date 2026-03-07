@@ -82,16 +82,17 @@ export function ProductCard({ product, compact }: ProductCardProps) {
                     <div className={`absolute z-10 flex flex-col gap-1.5 ${compact ? "top-1.5 right-1.5" : "top-3 right-3"}`}>
                         <button
                             onClick={handleWishlistToggle}
-                            className={`rounded-full flex items-center justify-center shadow-md transition-all group/icon ${compact ? "w-7 h-7" : "w-9 h-9"} ${inWishlist
+                            className={`rounded-full flex items-center justify-center shadow-md transition-all group/icon touch-manipulation ${compact ? "min-w-[44px] min-h-[44px] w-9 h-9" : "w-9 h-9"} ${inWishlist
                                 ? "bg-[#005000] text-white"
                                 : "bg-white hover:bg-[#005000] hover:text-white"
                                 }`}
                             title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                            aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                         >
                             <Heart className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"} ${inWishlist ? "fill-white text-white" : "text-gray-700 group-hover/icon:text-white"}`} />
                         </button>
-                        <Link href={`/shop/${product.id}`} onClick={(e) => e.stopPropagation()}>
-                            <button type="button" className={`bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#005000] hover:text-white transition-all group/icon ${compact ? "w-7 h-7" : "w-9 h-9"}`}>
+                        <Link href={`/shop/${product.id}`} onClick={(e) => e.stopPropagation()} className={compact ? "min-w-[44px] min-h-[44px] flex items-center justify-center" : ""}>
+                            <button type="button" className={`bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#005000] hover:text-white transition-all group/icon touch-manipulation ${compact ? "min-w-[44px] min-h-[44px] w-9 h-9" : "w-9 h-9"}`} aria-label="View product">
                                 <Eye className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"} text-gray-700 group-hover/icon:text-white`} />
                             </button>
                         </Link>
