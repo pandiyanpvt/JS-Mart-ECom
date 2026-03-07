@@ -16,7 +16,8 @@ import {
     Banknote,
     X,
     Loader2,
-    User
+    User,
+    RotateCcw
 } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -25,6 +26,8 @@ import orderService from "@/services/order.service";
 import toast from "react-hot-toast";
 import { useModal } from "@/components/providers/ModalProvider";
 import { cn } from "@/lib/utils";
+import { refundService, settingsService } from "@/services";
+import type { Refund } from "@/services/refund.service";
 
 export default function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
@@ -35,6 +38,17 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
     const [showRefundModal, setShowRefundModal] = useState(false);
     const [submittingCancel, setSubmittingCancel] = useState(false);
     const [refundMethod, setRefundMethod] = useState<"BANK" | "POINTS" | null>(null);
+    const [refundDays, setRefundDays] = useState<number | null>(null);
+    const [itemRefundModalOpen, setItemRefundModalOpen] = useState(false);
+    const [selectedDetail, setSelectedDetail] = useState<any | null>(null);
+    const [itemRefundQuantity, setItemRefundQuantity] = useState(1);
+    const [itemMaxQuantity, setItemMaxQuantity] = useState(1);
+    const [isOfferBundle, setIsOfferBundle] = useState(false);
+    const [itemRefundReason, setItemRefundReason] = useState("");
+    const [itemRefundMethod, setItemRefundMethod] = useState<"BANK" | "POINTS" | null>(null);
+    const [itemRefundEvidence, setItemRefundEvidence] = useState<File | null>(null);
+    const [submittingItemRefund, setSubmittingItemRefund] = useState(false);
+    const [myRefunds, setMyRefunds] = useState<any[]>([]);
 
     const fetchOrder = async () => {
         setLoading(true);
@@ -50,9 +64,36 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
     };
 
     useEffect(() => {
-        if (id) {
-            fetchOrder();
-        }
+        const load = async () => {
+            if (!id) return;
+            await fetchOrder();
+            try {
+                const [settings, refunds] = await Promise.all([
+                    settingsService.getSettings().catch(() => null),
+                    refundService.getMyRefunds().catch(() => [] as Refund[])
+                ]);
+
+                if (settings?.storeSettings) {
+                    const refundSetting = settings.storeSettings.find(
+                        (s) => s.configKey === "REFUND_DAYS"
+                    );
+                    if (refundSetting) {
+                        const days = parseInt(refundSetting.configValue, 10);
+                        if (!Number.isNaN(days)) {
+                            setRefundDays(days);
+                        }
+                    }
+                }
+
+                if (Array.isArray(refunds)) {
+                    setMyRefunds(refunds);
+                }
+            } catch (e) {
+                console.error("Failed to load refund helpers", e);
+            }
+        };
+
+        load();
     }, [id]);
 
     const { showModal } = useModal();
@@ -123,6 +164,116 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                 }
             }
         });
+    };
+
+    const openItemRefundModal = (detail: any) => {
+        setSelectedDetail(detail);
+
+        let maxQty = Number(detail.quantity || 1);
+        let offerBundle = false;
+
+        // If item is part of an offer, require returning full bundle (paid + free items)
+        if (detail.offerId && Array.isArray(order?.details)) {
+            const bundleQty = order.details
+                .filter((d: any) => d.offerId === detail.offerId)
+                .reduce((sum: number, d: any) => sum + (Number(d.quantity) || 0), 0);
+
+            if (bundleQty > 0) {
+                maxQty = bundleQty;
+                offerBundle = true;
+            }
+        }
+
+        setItemMaxQuantity(maxQty);
+        setItemRefundQuantity(maxQty);
+        setIsOfferBundle(offerBundle);
+        setItemRefundReason("");
+        const paymentTypeName = (order?.paymentType?.type || "").toLowerCase();
+        if (paymentTypeName.includes("cash on delivery") || paymentTypeName.includes("cod")) {
+            setItemRefundMethod("POINTS");
+        } else {
+            setItemRefundMethod(null);
+        }
+        setItemRefundModalOpen(true);
+    };
+
+    const closeItemRefundModal = () => {
+        if (submittingItemRefund) return;
+        setItemRefundModalOpen(false);
+        setSelectedDetail(null);
+    };
+
+    const hasActiveRefundForDetail = (detail: any) => {
+        if (!order) return false;
+        return myRefunds.some(
+            (r) =>
+                r.orderId === order.id &&
+                r.productId === detail.productId &&
+                r.status !== "REJECTED"
+        );
+    };
+
+    const getRefundStatusForDetail = (detail: any) => {
+        if (!order) return null;
+        const match = myRefunds.find(
+            (r) => r.orderId === order.id && r.productId === detail.productId
+        );
+        return match?.status || null;
+    };
+
+    const submitItemRefund = async () => {
+        if (!order || !selectedDetail) return;
+
+        if (!itemRefundMethod) {
+            toast.error("Please select a refund method");
+            return;
+        }
+
+        if (!itemRefundReason.trim()) {
+            toast.error("Please provide a reason");
+            return;
+        }
+
+        if (!itemRefundEvidence) {
+            toast.error("Please upload an image as evidence for the return");
+            return;
+        }
+
+        if (itemRefundQuantity < 1 || itemRefundQuantity > itemMaxQuantity) {
+            toast.error("Invalid quantity selected");
+            return;
+        }
+
+        setSubmittingItemRefund(true);
+        try {
+            const formData = new FormData();
+            formData.append("orderId", order.id.toString());
+            formData.append("productId", selectedDetail.productId.toString());
+            formData.append("quantity", itemRefundQuantity.toString());
+            formData.append("reason", itemRefundReason.trim());
+            formData.append("refundMethod", itemRefundMethod);
+            formData.append("evidence", itemRefundEvidence);
+
+            await refundService.requestRefund(formData);
+            toast.success("Return / refund request submitted");
+
+            // Refresh order and refunds
+            await fetchOrder();
+            const refunds = await refundService.getMyRefunds().catch(() => [] as any[]);
+            if (Array.isArray(refunds)) {
+                setMyRefunds(refunds);
+            }
+            closeItemRefundModal();
+            setItemRefundEvidence(null);
+        } catch (error: any) {
+            const message =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to submit refund request";
+            toast.error(message);
+        } finally {
+            setSubmittingItemRefund(false);
+        }
     };
 
     if (loading) {
@@ -197,8 +348,9 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                                 order.status.toUpperCase() === 'SHIPPED' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                                                     order.status.toUpperCase() === 'DELIVERED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                                                         order.status.toUpperCase() === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-200 shadow-sm shadow-green-100' :
-                                                            order.status.toUpperCase() === 'CANCELLED' ? 'bg-rose-50 text-rose-600 border-rose-100' :
-                                                                'bg-gray-50 text-gray-500 border-gray-100'
+                                                            order.status.toUpperCase() === 'CANCELLED' || order.status.toUpperCase() === 'RETURNED' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                                                                order.status.toUpperCase() === 'RETURN_REQUESTED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                                                    'bg-gray-50 text-gray-500 border-gray-100'
                                     )}>
                                         {order.status}
                                     </span>
@@ -321,6 +473,89 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                     )}
                 </div>
 
+                {/* Return Tracking Section */}
+                {myRefunds.filter(r => r.orderId === order.id).length > 0 && (
+                    <div className="bg-white rounded-xl shadow-md p-8 mb-6 border-l-4 border-emerald-500">
+                        <div className="flex items-center gap-3 mb-6">
+                            <RotateCcw className="h-6 w-6 text-emerald-600" />
+                            <h3 className="text-xl font-bold text-gray-900">Return & Refund Tracking</h3>
+                        </div>
+
+                        <div className="space-y-8">
+                            {myRefunds
+                                .filter(r => r.orderId === order.id)
+                                .map((refund) => (
+                                    <div key={refund.id} className="border-b border-gray-100 last:border-0 pb-8 last:pb-0">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 font-bold">
+                                                    #{refund.id}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-gray-900">
+                                                        {refund.product?.productName || "Product Refund"}
+                                                    </h4>
+                                                    <p className="text-xs text-gray-500">
+                                                        Qty: {refund.quantity} • Amount: AUD {Number(refund.refundAmount).toFixed(2)}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className={cn(
+                                                "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                                                refund.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                                    refund.status === 'APPROVED' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                        refund.status === 'COLLECTED' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                                                            refund.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                                refund.status === 'REJECTED' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                                                                    'bg-gray-50 text-gray-500 border-gray-100'
+                                            )}>
+                                                {refund.status}
+                                            </span>
+                                        </div>
+
+                                        {refund.status === 'PICKUP_ASSIGNED' && refund.pickupOtp && (
+                                            <div className="mb-6 p-5 bg-amber-50 rounded-[2rem] border border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-6 animate-in zoom-in-95 duration-500">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-amber-200">
+                                                        <RotateCcw className="w-6 h-6 animate-pulse" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-black text-amber-900 uppercase tracking-widest text-[10px] mb-1">Return Pickup Code</h4>
+                                                        <p className="text-sm font-bold text-amber-800 leading-tight">Verify this code with the pickup agent</p>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-white px-8 py-3 rounded-2xl border-2 border-amber-200 shadow-sm flex flex-col items-center">
+                                                    <span className="text-3xl font-black text-amber-600 tracking-[0.3em]">
+                                                        {refund.pickupOtp}
+                                                    </span>
+                                                    <p className="text-[9px] font-black text-amber-400 mt-1 uppercase tracking-widest">Confidential</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="relative pl-6 border-l-2 border-gray-100 ml-5 space-y-6">
+                                            {refund.tracking?.map((track: any, idx: number) => (
+                                                <div key={track.id} className="relative">
+                                                    <div className={cn(
+                                                        "absolute -left-[35px] top-0 w-4 h-4 rounded-full border-2 bg-white",
+                                                        idx === 0 ? "border-emerald-500 bg-emerald-50" : "border-gray-200"
+                                                    )} />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-bold text-gray-900">{track.status}</span>
+                                                        {track.note && <p className="text-xs text-gray-600 mt-1">{track.note}</p>}
+                                                        <span className="text-[10px] text-gray-400 mt-1">
+                                                            {new Date(track.dateTime || track.createdAt).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Order Items */}
                 <div className="bg-white rounded-xl shadow-md p-8 mb-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-6">Order Items</h3>
@@ -333,6 +568,13 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                             const imgSrc = imgRaw
                                 ? (imgRaw.startsWith("http") ? imgRaw : (imgRaw.startsWith("/") ? imgRaw : `/${imgRaw}`))
                                 : "/placeholder.png";
+
+                            const refundStatus = getRefundStatusForDetail(detail);
+                            const isFreeItem = Number(detail.pricePerUnit || 0) <= 0;
+                            const disableReturn =
+                                order.status?.toUpperCase() !== "COMPLETED" ||
+                                hasActiveRefundForDetail(detail) ||
+                                isFreeItem;
 
                             return (
                                 <div
@@ -357,6 +599,28 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                             AUD {(Number(detail.pricePerUnit || 0) * detail.quantity).toFixed(2)}
                                         </p>
                                         <p className="text-sm text-gray-600">AUD {Number(detail.pricePerUnit || 0).toFixed(2)} each</p>
+                                        {refundStatus ? (
+                                            <p className="mt-2 text-xs font-semibold text-emerald-700 bg-emerald-50 inline-flex px-2 py-1 rounded-full border border-emerald-100">
+                                                <RotateCcw className="w-3 h-3 mr-1" />
+                                                Refund: {refundStatus}
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    disabled={disableReturn}
+                                                    onClick={() => openItemRefundModal(detail)}
+                                                    className="mt-2 inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+                                                >
+                                                    <RotateCcw className="w-3 h-3 mr-1" />
+                                                    Request Return
+                                                </button>
+                                                {isFreeItem && (
+                                                    <p className="mt-1 text-[11px] text-gray-500">
+                                                        Free items from offers must be returned together with the paid item.
+                                                    </p>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -470,7 +734,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                 </div>
             </div>
 
-            {/* Refund Selection Modal */}
+            {/* Refund Selection Modal (for cancelling paid PENDING orders) */}
             <Transition.Root show={showRefundModal} as={Fragment}>
                 <Dialog as="div" className="relative z-[9999]" onClose={() => !submittingCancel && setShowRefundModal(false)}>
                     <Transition.Child
@@ -579,6 +843,226 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                             className="w-full py-2 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
                                         >
                                             Nevermind, keep order
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition.Root>
+            {/* Per-item Return / Refund Modal */}
+            <Transition.Root show={itemRefundModalOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-[9999]" onClose={closeItemRefundModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 z-10 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 translate-y-4 scale-95"
+                                enterTo="opacity-100 translate-y-0 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 translate-y-0 scale-100"
+                                leaveTo="opacity-0 translate-y-4 scale-95"
+                            >
+                                <Dialog.Panel className="relative transform overflow-hidden rounded-[2rem] bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                    <div className="bg-[#005000] px-6 py-8 text-center text-white relative">
+                                        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                                            <RotateCcw className="h-8 w-8 text-white" />
+                                        </div>
+                                        <Dialog.Title as="h3" className="text-2xl font-bold">
+                                            Request a Return
+                                        </Dialog.Title>
+                                        <p className="mt-2 text-green-100 text-sm">
+                                            {refundDays
+                                                ? `You can request a return within ${refundDays} day${refundDays > 1 ? "s" : ""} after delivery, subject to approval.`
+                                                : "Return requests are allowed for a limited time after delivery, subject to approval."}
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white px-8 pt-8 pb-4 space-y-4 text-left">
+                                        <div>
+                                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">
+                                                Item
+                                            </p>
+                                            <p className="text-sm font-bold text-gray-900">
+                                                {selectedDetail?.Product?.productName ||
+                                                    selectedDetail?.product?.productName ||
+                                                    "Selected item"}
+                                            </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Quantity in order: {selectedDetail?.quantity ?? 0}
+                                            </p>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="text-left">
+                                                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                                    Quantity to return
+                                                </label>
+                                                {isOfferBundle ? (
+                                                    <div className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-800">
+                                                        {itemMaxQuantity} (full offer bundle)
+                                                    </div>
+                                                ) : (
+                                                    <input
+                                                        type="number"
+                                                        min={1}
+                                                        max={itemMaxQuantity}
+                                                        value={itemRefundQuantity}
+                                                        onChange={(e) =>
+                                                            setItemRefundQuantity(
+                                                                Number(e.target.value) || 1
+                                                            )
+                                                        }
+                                                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500"
+                                                    />
+                                                )}
+                                            </div>
+                                            <div className="text-left">
+                                                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                                    Refund method
+                                                </label>
+                                                <div className="space-y-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setItemRefundMethod("POINTS")}
+                                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-xs ${itemRefundMethod === "POINTS"
+                                                            ? "border-[#005000] bg-green-50 text-[#005000]"
+                                                            : "border-gray-200 text-gray-700"
+                                                            }`}
+                                                    >
+                                                        <Wallet className="w-4 h-4" />
+                                                        <span className="font-semibold">
+                                                            JS Mart Points
+                                                        </span>
+                                                    </button>
+                                                    {!((order?.paymentType?.type || "")
+                                                        .toLowerCase()
+                                                        .includes("cash on delivery") ||
+                                                        (order?.paymentType?.type || "")
+                                                            .toLowerCase()
+                                                            .includes("cod")) && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setItemRefundMethod("BANK")}
+                                                                className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-xs ${itemRefundMethod === "BANK"
+                                                                    ? "border-[#005000] bg-green-50 text-[#005000]"
+                                                                    : "border-gray-200 text-gray-700"
+                                                                    }`}
+                                                            >
+                                                                <Banknote className="w-4 h-4" />
+                                                                <span className="font-semibold">
+                                                                    Original payment method
+                                                                </span>
+                                                            </button>
+                                                        )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-left">
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                                Reason for return
+                                            </label>
+                                            <textarea
+                                                rows={3}
+                                                value={itemRefundReason}
+                                                onChange={(e) => setItemRefundReason(e.target.value)}
+                                                placeholder="Briefly describe the issue or reason for your return..."
+                                                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 resize-none"
+                                            />
+                                            {isOfferBundle && (
+                                                <p className="mt-2 text-[11px] text-gray-500">
+                                                    This item is part of an offer. Returning it means returning the entire bundle ({itemMaxQuantity} units, including free items).
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="text-left">
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                                Evidence Image (Required)
+                                            </label>
+                                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-emerald-400 transition-colors">
+                                                <div className="space-y-1 text-center">
+                                                    {itemRefundEvidence ? (
+                                                        <div className="flex flex-col items-center">
+                                                            <div className="w-24 h-24 rounded-lg overflow-hidden mb-2 border border-gray-200">
+                                                                <img
+                                                                    src={URL.createObjectURL(itemRefundEvidence)}
+                                                                    alt="Preview"
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </div>
+                                                            <p className="text-xs text-gray-600 truncate max-w-[200px]">{itemRefundEvidence.name}</p>
+                                                            <button
+                                                                onClick={() => setItemRefundEvidence(null)}
+                                                                className="text-xs text-red-500 font-bold mt-2 hover:underline"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <div className="flex text-sm text-gray-600">
+                                                                <label className="relative cursor-pointer bg-white rounded-md font-medium text-emerald-600 hover:text-emerald-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-emerald-500">
+                                                                    <span>Upload a file</span>
+                                                                    <input
+                                                                        type="file"
+                                                                        className="sr-only"
+                                                                        accept="image/*"
+                                                                        onChange={(e) => {
+                                                                            if (e.target.files && e.target.files[0]) {
+                                                                                setItemRefundEvidence(e.target.files[0]);
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                </label>
+                                                                <p className="pl-1">or drag and drop</p>
+                                                            </div>
+                                                            <p className="text-xs text-gray-500">
+                                                                PNG, JPG up to 10MB
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-50/50 px-8 py-6 flex flex-col gap-3">
+                                        <Button
+                                            onClick={submitItemRefund}
+                                            disabled={submittingItemRefund}
+                                            className="w-full bg-[#005000] hover:bg-[#003d00] h-12 font-bold rounded-xl shadow-lg shadow-green-900/10 active:scale-[0.98] transition-all"
+                                        >
+                                            {submittingItemRefund ? (
+                                                <>
+                                                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                                                    Submitting request...
+                                                </>
+                                            ) : (
+                                                "Submit Return Request"
+                                            )}
+                                        </Button>
+                                        <button
+                                            onClick={closeItemRefundModal}
+                                            disabled={submittingItemRefund}
+                                            className="w-full py-2 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+                                        >
+                                            Nevermind, go back
                                         </button>
                                     </div>
                                 </Dialog.Panel>

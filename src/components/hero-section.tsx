@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface HeroSlide {
@@ -82,7 +83,7 @@ export default function HeroSection({
                             subtitle: "",
                             description: "",
                             buttonText: "",
-                            buttonLink: "/shop",
+                            buttonLink: p.redirectLink || "/shop",
                             image: p.promotionImg
                         }));
                     setSlides(mappedSlides);
@@ -135,7 +136,11 @@ export default function HeroSection({
                                 }`}
                         >
                             {/* Background Image - fills hero (nav clearance via layout spacer) */}
-                            <div className="absolute inset-0">
+                            <Link
+                                href={slide.buttonLink || "/shop"}
+                                target={slide.buttonLink?.startsWith('http') ? "_blank" : undefined}
+                                className="absolute inset-0 block"
+                            >
                                 <Image
                                     src={slide.image}
                                     alt={slide.title}
@@ -144,7 +149,7 @@ export default function HeroSection({
                                     priority={index === 0}
                                     sizes="100vw"
                                 />
-                            </div>
+                            </Link>
 
                         </div>
                     ))}

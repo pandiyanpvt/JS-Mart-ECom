@@ -6,6 +6,7 @@ export interface Promotion {
     order: number;
     promotionImg: string;
     isActive: boolean;
+    redirectLink?: string;
 }
 
 const promotionService = {

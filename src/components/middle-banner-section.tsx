@@ -10,6 +10,7 @@ interface Promotion {
     order: number;
     promotionImg: string;
     isActive: boolean;
+    redirectLink?: string;
 }
 
 export default function MiddleBannerSection() {
@@ -45,7 +46,8 @@ export default function MiddleBannerSection() {
                     {duplicatedBanners.map((banner, index) => (
                         <Link
                             key={`${banner.id}-${index}`}
-                            href="/shop"
+                            href={banner.redirectLink || "/shop"}
+                            target={banner.redirectLink?.startsWith('http') ? "_blank" : undefined}
                             className="flex-shrink-0 w-[300px] md:w-[360px] block relative overflow-hidden group rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-[#005000]/30 transition-all duration-300 aspect-[3/2] bg-white"
                         >
                             <Image
