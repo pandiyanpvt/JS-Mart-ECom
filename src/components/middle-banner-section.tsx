@@ -11,6 +11,7 @@ interface Promotion {
     order: number;
     promotionImg: string;
     isActive: boolean;
+    redirectLink?: string;
 }
 
 export default function MiddleBannerSection() {
@@ -58,7 +59,8 @@ export default function MiddleBannerSection() {
                     {banners.map((banner) => (
                         <Link
                             key={banner.id}
-                            href="/shop"
+                            href={banner.redirectLink || "/shop"}
+                            target={banner.redirectLink?.startsWith('http') ? "_blank" : undefined}
                             className="flex-shrink-0 w-[58vw] max-w-[220px] block relative overflow-hidden group aspect-[4/5] shadow-md border border-slate-100 active:shadow-xl transition-all rounded-lg"
                         >
                             <Image
@@ -85,7 +87,11 @@ export default function MiddleBannerSection() {
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             />
-                            <Link href="/shop" className="absolute inset-0 z-10">
+                            <Link
+                                href={banner.redirectLink || "/shop"}
+                                target={banner.redirectLink?.startsWith('http') ? "_blank" : undefined}
+                                className="absolute inset-0 z-10"
+                            >
                                 <span className="sr-only">View Offer</span>
                             </Link>
                         </div>
