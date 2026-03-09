@@ -14,6 +14,7 @@ export interface Product {
     tag?: string;
     brand?: string;
     offerValidity?: string;
+    isReturnable?: boolean | number;
 }
 
 export const categories = [

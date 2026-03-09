@@ -34,6 +34,7 @@ export interface User {
     zipCode?: string;
     interests?: string;
     referralSource?: string;
+    socialMediaLink?: string;
     createdAt?: string;
     updatedAt?: string;
     user_role?: UserRole;
@@ -61,6 +62,7 @@ export interface UpdateProfileData {
     zipCode?: string;
     interests?: string;
     referralSource?: string;
+    socialMediaLink?: string;
 }
 
 const userService = {

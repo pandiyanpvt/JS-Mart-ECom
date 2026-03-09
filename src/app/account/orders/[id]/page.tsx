@@ -17,7 +17,8 @@ import {
     X,
     Loader2,
     User,
-    RotateCcw
+    RotateCcw,
+    Star
 } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -26,8 +27,9 @@ import orderService from "@/services/order.service";
 import toast from "react-hot-toast";
 import { useModal } from "@/components/providers/ModalProvider";
 import { cn } from "@/lib/utils";
-import { refundService, settingsService } from "@/services";
+import { refundService, settingsService, reviewService } from "@/services";
 import type { Refund } from "@/services/refund.service";
+import type { UserReview } from "@/services/review.service";
 
 export default function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
@@ -50,6 +52,14 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
     const [submittingItemRefund, setSubmittingItemRefund] = useState(false);
     const [myRefunds, setMyRefunds] = useState<any[]>([]);
 
+    // Review states
+    const [myReviews, setMyReviews] = useState<UserReview[]>([]);
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    const [submittingReview, setSubmittingReview] = useState(false);
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewComment, setReviewComment] = useState("");
+    const [hoverRating, setHoverRating] = useState(0);
+
     const fetchOrder = async () => {
         setLoading(true);
         try {
@@ -68,9 +78,10 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
             if (!id) return;
             await fetchOrder();
             try {
-                const [settings, refunds] = await Promise.all([
+                const [settings, refunds, reviews] = await Promise.all([
                     settingsService.getSettings().catch(() => null),
-                    refundService.getMyRefunds().catch(() => [] as Refund[])
+                    refundService.getMyRefunds().catch(() => [] as Refund[]),
+                    reviewService.getMyReviews().catch(() => [] as UserReview[])
                 ]);
 
                 if (settings?.storeSettings) {
@@ -87,6 +98,10 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
                 if (Array.isArray(refunds)) {
                     setMyRefunds(refunds);
+                }
+
+                if (Array.isArray(reviews)) {
+                    setMyReviews(reviews);
                 }
             } catch (e) {
                 console.error("Failed to load refund helpers", e);
@@ -273,6 +288,56 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
             toast.error(message);
         } finally {
             setSubmittingItemRefund(false);
+        }
+    };
+
+    const hasReviewed = (productId: number) => {
+        return myReviews.some(
+            (r) => r.orderId === order?.id && r.productId === productId
+        );
+    };
+
+    const openReviewModal = (detail: any) => {
+        setSelectedDetail(detail);
+        setReviewRating(5);
+        setReviewComment("");
+        setReviewModalOpen(true);
+    };
+
+    const closeReviewModal = () => {
+        if (submittingReview) return;
+        setReviewModalOpen(false);
+        setSelectedDetail(null);
+    };
+
+    const submitReview = async () => {
+        if (!order || !selectedDetail) return;
+
+        if (reviewRating < 1 || reviewRating > 5) {
+            toast.error("Please provide a valid rating");
+            return;
+        }
+
+        setSubmittingReview(true);
+        try {
+            await reviewService.createReview({
+                orderId: order.id,
+                productId: selectedDetail.productId,
+                rating: reviewRating,
+                comment: reviewComment.trim()
+            });
+            toast.success("Review submitted successfully");
+
+            // Refresh reviews
+            const reviews = await reviewService.getMyReviews().catch(() => [] as UserReview[]);
+            if (Array.isArray(reviews)) {
+                setMyReviews(reviews);
+            }
+            closeReviewModal();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to submit review");
+        } finally {
+            setSubmittingReview(false);
         }
     };
 
@@ -571,10 +636,12 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
                             const refundStatus = getRefundStatusForDetail(detail);
                             const isFreeItem = Number(detail.pricePerUnit || 0) <= 0;
+                            const isReturnable = product?.isReturnable === true || product?.isReturnable === 1 || product?.isReturnable === '1';
                             const disableReturn =
                                 order.status?.toUpperCase() !== "COMPLETED" ||
                                 hasActiveRefundForDetail(detail) ||
-                                isFreeItem;
+                                isFreeItem ||
+                                !isReturnable;
 
                             return (
                                 <div
@@ -606,17 +673,37 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                             </p>
                                         ) : (
                                             <>
+                                                {order.status?.toUpperCase() === "COMPLETED" && !hasReviewed(detail.productId) && (
+                                                    <button
+                                                        onClick={() => openReviewModal(detail)}
+                                                        className="mt-2 inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors border-indigo-600 text-indigo-700 hover:bg-indigo-50 mr-2"
+                                                    >
+                                                        <Star className="w-3 h-3 mr-1" />
+                                                        Review Product
+                                                    </button>
+                                                )}
+                                                {hasReviewed(detail.productId) && (
+                                                    <p className="mt-2 text-xs font-semibold text-indigo-700 bg-indigo-50 inline-flex px-2 py-1 rounded-full border border-indigo-100 mr-2">
+                                                        <Star className="w-3 h-3 mr-1 fill-indigo-700 text-indigo-700" />
+                                                        Reviewed
+                                                    </p>
+                                                )}
                                                 <button
                                                     disabled={disableReturn}
                                                     onClick={() => openItemRefundModal(detail)}
                                                     className="mt-2 inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-emerald-600 text-emerald-700 hover:bg-emerald-50"
                                                 >
                                                     <RotateCcw className="w-3 h-3 mr-1" />
-                                                    Request Return
+                                                    {!isReturnable ? "Non-returnable" : "Request Return"}
                                                 </button>
                                                 {isFreeItem && (
                                                     <p className="mt-1 text-[11px] text-gray-500">
                                                         Free items from offers must be returned together with the paid item.
+                                                    </p>
+                                                )}
+                                                {!isReturnable && (
+                                                    <p className="mt-1 text-[11px] text-rose-500 font-medium">
+                                                        This item cannot be returned.
                                                     </p>
                                                 )}
                                             </>
@@ -1063,6 +1150,122 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                                             className="w-full py-2 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
                                         >
                                             Nevermind, go back
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition.Root>
+
+            {/* Review Modal */}
+            <Transition.Root show={reviewModalOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-[9999]" onClose={closeReviewModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 z-10 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 translate-y-4 scale-95"
+                                enterTo="opacity-100 translate-y-0 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 translate-y-0 scale-100"
+                                leaveTo="opacity-0 translate-y-4 scale-95"
+                            >
+                                <Dialog.Panel className="relative transform overflow-hidden rounded-[2rem] bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                    <div className="bg-[#00028C] px-6 py-8 text-center text-white relative">
+                                        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                                            <Star className="h-8 w-8 text-white fill-white" />
+                                        </div>
+                                        <Dialog.Title as="h3" className="text-2xl font-bold">
+                                            Review Product
+                                        </Dialog.Title>
+                                        <p className="mt-2 text-indigo-100 text-sm">
+                                            Share your thoughts about {selectedDetail?.Product?.productName || selectedDetail?.product?.productName}
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white px-8 pt-8 pb-4 space-y-6 text-left">
+                                        <div className="flex flex-col items-center">
+                                            <p className="text-sm font-semibold text-gray-700 mb-3">Rate your product</p>
+                                            <div className="flex gap-2">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        type="button"
+                                                        onClick={() => setReviewRating(star)}
+                                                        onMouseEnter={() => setHoverRating(star)}
+                                                        onMouseLeave={() => setHoverRating(0)}
+                                                        className="transition-all transform hover:scale-110 focus:outline-none"
+                                                    >
+                                                        <Star
+                                                            className={cn(
+                                                                "w-10 h-10 transition-colors duration-200",
+                                                                (hoverRating ? star <= hoverRating : star <= reviewRating)
+                                                                    ? "fill-amber-400 text-amber-400 drop-shadow-sm"
+                                                                    : "text-gray-200 fill-gray-100 hover:text-amber-200"
+                                                            )}
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <p className="text-xs font-bold mt-3 uppercase tracking-widest text-[#00028C]">
+                                                {reviewRating === 5 ? "Excellent!" :
+                                                    reviewRating === 4 ? "Very Good" :
+                                                        reviewRating === 3 ? "Average" :
+                                                            reviewRating === 2 ? "Poor" :
+                                                                reviewRating === 1 ? "Terrible" : ""}
+                                            </p>
+                                        </div>
+
+                                        <div className="text-left">
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                                Your Review (Optional)
+                                            </label>
+                                            <textarea
+                                                rows={4}
+                                                value={reviewComment}
+                                                onChange={(e) => setReviewComment(e.target.value)}
+                                                placeholder="What did you like or dislike? How was the quality?"
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none transition-all"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-50/50 px-8 py-6 flex flex-col gap-3 border-t border-gray-100">
+                                        <Button
+                                            onClick={submitReview}
+                                            disabled={submittingReview}
+                                            className="w-full bg-[#00028C] hover:bg-[#00026e] h-12 font-bold rounded-xl shadow-lg shadow-indigo-900/10 active:scale-[0.98] transition-all"
+                                        >
+                                            {submittingReview ? (
+                                                <>
+                                                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                                                    Submitting Review...
+                                                </>
+                                            ) : (
+                                                "Submit Review"
+                                            )}
+                                        </Button>
+                                        <button
+                                            onClick={closeReviewModal}
+                                            disabled={submittingReview}
+                                            className="w-full py-2 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+                                        >
+                                            Cancel
                                         </button>
                                     </div>
                                 </Dialog.Panel>

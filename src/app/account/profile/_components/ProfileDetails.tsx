@@ -41,6 +41,7 @@ export function ProfileDetails({ user, onUpdate }: ProfileDetailsProps) {
         zipCode: user.zipCode || "",
         interests: user.interests || "",
         referralSource: user.referralSource || "",
+        socialMediaLink: user.socialMediaLink || "",
     });
 
     const requiredFields = [
@@ -128,6 +129,7 @@ export function ProfileDetails({ user, onUpdate }: ProfileDetailsProps) {
                 zipCode: formData.zipCode || undefined,
                 interests: formData.interests || undefined,
                 referralSource: formData.referralSource || undefined,
+                socialMediaLink: formData.socialMediaLink || undefined,
             });
             const updatedUser = await userService.getProfile();
             if (updatedUser) {
@@ -429,6 +431,22 @@ export function ProfileDetails({ user, onUpdate }: ProfileDetailsProps) {
                                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">How you found us</p>
                                                 <p className="font-bold text-gray-900 capitalize">{formData.referralSource?.toLowerCase().replace(/_/g, ' ') || "Direct Visit"}</p>
                                             </div>
+                                            <div className="space-y-1 sm:col-span-2">
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Social Media / Website</p>
+                                                {formData.socialMediaLink ? (
+                                                    <a
+                                                        href={formData.socialMediaLink.startsWith('http') ? formData.socialMediaLink : `https://${formData.socialMediaLink}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                                                    >
+                                                        {formData.socialMediaLink}
+                                                        <Globe size={12} />
+                                                    </a>
+                                                ) : (
+                                                    <p className="font-bold text-gray-400 italic">Not provided</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -599,6 +617,19 @@ export function ProfileDetails({ user, onUpdate }: ProfileDetailsProps) {
                                         <option value="TAMIL">Tamil</option>
                                         <option value="HINDI">Hindi</option>
                                     </Select>
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label className="text-sm font-bold text-gray-700">Social Media / Portfolio Link</Label>
+                                    <div className="relative">
+                                        <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                        <Input
+                                            value={formData.socialMediaLink}
+                                            onChange={(e) => setFormData({ ...formData, socialMediaLink: e.target.value })}
+                                            className="pl-10 h-11 rounded-xl"
+                                            placeholder="https://facebook.com/your-profile or https://your-website.com"
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 font-medium">Providing this helps us better tailor our marketing & rewards for you.</p>
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-sm font-bold text-gray-700">Residential Address</Label>
