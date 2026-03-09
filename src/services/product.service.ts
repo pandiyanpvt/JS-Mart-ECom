@@ -11,6 +11,7 @@ export interface Product {
     price: number;
     isActive: boolean;
     isFeatured: boolean;
+    isReturnable: boolean | number;
     createdAt?: string;
     updatedAt?: string;
     /** Backend returns alias "images" */

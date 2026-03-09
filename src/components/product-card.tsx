@@ -76,6 +76,12 @@ export function ProductCard({ product, compact }: ProductCardProps) {
                                 {badge}
                             </span>
                         ))}
+                        {/* Non-returnable Badge */}
+                        {(product.isReturnable === 0 || product.isReturnable === false) && (
+                            <span className="bg-rose-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm whitespace-nowrap">
+                                Non-returnable
+                            </span>
+                        )}
                     </div>
 
                     {/* Action Icons */}
@@ -135,10 +141,10 @@ export function ProductCard({ product, compact }: ProductCardProps) {
 
                     {/* Rating */}
                     {!compact && (
-                    <div className="flex items-center gap-2">
-                        {renderStars(4)}
-                        <span className="text-gray-500 text-sm">(45)</span>
-                    </div>
+                        <div className="flex items-center gap-2">
+                            {renderStars(4)}
+                            <span className="text-gray-500 text-sm">(45)</span>
+                        </div>
                     )}
 
                     {/* Offer Validity */}

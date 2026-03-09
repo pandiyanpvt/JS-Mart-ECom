@@ -10,7 +10,7 @@ import type { Product as BackendProduct } from "@/services/product.service";
 import { getProductImages, getProductImageUrl } from "@/services/product.service";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, ChevronRight, Home, Crown, Zap, Gem } from "lucide-react";
+import { Heart, ChevronDown, ChevronUp, Percent, Package, Clock, MapPin, Loader2, Minus, Plus, Gift, Tag, ChevronRight, Home, Crown, Zap, Gem, RotateCcw } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Product as LibProduct } from "@/lib/data";
 import { offerService } from "@/services/offer.service";
@@ -36,6 +36,7 @@ function adaptToLibProduct(p: BackendProduct): LibProduct {
         rating: 4,
         reviews: 45,
         brand: p.brand?.brand ?? p.brand?.brandName ?? "",
+        isReturnable: p.isReturnable,
     };
 }
 
@@ -274,6 +275,12 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                                         <p className="text-sm font-semibold text-gray-600">
                                             Brand: {product.brand?.brand ?? product.brand?.brandName ?? "—"}
                                         </p>
+                                    )}
+                                    {(product.isReturnable == 0 || product.isReturnable === false) && (
+                                        <div className="flex items-center gap-2 text-rose-600 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100 w-fit">
+                                            <RotateCcw className="w-4 h-4" />
+                                            <span className="text-xs font-bold uppercase tracking-wide">Non-returnable</span>
+                                        </div>
                                     )}
 
                                     {/* Price with Offer */}

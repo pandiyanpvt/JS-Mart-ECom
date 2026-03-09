@@ -40,39 +40,56 @@ const getAllCategoryIds = (category: Category): number[] => {
 const CategoryItem = ({
   category,
   handleCategoryChange,
-  selectedCategory,
+  selectedCategories,
+  availableCategoryIds,
   level = 0
 }: {
   category: Category;
   handleCategoryChange: (id: string) => void;
-  selectedCategory: string;
+  selectedCategories: string[];
+  availableCategoryIds?: Set<number>;
   level?: number;
 }) => {
-  const isSelected = selectedCategory === String(category.id);
+  const isSelected = selectedCategories.includes(String(category.id));
+
+  // A category is visible if it has products OR if any of its subcategories are visible
+  const isVisible = !availableCategoryIds ||
+    availableCategoryIds.has(category.id) ||
+    (category.subCategories && category.subCategories.some(sub => {
+      const checkVisibility = (c: Category): boolean => {
+        return availableCategoryIds.has(c.id) || (c.subCategories?.some(checkVisibility) ?? false);
+      };
+      return checkVisibility(sub);
+    }));
+
+  if (!isVisible) return null;
 
   return (
-    <li>
-      <button
+    <li className="space-y-1">
+      <div
+        className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all hover:bg-gray-50 group cursor-pointer"
         onClick={() => handleCategoryChange(String(category.id))}
-        className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold flex items-center justify-between ${isSelected
-          ? "bg-[#005000] text-white"
-          : "text-[#253D4E] hover:bg-gray-50"
-          }`}
-        style={{ paddingLeft: `${1 + level}rem` }}
       >
-        <span>{category.category}</span>
-        {category.subCategories && category.subCategories.length > 0 && (
-          <ChevronDown className={`w-4 h-4 ${isSelected ? "text-white" : "text-gray-400"}`} />
-        )}
-      </button>
+        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected
+            ? "bg-[#005000] border-[#005000]"
+            : "bg-white border-gray-300 group-hover:border-[#005000]"
+          }`}>
+          {isSelected && <div className="w-2.5 h-1.5 border-l-2 border-b-2 border-white -rotate-45 mb-1" />}
+        </div>
+        <span className={`text-sm font-semibold transition-colors ${isSelected ? "text-[#005000]" : "text-[#253D4E]"
+          }`}>
+          {category.category}
+        </span>
+      </div>
       {category.subCategories && category.subCategories.length > 0 && (
-        <ul className="mt-1 space-y-1">
+        <ul className="ml-4 space-y-1 border-l border-gray-100 pl-2">
           {category.subCategories.map(sub => (
             <CategoryItem
               key={sub.id}
               category={sub}
               handleCategoryChange={handleCategoryChange}
-              selectedCategory={selectedCategory}
+              selectedCategories={selectedCategories}
+              availableCategoryIds={availableCategoryIds}
               level={level + 1}
             />
           ))}
@@ -84,10 +101,12 @@ const CategoryItem = ({
 
 interface FilterSidebarContentProps {
   categories: Category[];
-  selectedCategory: string;
+  selectedCategories: string[];
+  availableCategoryIds?: Set<number>;
   handleCategoryChange: (id: string) => void;
   brands: Brand[];
-  selectedBrand: string;
+  selectedBrands: string[];
+  availableBrandIds?: Set<number>;
   handleBrandChange: (id: string) => void;
   priceRange: number[];
   setPriceRange: (range: number[]) => void;
@@ -98,10 +117,12 @@ interface FilterSidebarContentProps {
 
 const FilterSidebarContent = ({
   categories,
-  selectedCategory,
+  selectedCategories,
+  availableCategoryIds,
   handleCategoryChange,
   brands,
-  selectedBrand,
+  selectedBrands,
+  availableBrandIds,
   handleBrandChange,
   priceRange,
   setPriceRange,
@@ -119,15 +140,21 @@ const FilterSidebarContent = ({
       ) : (
         <ul className="space-y-2">
           <li>
-            <button
+            <div
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all hover:bg-gray-50 group cursor-pointer"
               onClick={() => handleCategoryChange("all")}
-              className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedCategory === "all"
-                ? "bg-[#005000] text-white"
-                : "text-[#253D4E] hover:bg-gray-50"
-                }`}
             >
-              All Products
-            </button>
+              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedCategories.length === 0
+                ? "bg-[#005000] border-[#005000]"
+                : "bg-white border-gray-300 group-hover:border-[#005000]"
+                }`}>
+                {selectedCategories.length === 0 && <div className="w-2.5 h-1.5 border-l-2 border-b-2 border-white -rotate-45 mb-1" />}
+              </div>
+              <span className={`text-sm font-semibold transition-colors ${selectedCategories.length === 0 ? "text-[#005000]" : "text-[#253D4E]"
+                }`}>
+                All Products
+              </span>
+            </div>
           </li>
           {categories
             .filter(cat => cat.level === 1)
@@ -136,7 +163,8 @@ const FilterSidebarContent = ({
                 key={cat.id}
                 category={cat}
                 handleCategoryChange={handleCategoryChange}
-                selectedCategory={selectedCategory}
+                selectedCategories={selectedCategories}
+                availableCategoryIds={availableCategoryIds}
               />
             ))}
         </ul>
@@ -145,31 +173,50 @@ const FilterSidebarContent = ({
 
     <div>
       <h3 className="font-extrabold text-[#253D4E] text-lg mb-4">Filter by Brand</h3>
-      <ul className="space-y-2 max-h-48 overflow-y-auto">
+      <ul className="space-y-1 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
         <li>
-          <button
+          <div
+            className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all hover:bg-gray-50 group cursor-pointer"
             onClick={() => handleBrandChange("all")}
-            className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedBrand === "all"
-              ? "bg-[#005000] text-white"
-              : "text-[#253D4E] hover:bg-gray-50"
-              }`}
           >
-            All Brands
-          </button>
+            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedBrands.length === 0
+              ? "bg-[#005000] border-[#005000]"
+              : "bg-white border-gray-300 group-hover:border-[#005000]"
+              }`}>
+              {selectedBrands.length === 0 && <div className="w-2.5 h-1.5 border-l-2 border-b-2 border-white -rotate-45 mb-1" />}
+            </div>
+            <span className={`text-sm font-semibold transition-colors ${selectedBrands.length === 0 ? "text-[#005000]" : "text-[#253D4E]"
+              }`}>
+              All Brands
+            </span>
+          </div>
         </li>
-        {brands.map((b) => (
-          <li key={b.id}>
-            <button
-              onClick={() => handleBrandChange(String(b.id))}
-              className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${selectedBrand === String(b.id)
-                ? "bg-[#005000] text-white"
-                : "text-[#253D4E] hover:bg-gray-50"
-                }`}
-            >
-              {b.brand}
-            </button>
-          </li>
-        ))}
+        {brands.map((b) => {
+          const isSelected = selectedBrands.includes(String(b.id));
+          const isVisible = !availableBrandIds || availableBrandIds.has(b.id);
+
+          if (!isVisible) return null;
+
+          return (
+            <li key={b.id}>
+              <div
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all hover:bg-gray-50 group cursor-pointer"
+                onClick={() => handleBrandChange(String(b.id))}
+              >
+                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected
+                  ? "bg-[#005000] border-[#005000]"
+                  : "bg-white border-gray-300 group-hover:border-[#005000]"
+                  }`}>
+                  {isSelected && <div className="w-2.5 h-1.5 border-l-2 border-b-2 border-white -rotate-45 mb-1" />}
+                </div>
+                <span className={`text-sm font-semibold transition-colors ${isSelected ? "text-[#005000]" : "text-[#253D4E]"
+                  }`}>
+                  {b.brand}
+                </span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
 
@@ -231,8 +278,8 @@ function ShopContent() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [productOffers, setProductOffers] = useState<Map<number, Offer[]>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || "all");
-  const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand || "all");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? initialCategory.split(',') : []);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(initialBrand ? initialBrand.split(',') : []);
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 10000]);
@@ -294,38 +341,54 @@ function ShopContent() {
   }, [searchQuery]);
 
   useEffect(() => {
-    setSelectedCategory(initialCategory || "all");
+    setSelectedCategories(initialCategory ? initialCategory.split(',') : []);
   }, [initialCategory]);
 
   useEffect(() => {
-    setSelectedBrand(initialBrand || "all");
+    setSelectedBrands(initialBrand ? initialBrand.split(',') : []);
   }, [initialBrand]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, selectedBrand, sortBy]);
+  }, [selectedCategories, selectedBrands, sortBy]);
 
-  const buildShopUrl = (category: string, brand: string) => {
+  const buildShopUrl = (categories: string[], brands: string[]) => {
     const params = new URLSearchParams();
-    if (category !== "all") params.set("category", category);
-    if (brand !== "all") params.set("brand", brand);
+    if (categories.length > 0) params.set("category", categories.join(','));
+    if (brands.length > 0) params.set("brand", brands.join(','));
     const q = params.toString();
     return q ? `/shop?${q}` : "/shop";
   };
 
   const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    router.replace(buildShopUrl(categoryId, selectedBrand), { scroll: false });
+    let newCategories: string[];
+    if (categoryId === "all") {
+      newCategories = [];
+    } else {
+      newCategories = selectedCategories.includes(categoryId)
+        ? selectedCategories.filter(id => id !== categoryId)
+        : [...selectedCategories, categoryId];
+    }
+    setSelectedCategories(newCategories);
+    router.replace(buildShopUrl(newCategories, selectedBrands), { scroll: false });
   };
 
   const handleBrandChange = (brandId: string) => {
-    setSelectedBrand(brandId);
-    router.replace(buildShopUrl(selectedCategory, brandId), { scroll: false });
+    let newBrands: string[];
+    if (brandId === "all") {
+      newBrands = [];
+    } else {
+      newBrands = selectedBrands.includes(brandId)
+        ? selectedBrands.filter(id => id !== brandId)
+        : [...selectedBrands, brandId];
+    }
+    setSelectedBrands(newBrands);
+    router.replace(buildShopUrl(selectedCategories, newBrands), { scroll: false });
   };
 
   const handleClearAllFilters = () => {
-    setSelectedCategory("all");
-    setSelectedBrand("all");
+    setSelectedCategories([]);
+    setSelectedBrands([]);
     setPriceRange([0, maxPrice]);
     router.replace("/shop", { scroll: false });
   };
@@ -334,20 +397,22 @@ function ShopContent() {
     let filtered = products;
 
     // Apply category filter
-    if (selectedCategory !== "all") {
+    if (selectedCategories.length > 0) {
       filtered = filtered.filter((p) => {
-        const categoryObj = categories.find(c => String(c.id) === selectedCategory);
-        if (categoryObj) {
-          const allowedIds = getAllCategoryIds(categoryObj);
-          return allowedIds.includes(p.productCategoryId);
-        }
-        return p.productCategoryId === Number(selectedCategory);
+        return selectedCategories.some(catId => {
+          const categoryObj = categories.find(c => String(c.id) === catId);
+          if (categoryObj) {
+            const allowedIds = getAllCategoryIds(categoryObj);
+            return allowedIds.includes(p.productCategoryId);
+          }
+          return p.productCategoryId === Number(catId);
+        });
       });
     }
 
     // Apply brand filter
-    if (selectedBrand !== "all") {
-      filtered = filtered.filter((p) => p.brandId === Number(selectedBrand));
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter((p) => selectedBrands.includes(String(p.brandId)));
     }
 
     // Apply price filter
@@ -369,7 +434,38 @@ function ShopContent() {
     });
 
     return sorted;
-  }, [products, selectedCategory, selectedBrand, sortBy, priceRange, searchQuery, categories]);
+  }, [products, selectedCategories, selectedBrands, sortBy, priceRange, categories]);
+
+  // Interdependent filters: Calculate which brands/categories should be visible
+  const availableBrandIds = useMemo(() => {
+    if (selectedCategories.length === 0) return new Set(brands.map(b => b.id));
+
+    const brandsInCategories = new Set<number>();
+    products.forEach(p => {
+      const isMatch = selectedCategories.some(catId => {
+        const categoryObj = categories.find(c => String(c.id) === catId);
+        if (categoryObj) {
+          const allowedIds = getAllCategoryIds(categoryObj);
+          return allowedIds.includes(p.productCategoryId);
+        }
+        return p.productCategoryId === Number(catId);
+      });
+      if (isMatch) brandsInCategories.add(p.brandId);
+    });
+    return brandsInCategories;
+  }, [products, selectedCategories, categories, brands]);
+
+  const availableCategoryIds = useMemo(() => {
+    if (selectedBrands.length === 0) return new Set(categories.map(c => c.id));
+
+    const categoriesInBrands = new Set<number>();
+    products.forEach(p => {
+      if (selectedBrands.includes(String(p.brandId))) {
+        categoriesInBrands.add(p.productCategoryId);
+      }
+    });
+    return categoriesInBrands;
+  }, [products, selectedBrands, categories]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
@@ -516,10 +612,12 @@ function ShopContent() {
                 <div className="h-full overflow-y-auto pb-20">
                   <FilterSidebarContent
                     categories={categories}
-                    selectedCategory={selectedCategory}
+                    selectedCategories={selectedCategories}
+                    availableCategoryIds={availableCategoryIds}
                     handleCategoryChange={handleCategoryChange}
                     brands={brands}
-                    selectedBrand={selectedBrand}
+                    selectedBrands={selectedBrands}
+                    availableBrandIds={availableBrandIds}
                     handleBrandChange={handleBrandChange}
                     priceRange={priceRange}
                     setPriceRange={setPriceRange}
@@ -544,11 +642,11 @@ function ShopContent() {
             )}
             <select
               className="min-h-[44px] sm:min-h-0 px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-200 rounded-lg bg-white text-xs sm:text-sm font-semibold text-[#253D4E] focus:outline-none focus:ring-2 focus:ring-[#005000] focus:border-transparent w-full sm:w-auto min-w-[140px]"
-              value={selectedBrand}
+              value={selectedBrands.length === 1 ? selectedBrands[0] : "all"}
               onChange={(e) => handleBrandChange(e.target.value)}
               aria-label="Filter by brand"
             >
-              <option value="all">Brand: All</option>
+              <option value="all">Brand: {selectedBrands.length > 1 ? `(${selectedBrands.length}) Selected` : 'All'}</option>
               {brands.map((b) => (
                 <option key={b.id} value={String(b.id)}>{b.brand}</option>
               ))}
@@ -569,10 +667,12 @@ function ShopContent() {
           <aside className="hidden lg:block lg:w-[20%] lg:min-w-[250px]">
             <FilterSidebarContent
               categories={categories}
-              selectedCategory={selectedCategory}
+              selectedCategories={selectedCategories}
+              availableCategoryIds={availableCategoryIds}
               handleCategoryChange={handleCategoryChange}
               brands={brands}
-              selectedBrand={selectedBrand}
+              selectedBrands={selectedBrands}
+              availableBrandIds={availableBrandIds}
               handleBrandChange={handleBrandChange}
               priceRange={priceRange}
               setPriceRange={setPriceRange}

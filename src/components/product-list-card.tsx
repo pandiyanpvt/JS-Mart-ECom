@@ -82,6 +82,20 @@ export function ProductListCard({ product }: ProductListCardProps) {
                                         {badge}
                                     </span>
                                 ))}
+                                {/* Non-returnable Badge */}
+                                {(product.isReturnable === 0 || product.isReturnable === false) && (
+                                    <span className="bg-rose-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm whitespace-nowrap">
+                                        Non-returnable
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        {/* Non-returnable Badge standalone if no badges exist */}
+                        {(!product.badges || product.badges.length === 0) && (product.isReturnable === 0 || product.isReturnable === false) && (
+                            <div className="absolute top-2 left-2 z-10">
+                                <span className="bg-rose-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm whitespace-nowrap">
+                                    Non-returnable
+                                </span>
                             </div>
                         )}
 
