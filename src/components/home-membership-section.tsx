@@ -21,12 +21,12 @@ export default function HomeMembershipSection() {
 
     return (
         <section className="w-full py-10 md:py-12 bg-slate-50">
-            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                 <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 mb-4 md:mb-8">
-                    <h2 className="text-lg md:text-2xl font-extrabold text-[#253D4E] leading-tight">Membership</h2>
+                    <h2 className="text-lg md:text-2xl xl:text-3xl font-extrabold text-[#253D4E] leading-tight">Membership</h2>
                     <Link
                         href="/membership"
-                        className="shrink-0 px-3 py-2 md:px-5 md:py-3 md:min-h-[44px] flex items-center bg-[#005000] hover:bg-[#006600] text-white text-xs md:text-sm font-semibold transition-colors touch-manipulation rounded"
+                        className="shrink-0 px-3 py-2 md:px-5 md:py-3 md:min-h-[44px] xl:px-6 xl:py-3.5 flex items-center bg-[#005000] hover:bg-[#006600] text-white text-xs md:text-sm xl:text-base font-semibold transition-colors touch-manipulation rounded"
                     >
                         View Plans
                     </Link>
@@ -71,7 +71,7 @@ export default function HomeMembershipSection() {
                                             </li>
                                         ))}
                                     </ul>
-                                    <span className="mt-auto inline-block w-full py-2 md:py-2.5 text-center text-xs md:text-sm font-semibold text-[#005000] border-2 border-[#005000] rounded-lg group-hover:bg-[#005000] group-hover:text-white transition-colors">
+                                    <span className="mt-auto inline-block w-full py-2 md:py-2.5 text-center text-xs md:text-sm xl:text-base font-semibold text-[#005000] border-2 border-[#005000] rounded-lg group-hover:bg-[#005000] group-hover:text-white transition-colors">
                                         View details
                                     </span>
                                 </div>

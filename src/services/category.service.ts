@@ -7,7 +7,6 @@ export interface Category {
     bannerImg?: string;
     level: number;
     parentId?: number;
-    isWeightBased: boolean;
     isActive: boolean;
     createdAt?: string;
     updatedAt?: string;

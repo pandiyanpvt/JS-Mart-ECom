@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 export default function OrdersRedirectPage() {
   const router = useRouter();
 
+  
   useEffect(() => {
     router.replace("/account/orders");
   }, [router]);

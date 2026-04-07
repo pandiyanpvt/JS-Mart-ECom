@@ -9,8 +9,10 @@ import { offerService } from "@/services/offer.service";
 import { couponService } from "@/services/coupon.service";
 import { membershipService, type UserSubscription } from "@/services/membership.service";
 import { calculateCartTotals } from "@/utils/offerUtils";
-import { ShieldCheck, Tag, X, Plus, Minus, ShoppingBag } from "lucide-react";
+import { ShieldCheck, Tag, X, Plus, Minus } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { cn } from "@/lib/utils";
+import { resolveImageSrc } from "@/lib/images";
 
 type CartModalProps = {
     isOpen: boolean;
@@ -100,7 +102,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b bg-gray-50/50">
                     <div className="flex items-center gap-3">
-                        <ShoppingBag className="text-[#005000]" />
+                        <CartOutlineIcon className="h-6 w-6 text-[#005000]" />
                         <h2 className="text-xl font-black text-[#253D4E] tracking-tight">Your Cart</h2>
                         <span className="bg-[#005000] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
                             {cart.length}
@@ -119,7 +121,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                 {cart.length === 0 ? (
                     <div className="flex flex-col flex-1 justify-center items-center p-8 text-center bg-white animate-in fade-in duration-500">
                         <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                            <ShoppingBag className="w-10 h-10 text-gray-300" />
+                            <CartOutlineIcon className="w-10 h-10 text-gray-300" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Your cart is empty</h3>
                         <p className="text-gray-500 text-sm mb-8 max-w-[240px] leading-relaxed">
@@ -143,7 +145,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                                     {/* Image */}
                                     <div className="relative h-24 w-24 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
                                         <img
-                                            src={item.image?.startsWith("http") ? item.image : item.image ? `/${item.image}` : "/placeholder.png"}
+                                            src={resolveImageSrc(item.image)}
                                             className="h-full w-full object-contain p-2 mix-blend-multiply"
                                             alt={item.name}
                                         />

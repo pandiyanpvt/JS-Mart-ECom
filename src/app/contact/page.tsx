@@ -6,20 +6,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import HeroSection, { HeroSlide } from "@/components/hero-section";
+import PageHero from "@/components/page-hero";
 import { contactService } from "@/services/contact.service";
-
-const contactHeroSlides: HeroSlide[] = [
-  {
-    id: 1,
-    title: "Get in Touch",
-    subtitle: "Contact Us",
-    description: "Have a question or need assistance? We're here to help. Reach out to our friendly customer support team.",
-    buttonText: "Visit FAQ",
-    buttonLink: "/faq",
-    image: "/images/headers/contact-header.png"
-  }
-];
 
 const initialForm = {
   firstName: "",
@@ -95,9 +83,15 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <HeroSection slides={contactHeroSlides} className="min-h-[300px] md:min-h-[400px]" />
+      <PageHero
+        image="/images/headers/contact-header.png"
+        imageAlt="Contact JS Mart"
+        title="Get in Touch"
+        subtitle="Have a question or need assistance? We're here to help — reach out to our friendly customer support team."
+        align="center"
+      />
 
-      <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 -mt-12 sm:-mt-16 relative z-10 mb-8 sm:mb-10 md:mb-12">
+      <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 -mt-12 sm:-mt-16 relative z-10 mb-8 sm:mb-10 md:mb-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {contactInfo.map((info, index) => {
             const Icon = info.icon;
@@ -118,7 +112,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <section className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-10 sm:pb-12 md:pb-20">
+      <section className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-10 sm:pb-12 md:pb-20">
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6 md:p-8 lg:p-10">
             <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#253D4E] mb-1.5 sm:mb-2">Send us a message</h2>
@@ -258,7 +252,7 @@ export default function ContactPage() {
       </section>
 
       <section className="bg-white py-8 sm:py-10 md:py-16 border-t border-slate-100">
-        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+        <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center">
           <h3 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#253D4E] mb-1.5 sm:mb-2">Customer support hours</h3>
           <p className="text-slate-500 text-xs sm:text-sm mb-4 sm:mb-6 max-w-xl mx-auto">
             Our support team is available during the following hours.

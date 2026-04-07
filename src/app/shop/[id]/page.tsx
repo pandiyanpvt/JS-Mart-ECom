@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 function adaptToLibProduct(p: BackendProduct): LibProduct {
     const imgs = getProductImages(p);
     const primary = imgs.find((img) => img.isPrimary) || imgs[0];
-    const primaryImage = primary ? getProductImageUrl(primary) : "/images/products/placeholder.png";
+    const primaryImage = getProductImageUrl(primary);
     return {
         id: String(p.id),
         name: p.productName,
@@ -32,7 +32,7 @@ function adaptToLibProduct(p: BackendProduct): LibProduct {
         originalPrice: undefined,
         image: primaryImage,
         description: p.description || "",
-        weight: p.weight ? `${p.weight}g` : "—",
+        weight: "Per unit",
         rating: 4,
         reviews: 45,
         brand: p.brand?.brand ?? p.brand?.brandName ?? "",
@@ -142,7 +142,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 pt-[100px] pb-12 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 pt-0 pb-12 flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 animate-spin text-[#005000] mx-auto mb-4" />
                     <p className="text-gray-600 font-semibold">Loading product...</p>
@@ -153,7 +153,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
 
     if (!product) {
         return (
-            <div className="min-h-screen bg-gray-50 pt-[100px] pb-12 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 pt-0 pb-12 flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-xl font-bold text-[#253D4E] mb-4">Product not found</p>
                     <Link href="/shop">
@@ -167,7 +167,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
     const categoryName = product.product_category?.category || "Uncategorized";
     const imgs = getProductImages(product);
     const primaryImg = imgs.find((img) => img.isPrimary) || imgs[0];
-    const primaryImage = primaryImg ? getProductImageUrl(primaryImg) : "/images/products/placeholder.png";
+    const primaryImage = getProductImageUrl(primaryImg);
     const allImages = imgs.length ? imgs.map((img) => getProductImageUrl(img)) : [primaryImage];
     const price = Number(product.price);
     const libProduct = adaptToLibProduct(product);
@@ -177,7 +177,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
         <div className="min-h-screen bg-gray-50 pb-4 md:pb-8">
             {/* Breadcrumbs */}
             <div className="w-full pt-0 pb-2 md:pb-4">
-                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                     <nav className="flex items-center gap-2 text-sm text-gray-600">
                         <Link href="/" className="hover:text-[#005000] transition-colors flex items-center gap-1">
                             <Home className="w-4 h-4" />
@@ -207,7 +207,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
             </div>
 
             <div className="w-full py-4 md:py-6">
-                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
                             {/* Left: Image gallery */}
@@ -264,11 +264,6 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                                     {product.description && (
                                         <p className="text-gray-600 text-sm leading-relaxed">
                                             {product.description}
-                                        </p>
-                                    )}
-                                    {product.product_category?.isWeightBased && product.weight && (
-                                        <p className="text-sm font-semibold text-gray-600">
-                                            Weight: {product.weight}kg
                                         </p>
                                     )}
                                     {product.brand && (
@@ -483,7 +478,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                                         {relatedProducts.map((relatedProduct) => {
                                             const relatedImgs = getProductImages(relatedProduct);
                                             const relatedPrimary = relatedImgs.find((img) => img.isPrimary) || relatedImgs[0];
-                                            const relatedImage = relatedPrimary ? getProductImageUrl(relatedPrimary) : "/placeholder.png";
+                                            const relatedImage = getProductImageUrl(relatedPrimary);
                                             const relatedLib = adaptToLibProduct(relatedProduct);
                                             return (
                                                 <ProductCard key={relatedProduct.id} product={relatedLib} />

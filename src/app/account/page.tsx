@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Package, ShoppingBag, MapPin, CreditCard, TrendingUp } from "lucide-react";
+import { Package, MapPin, CreditCard, TrendingUp } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import Cookies from 'js-cookie';
 import { useSession } from "next-auth/react";
 
@@ -84,7 +85,7 @@ export default function AccountDashboard() {
         {
             label: "Active Orders",
             value: "3",
-            icon: ShoppingBag,
+            icon: CartOutlineIcon,
             color: "bg-[#005000]",
             trend: "2 in transit",
         },
@@ -134,13 +135,13 @@ export default function AccountDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-4 sm:pt-6 md:pt-8 pb-3 sm:pb-4">
+            <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-4 sm:pt-6 md:pt-8 pb-3 sm:pb-4">
                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
                     My Account
                 </h1>
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-8 sm:pb-10 md:pb-12 space-y-4 sm:space-y-6 md:space-y-8">
+            <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-8 sm:pb-10 md:pb-12 space-y-4 sm:space-y-6 md:space-y-8">
                 {/* Welcome Section */}
                 <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 md:p-8">
                     <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">

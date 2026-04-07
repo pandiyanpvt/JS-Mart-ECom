@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Product } from "@/lib/data";
+import { resolveImageSrc } from "@/lib/images";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import Link from "next/link";
@@ -31,7 +32,7 @@ export function ProductCard({ product, compact }: ProductCardProps) {
     };
 
     const renderStars = (rating: number = 4) => {
-        const starClass = compact ? "w-3 h-3" : "w-4 h-4";
+        const starClass = compact ? "w-3 h-3" : "w-4 h-4 xl:w-5 xl:h-5";
         return (
             <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -105,9 +106,9 @@ export function ProductCard({ product, compact }: ProductCardProps) {
                     </div>
 
                     {/* Product Image */}
-                    <div className={`relative w-full flex items-center justify-center ${compact ? "h-[90px]" : "h-[140px] md:h-[180px]"}`}>
+                    <div className={`relative w-full flex items-center justify-center ${compact ? "h-[90px]" : "h-[140px] md:h-[180px] xl:h-[200px] 2xl:h-[220px]"}`}>
                         <Image
-                            src={product.image}
+                            src={resolveImageSrc(product.image)}
                             alt={product.name}
                             fill
                             className="object-contain group-hover:scale-110 transition-transform duration-500"
@@ -117,23 +118,23 @@ export function ProductCard({ product, compact }: ProductCardProps) {
 
                 {/* Product Info - productName, brand, price */}
                 <div className={compact ? "p-2 space-y-0.5" : "p-3 md:p-4 space-y-1 md:space-y-2"}>
-                    <h3 className={`text-[#253D4E] font-semibold leading-tight hover:text-[#005000] transition-colors line-clamp-2 ${compact ? "text-[11px]" : "text-xs md:text-sm"}`}>
+                    <h3 className={`text-[#253D4E] font-semibold leading-tight hover:text-[#005000] transition-colors line-clamp-2 ${compact ? "text-[11px]" : "text-xs md:text-sm xl:text-base"}`}>
                         {product.name}
                     </h3>
 
                     {product.brand && !compact && (
-                        <p className="text-gray-500 text-xs font-medium">
+                        <p className="text-gray-500 text-xs xl:text-sm font-medium">
                             {product.brand}
                         </p>
                     )}
 
                     {/* Price */}
                     <div className="flex items-center gap-2">
-                        <span className={`text-[#FF4858] font-bold ${compact ? "text-xs" : "text-base md:text-xl"}`}>
+                        <span className={`text-[#FF4858] font-bold ${compact ? "text-xs" : "text-base md:text-xl xl:text-2xl"}`}>
                             AUD {displayPrice.toFixed(0)}
                         </span>
                         {product.originalPrice && !compact && (
-                            <span className="text-gray-400 text-sm line-through font-medium">
+                            <span className="text-gray-400 text-sm xl:text-base line-through font-medium">
                                 AUD {product.originalPrice.toFixed(0)}
                             </span>
                         )}
@@ -143,7 +144,7 @@ export function ProductCard({ product, compact }: ProductCardProps) {
                     {!compact && (
                         <div className="flex items-center gap-2">
                             {renderStars(4)}
-                            <span className="text-gray-500 text-sm">(45)</span>
+                            <span className="text-gray-500 text-sm xl:text-base">(45)</span>
                         </div>
                     )}
 

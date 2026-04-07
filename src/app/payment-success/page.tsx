@@ -3,7 +3,8 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle, Loader2, ShoppingBag, ArrowRight, Home } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, ArrowRight, Home } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { useCart } from "@/context/CartContext";
 import api from "@/services/apiClient";
 import Cookies from "js-cookie";
@@ -181,7 +182,7 @@ const PaymentSuccessContent = () => {
                             className="group flex items-center justify-between w-full py-4 px-6 bg-[#005000] hover:bg-[#003d00] text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-green-900/20 active:scale-[0.98]"
                         >
                             <span className="flex items-center gap-3">
-                                <ShoppingBag className="w-5 h-5" />
+                                <CartOutlineIcon className="w-5 h-5" />
                                 Track My Order
                             </span>
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

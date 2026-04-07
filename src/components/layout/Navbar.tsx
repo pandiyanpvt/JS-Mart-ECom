@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { MapPin, Search, ShoppingBag, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight, Loader2, Bell, MessageSquare, Star, Crown, X } from "lucide-react";
+import { MapPin, Search, Menu, ChevronDown, User, LogOut, Package, Heart, Apple, Milk, Cake, Coffee, Beef, Fish, Home, Baby, ChevronRight, Loader2, Bell, MessageSquare, Star, Crown, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import CartModal from "@/components/layout/add-cart-modal";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { categoryService, productService, notificationService } from "@/services";
 import { type Category } from "@/services/category.service";
 import { type Product } from "@/services/product.service";
@@ -316,7 +317,7 @@ export function Navbar() {
                                         executeSearch(searchQuery, selectedSearchCategory);
                                     }
                                 }}
-                                className="flex-1 h-10 border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-sm bg-[#F3F4F6] shadow-none"
+                                className="flex-1 h-11 border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-base bg-[#F3F4F6] shadow-none"
                                 placeholder="Search products..."
                                 autoFocus
                             />
@@ -337,7 +338,7 @@ export function Navbar() {
                                 setShowSearchResults(false);
                                 setSearchQuery("");
                             }}
-                            className="px-3 py-2 text-gray-600 hover:text-gray-800 font-semibold text-sm"
+                            className="px-3 py-2 text-gray-600 hover:text-gray-800 font-semibold text-base"
                         >
                             Cancel
                         </button>
@@ -350,7 +351,7 @@ export function Navbar() {
                                 {searchResults.map((product) => {
                                     const imgs = getProductImages(product);
                                     const primary = imgs.find((img) => img.isPrimary) || imgs[0];
-                                    const imageUrl = primary ? getProductImageUrl(primary) : "/placeholder.png";
+                                    const imageUrl = getProductImageUrl(primary);
                                     return (
                                         <Link
                                             key={product.id}
@@ -372,10 +373,10 @@ export function Navbar() {
                                                 />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-semibold text-sm text-[#253D4E] truncate">
+                                                <h4 className="font-semibold text-base text-[#253D4E] truncate">
                                                     {product.productName}
                                                 </h4>
-                                                <p className="text-sm text-[#005000] font-bold">
+                                                <p className="text-base text-[#005000] font-bold">
                                                     AUD {Number(product.price).toFixed(2)}
                                                 </p>
                                             </div>
@@ -385,7 +386,7 @@ export function Navbar() {
                                 {searchQuery.trim() && (
                                     <button
                                         onClick={() => executeSearch(searchQuery, selectedSearchCategory)}
-                                        className="w-full p-3 text-center text-sm font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2 block"
+                                        className="w-full p-3 text-center text-base font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2 block"
                                     >
                                         View all results for "{searchQuery}"
                                         {selectedSearchCategory && <span className="text-gray-400 font-normal"> in {selectedSearchCategory.category}</span>}
@@ -398,8 +399,8 @@ export function Navbar() {
             )}
 
             {/* Main Navbar (safe-area for notched phones) */}
-            <div className="py-2 pl-2 pr-2 md:pl-0 md:pr-4 fixed top-0 left-0 right-0 md:bg-white w-full z-50 border-b border-gray-100/50 md:border-gray-100 shadow-sm min-h-[64px] h-16 sm:h-[72px] md:h-[80px] flex items-center pt-[env(safe-area-inset-top,0px)] backdrop-blur-md bg-white/80 md:backdrop-blur-none md:bg-white">
-                <div className="flex items-center justify-between gap-2 md:gap-6 w-full max-w-[1920px] mx-auto px-1 sm:px-2">
+            <div className="py-2 px-0 fixed top-0 left-0 right-0 md:bg-white w-full z-50 border-b border-gray-100/50 md:border-gray-100 shadow-sm min-h-[64px] h-16 sm:h-[72px] md:h-20 flex items-center pt-[env(safe-area-inset-top,0px)] backdrop-blur-md bg-white/80 md:backdrop-blur-none md:bg-white">
+                <div className="flex items-center justify-between gap-2 md:gap-6 w-full px-3 sm:px-4 md:px-5 lg:px-6 xl:px-8 2xl:px-12">
                     {/* Hamburger Menu + Logo */}
                     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 min-w-0">
                         {/* Mobile Hamburger Menu Button - 44px touch target */}
@@ -412,16 +413,16 @@ export function Navbar() {
                             aria-label="Toggle menu"
                             aria-expanded={isMobileMenuOpen}
                         >
-                            <Menu className="w-5 h-5 text-gray-700 shrink-0" />
+                            <Menu className="w-6 h-6 text-gray-700 shrink-0" />
                         </button>
 
                         {/* Logo */}
-                        <Link href="/" className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-16 md:w-40 lg:h-20 lg:w-48 flex-shrink-0">
+                        <Link href="/" className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-36 lg:h-16 lg:w-40 flex-shrink-0">
                             <Image
                                 src="/logo/Web_Logo_Mart-01%20(1).png"
                                 alt="JS Mart Australia"
                                 fill
-                                sizes="(max-width: 768px) 112px, (max-width: 1024px) 160px, 192px"
+                                sizes="(max-width: 768px) 112px, (max-width: 1024px) 160px, (max-width: 1536px) 208px, 224px"
                                 className="object-contain"
                                 priority
                             />
@@ -431,18 +432,18 @@ export function Navbar() {
                     {/* Desktop Location - Restored */}
                     <div className="hidden xl:flex items-center gap-3 px-4 py-2 border-l border-r border-gray-100/80 group cursor-pointer hover:bg-gray-50 transition-all rounded-sm flex-shrink-0">
                         <div className="p-2 bg-green-50 rounded-full group-hover:bg-[#1F5632] group-hover:text-white transition-colors duration-300">
-                            <MapPin className="h-5 w-5 text-[#1F5632] group-hover:text-white" />
+                            <MapPin className="h-5 w-5 xl:h-6 xl:w-6 text-[#1F5632] group-hover:text-white" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none mb-1">From</span>
-                            <span className="text-xs font-black text-[#1F5632] whitespace-nowrap">Dubbo, AUSTRALIA</span>
+                            <span className="text-xs xl:text-sm text-gray-500 font-bold uppercase tracking-widest leading-none mb-1">From</span>
+                            <span className="text-sm xl:text-base font-black text-[#1F5632] whitespace-nowrap">Dubbo, AUSTRALIA</span>
                         </div>
-                        <ChevronDown className="h-3 w-3 text-gray-400 group-hover:text-[#1F5632] transition-colors ml-1" />
+                        <ChevronDown className="h-3.5 w-3.5 xl:h-4 xl:w-4 text-gray-400 group-hover:text-[#1F5632] transition-colors ml-1" />
                     </div>
 
                     {/* Search Bar */}
-                    <div className="flex-1 max-w-4xl hidden md:flex items-center px-4 search-container relative">
-                        <div className="flex w-full h-11 items-center bg-[#F3F4F6] rounded-md overflow-hidden ring-1 ring-gray-200 focus-within:ring-2 focus-within:ring-[#1F5632]/50 transition-all">
+                    <div className="flex-1 min-w-0 max-w-3xl lg:max-w-5xl xl:max-w-none hidden md:flex items-center px-2 md:px-4 search-container relative">
+                        <div className="flex w-full h-11 xl:h-12 items-center bg-[#F3F4F6] rounded-md overflow-hidden ring-1 ring-gray-200 focus-within:ring-2 focus-within:ring-[#1F5632]/50 transition-all">
 
                             <Input
                                 type="text"
@@ -466,7 +467,7 @@ export function Navbar() {
                                         executeSearch(searchQuery, selectedSearchCategory);
                                     }
                                 }}
-                                className="flex-1 h-full border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-base bg-[#F3F4F6] shadow-none"
+                                className="flex-1 h-full border-0 focus-visible:ring-0 text-gray-700 placeholder:text-gray-500 px-4 text-base md:text-base lg:text-lg bg-[#F3F4F6] shadow-none placeholder:md:text-base"
                                 placeholder="Search products..."
                             />
                             <button
@@ -474,9 +475,9 @@ export function Navbar() {
                                 className="h-full px-4 text-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center"
                             >
                                 {searchLoading ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    <Loader2 className="h-5 w-5 lg:h-6 lg:w-6 animate-spin" />
                                 ) : (
-                                    <Search className="h-5 w-5" />
+                                    <Search className="h-5 w-5 lg:h-6 lg:w-6" />
                                 )}
                             </button>
                         </div>
@@ -488,7 +489,7 @@ export function Navbar() {
                                     {searchResults.map((product) => {
                                         const imgs = getProductImages(product);
                                         const primary = imgs.find((img) => img.isPrimary) || imgs[0];
-                                        const imageUrl = primary ? getProductImageUrl(primary) : "/placeholder.png";
+                                        const imageUrl = getProductImageUrl(primary);
                                         return (
                                             <Link
                                                 key={product.id}
@@ -509,20 +510,20 @@ export function Navbar() {
                                                     />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="font-semibold text-sm text-[#253D4E] truncate">
-                                                        {product.productName}
-                                                    </h4>
-                                                    <p className="text-sm text-[#005000] font-bold">
-                                                        AUD {Number(product.price).toFixed(2)}
-                                                    </p>
-                                                </div>
-                                            </Link>
-                                        );
-                                    })}
-                                    {searchQuery.trim() && (
-                                        <button
-                                            onClick={() => executeSearch(searchQuery, selectedSearchCategory)}
-                                            className="w-full block p-3 text-center text-sm font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2"
+                                                <h4 className="font-semibold text-sm text-[#253D4E] truncate">
+                                                    {product.productName}
+                                                </h4>
+                                                <p className="text-sm text-[#005000] font-bold">
+                                                    AUD {Number(product.price).toFixed(2)}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
+                                {searchQuery.trim() && (
+                                    <button
+                                        onClick={() => executeSearch(searchQuery, selectedSearchCategory)}
+                                        className="w-full block p-3 text-center text-sm font-semibold text-[#005000] hover:bg-gray-50 rounded-lg border-t border-gray-200 mt-2"
                                         >
                                             View all results for "{searchQuery}"
                                             {selectedSearchCategory && <span className="text-gray-400 font-normal"> in {selectedSearchCategory.category}</span>}
@@ -545,14 +546,100 @@ export function Navbar() {
                             aria-label="Search"
                             aria-expanded={isMobileSearchOpen}
                         >
-                            <Search className="w-5 h-5 text-gray-700" />
+                            <Search className="w-6 h-6 text-gray-700" />
                         </button>
 
-                        {/* Sign In / User Account */}
+                        {/* Notifications */}
+                        {isLoggedIn && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="flex items-center justify-center min-h-[44px] min-w-[44px] md:h-10 md:w-10 md:min-h-0 md:min-w-0 hover:bg-gray-100 rounded-full transition-colors relative outline-none touch-manipulation">
+                                        <Bell className={`h-5 w-5 md:h-6 md:w-6 ${unreadCount > 0 ? "text-[#1F5632] fill-[#1F5632]/10" : "text-gray-700"}`} />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-0 right-0 h-3.5 w-3.5 md:h-4 md:w-4 bg-red-500 text-white text-[9px] md:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                                {unreadCount > 9 ? '9+' : unreadCount}
+                                            </span>
+                                        )}
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-80 p-0 overflow-hidden rounded-xl shadow-xl">
+                                    <div className="bg-[#1F5632] p-4 text-white flex items-center justify-between">
+                                        <h3 className="font-bold text-sm">Notifications</h3>
+                                        {unreadCount > 0 && (
+                                            <span className="text-[10px] bg-red-500 px-2 py-0.5 rounded-full font-bold">
+                                                {unreadCount} NEW
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                        {notifications.length === 0 ? (
+                                            <div className="p-8 text-center text-gray-400">
+                                                <Bell className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                                                <p className="text-xs">No notifications yet</p>
+                                            </div>
+                                        ) : (
+                                            notifications.map((notif) => (
+                                                <button
+                                                    key={notif.id}
+                                                    onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
+                                                    className={`w-full text-left p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 relative ${!notif.isRead ? "bg-green-50/30" : ""
+                                                        }`}
+                                                >
+                                                    {!notif.isRead && (
+                                                        <span className="absolute left-2 top-4 w-1.5 h-1.5 bg-[#1F5632] rounded-full"></span>
+                                                    )}
+                                                    <h4 className={`text-xs font-bold mb-0.5 ${!notif.isRead ? "text-gray-900" : "text-gray-600"}`}>
+                                                        {notif.title}
+                                                    </h4>
+                                                    <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
+                                                        {notif.message}
+                                                    </p>
+                                                    <span className="text-[9px] text-gray-400 mt-2 block">
+                                                        {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </button>
+                                            ))
+                                        )}
+                                    </div>
+                                    <Link
+                                        href="/account/profile?tab=notifications"
+                                        className="block p-3 text-center text-[11px] font-bold text-[#1F5632] bg-gray-50 hover:bg-gray-100 transition-colors border-t border-gray-100"
+                                    >
+                                        View All Notifications
+                                    </Link>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
+
+                        {/* Wishlist - 44px touch target on mobile */}
+                        <Link href="/wishlist" className="flex items-center justify-center min-h-[44px] min-w-[44px] md:h-10 md:w-10 md:min-h-0 md:min-w-0 hover:bg-gray-100 rounded-full transition-colors relative touch-manipulation">
+                            <Heart className={`h-5 w-5 md:h-6 md:w-6 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
+                            {wishlist.length > 0 && (
+                                <span className="absolute top-0 right-0 h-3.5 w-3.5 md:h-4 md:w-4 bg-red-500 text-white text-[9px] md:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                    {wishlist.length > 9 ? '9+' : wishlist.length}
+                                </span>
+                            )}
+                        </Link>
+
+                        {/* Cart - 44px touch target on mobile */}
+                        <button
+                            onClick={toggleModal}
+                            className="flex items-center justify-center min-h-[44px] min-w-[44px] md:h-10 md:w-10 md:min-h-0 md:min-w-0 hover:bg-gray-100 rounded-full transition-colors relative outline-none touch-manipulation"
+                        >
+                            <CartOutlineIcon className="h-5 w-5 md:h-6 md:w-6 text-gray-800" />
+                            {cart.length > 0 && (
+                                <span className="absolute top-0 right-0 h-3.5 w-3.5 md:h-4 md:w-4 bg-[#1F5632] text-white text-[9px] md:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                    {cart.length > 9 ? '9+' : cart.length}
+                                </span>
+                            )}
+                        </button>
+                        <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+
+                        {/* Login / User — right corner (after cart) */}
                         {isLoggedIn ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <button className="flex items-center gap-1 md:gap-2 hover:opacity-90 transition-opacity p-1 rounded-full outline-none ring-2 ring-transparent hover:ring-[#005000]/30 focus:ring-2 focus:ring-[#005000]/50">
+                                    <button className="flex items-center gap-1 md:gap-2 hover:opacity-90 transition-opacity p-1 rounded-full outline-none ring-2 ring-transparent hover:ring-[#005000]/30 focus:ring-2 focus:ring-[#005000]/50 shrink-0">
                                         {userProfileImg ? (
                                             <span className="relative h-8 w-8 md:h-9 md:w-9 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
                                                 <img
@@ -647,104 +734,18 @@ export function Navbar() {
                         ) : (
                             <Link
                                 href="/signin"
-                                className="hidden md:inline-flex items-center justify-center gap-2 h-10 px-6 rounded-full bg-[#1F5632] hover:bg-[#174428] text-white text-sm font-bold transition-transform active:scale-95 shadow-md"
+                                className="inline-flex items-center justify-center gap-1.5 min-h-[44px] h-9 md:h-10 px-3 sm:px-4 md:px-6 rounded-full bg-[#1F5632] hover:bg-[#174428] text-white text-xs sm:text-sm font-bold transition-transform active:scale-95 shadow-md shrink-0"
                             >
-                                Sign In
+                                Login
                             </Link>
                         )}
-
-                        {/* Notifications */}
-                        {isLoggedIn && (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="flex items-center justify-center min-h-[44px] min-w-[44px] md:h-10 md:w-10 md:min-h-0 md:min-w-0 hover:bg-gray-100 rounded-full transition-colors relative outline-none touch-manipulation">
-                                        <Bell className={`h-5 w-5 md:h-6 md:w-6 ${unreadCount > 0 ? "text-[#1F5632] fill-[#1F5632]/10" : "text-gray-700"}`} />
-                                        {unreadCount > 0 && (
-                                            <span className="absolute top-0 right-0 h-3.5 w-3.5 md:h-4 md:w-4 bg-red-500 text-white text-[9px] md:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                                                {unreadCount > 9 ? '9+' : unreadCount}
-                                            </span>
-                                        )}
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-80 p-0 overflow-hidden rounded-xl shadow-xl">
-                                    <div className="bg-[#1F5632] p-4 text-white flex items-center justify-between">
-                                        <h3 className="font-bold text-sm">Notifications</h3>
-                                        {unreadCount > 0 && (
-                                            <span className="text-[10px] bg-red-500 px-2 py-0.5 rounded-full font-bold">
-                                                {unreadCount} NEW
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                        {notifications.length === 0 ? (
-                                            <div className="p-8 text-center text-gray-400">
-                                                <Bell className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                                                <p className="text-xs">No notifications yet</p>
-                                            </div>
-                                        ) : (
-                                            notifications.map((notif) => (
-                                                <button
-                                                    key={notif.id}
-                                                    onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
-                                                    className={`w-full text-left p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 relative ${!notif.isRead ? "bg-green-50/30" : ""
-                                                        }`}
-                                                >
-                                                    {!notif.isRead && (
-                                                        <span className="absolute left-2 top-4 w-1.5 h-1.5 bg-[#1F5632] rounded-full"></span>
-                                                    )}
-                                                    <h4 className={`text-xs font-bold mb-0.5 ${!notif.isRead ? "text-gray-900" : "text-gray-600"}`}>
-                                                        {notif.title}
-                                                    </h4>
-                                                    <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
-                                                        {notif.message}
-                                                    </p>
-                                                    <span className="text-[9px] text-gray-400 mt-2 block">
-                                                        {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </span>
-                                                </button>
-                                            ))
-                                        )}
-                                    </div>
-                                    <Link
-                                        href="/account/profile?tab=notifications"
-                                        className="block p-3 text-center text-[11px] font-bold text-[#1F5632] bg-gray-50 hover:bg-gray-100 transition-colors border-t border-gray-100"
-                                    >
-                                        View All Notifications
-                                    </Link>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        )}
-
-                        {/* Wishlist - 44px touch target on mobile */}
-                        <Link href="/wishlist" className="flex items-center justify-center min-h-[44px] min-w-[44px] md:h-10 md:w-10 md:min-h-0 md:min-w-0 hover:bg-gray-100 rounded-full transition-colors relative touch-manipulation">
-                            <Heart className={`h-5 w-5 md:h-6 md:w-6 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : "text-gray-700"}`} />
-                            {wishlist.length > 0 && (
-                                <span className="absolute top-0 right-0 h-3.5 w-3.5 md:h-4 md:w-4 bg-red-500 text-white text-[9px] md:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                                    {wishlist.length > 9 ? '9+' : wishlist.length}
-                                </span>
-                            )}
-                        </Link>
-
-                        {/* Cart - 44px touch target on mobile */}
-                        <button
-                            onClick={toggleModal}
-                            className="flex items-center justify-center min-h-[44px] min-w-[44px] md:h-10 md:w-10 md:min-h-0 md:min-w-0 hover:bg-gray-100 rounded-full transition-colors relative outline-none touch-manipulation"
-                        >
-                            <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-gray-800" />
-                            {cart.length > 0 && (
-                                <span className="absolute top-0 right-0 h-3.5 w-3.5 md:h-4 md:w-4 bg-[#1F5632] text-white text-[9px] md:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                                    {cart.length > 9 ? '9+' : cart.length}
-                                </span>
-                            )}
-                        </button>
-                        <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
                     </div>
                 </div>
             </div>
 
-            {/* Green Category Navigation Bar - Fixed alignment (desktop only) */}
-            <div className="hidden md:flex bg-[#1F5632] text-white h-12 fixed top-[72px] md:top-[80px] left-0 right-0 w-full z-40 shadow-md">
-                <div className="flex items-center h-full w-full pl-0 min-w-0">
+            {/* Green Category Navigation Bar - Same horizontal frame as white navbar (desktop only) */}
+            <div className="hidden md:flex bg-[#1F5632] text-white h-12 xl:h-14 fixed top-[72px] md:top-20 left-0 right-0 w-full z-40 shadow-md">
+                <div className="flex items-center h-full w-full px-3 sm:px-4 md:px-5 lg:px-6 xl:px-8 2xl:px-12 min-w-0">
                     {/* All Button - Left Side with Hamburger */}
                     <DropdownMenu open={allMenuOpen} onOpenChange={(open) => {
                         setAllMenuOpen(open);
@@ -881,7 +882,7 @@ export function Navbar() {
                                             </div>
                                         ) : (
                                             <div className="flex-1 flex flex-col items-center justify-center text-center text-gray-400">
-                                                <ShoppingBag className="h-12 w-12 mb-3 opacity-20" />
+                                                <CartOutlineIcon className="h-12 w-12 mb-3 opacity-20 text-gray-400" />
                                                 <p className="text-sm font-medium">No products found</p>
                                                 <Link
                                                     href={`/shop?category=${activeCategory.id}`}
@@ -897,8 +898,8 @@ export function Navbar() {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    {/* Main Navigation Links - Horizontal */}
-                    <div className="flex-1 flex items-center h-full overflow-x-auto scrollbar-hide px-2">
+                    {/* Main navigation: equal flex segments so active/hover dark bg touches — no light-green gaps (avoid justify-between) */}
+                    <div className="flex flex-1 min-w-0 items-stretch h-full overflow-x-auto scrollbar-hide">
                         {navLinks.map((link, index) => {
                             const isActive =
                                 link.href === "/"
@@ -909,17 +910,19 @@ export function Navbar() {
                                 <Link
                                     key={index}
                                     href={link.href}
-                                    className={`h-full flex items-center gap-2 px-6 text-sm font-bold whitespace-nowrap uppercase tracking-wider transition-colors ${
+                                    className={`h-full flex items-center justify-center gap-1.5 px-1.5 sm:px-2 md:px-3 text-sm xl:text-base font-bold whitespace-nowrap uppercase tracking-wide xl:tracking-wider transition-colors ${
+                                        isHighlight ? "flex-[1.25] min-w-[13rem]" : "flex-1 min-w-0"
+                                    } ${
                                         isActive
                                             ? "bg-[#174428] text-white"
                                             : isHighlight
-                                                ? "text-amber-200 hover:bg-amber-500/30 hover:text-white"
-                                                : "text-white/90 hover:bg-[#174428]/80 hover:text-white"
+                                                ? "text-amber-200 hover:bg-[#174428]/85 hover:text-white"
+                                                : "text-white/90 hover:bg-[#174428]/75 hover:text-white"
                                     }`}
                                 >
                                     {link.name}
                                     {isHighlight && (
-                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-400/90 text-[#174428]">
+                                        <span className="hidden xl:inline-flex shrink-0 px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-400/90 text-[#174428]">
                                             Deals
                                         </span>
                                     )}
@@ -930,9 +933,9 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* Spacer so content starts below fixed nav (includes safe-area on mobile) */}
+            {/* Spacer: exact height of fixed white row + green category bar (md+), or mobile nav row only — no extra gap above hero/content. */}
             <div
-                className={`md:h-[96px] ${isMobileSearchOpen
+                className={`md:h-[128px] xl:h-[136px] ${isMobileSearchOpen
                     ? 'h-[calc(4rem+80px+env(safe-area-inset-top,0px))] sm:h-[calc(72px+80px+env(safe-area-inset-top,0px))]'
                     : 'h-[calc(4rem+env(safe-area-inset-top,0px))] sm:h-[calc(72px+env(safe-area-inset-top,0px))]'
                     }`}
@@ -953,10 +956,10 @@ export function Navbar() {
                 <div className="md:hidden fixed left-0 right-0 bottom-0 bg-white/75 backdrop-blur-2xl border-b border-white/20 shadow-2xl z-30 overflow-y-auto top-[calc(4rem+env(safe-area-inset-top,0px))] sm:top-[calc(72px+env(safe-area-inset-top,0px))] max-h-[calc(100vh-4rem-env(safe-area-inset-top,0px))] sm:max-h-[calc(100vh-72px-env(safe-area-inset-top,0px))] pb-[env(safe-area-inset-bottom,0px)]">
                     <div className="px-4 py-3 space-y-1 pb-4">
                         {/* Location Info - Mobile */}
-                        <div className="flex items-center gap-2 px-4 py-3 mb-2 text-sm text-gray-800 border-b border-white/20">
-                            <MapPin className="h-4 w-4 text-gray-600" />
+                        <div className="flex items-center gap-2 px-4 py-3 mb-2 text-base text-gray-800 border-b border-white/20">
+                            <MapPin className="h-5 w-5 text-gray-600 shrink-0" />
                             <div className="flex flex-col flex-1">
-                                <span className="text-gray-900 font-bold text-xs">Dubbo, AUSTRALIA</span>
+                                <span className="text-gray-900 font-bold text-sm">Dubbo, AUSTRALIA</span>
                             </div>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
@@ -976,7 +979,7 @@ export function Navbar() {
                                     key={index}
                                     href={link.href}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`flex items-center justify-between gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
+                                    className={`flex items-center justify-between gap-2 px-4 py-3 rounded-lg text-base font-semibold transition-all ${
                                         isActive
                                             ? "bg-[#005000]/90 backdrop-blur-sm text-white shadow-lg"
                                             : isHighlight
@@ -1000,7 +1003,7 @@ export function Navbar() {
                         {/* Categories Section */}
                         {categories.length > 0 && (
                             <>
-                                <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                <div className="px-4 py-2 text-sm font-bold text-gray-500 uppercase tracking-wider">
                                     Categories
                                 </div>
                                 {categories.map((category) => (
@@ -1008,7 +1011,7 @@ export function Navbar() {
                                         key={category.id}
                                         href={`/shop?category=${category.id}`}
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm transition-all"
+                                        className="block px-4 py-2.5 rounded-lg text-base font-medium text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm transition-all"
                                     >
                                         {category.category}
                                     </Link>
@@ -1023,10 +1026,10 @@ export function Navbar() {
                                 <Link
                                     href="/account/profile?tab=notifications"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm transition-all"
+                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-base font-semibold text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm transition-all"
                                 >
                                     <div className="relative">
-                                        <Bell className="h-4 w-4" />
+                                        <Bell className="h-5 w-5" />
                                         {unreadCount > 0 && (
                                             <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
                                         )}
@@ -1044,9 +1047,9 @@ export function Navbar() {
                         <Link
                             href="/wishlist"
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                            className="flex items-center gap-2 px-4 py-3 rounded-lg text-base font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
                         >
-                            <Heart className={`h-4 w-4 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : ""}`} />
+                            <Heart className={`h-5 w-5 ${wishlist.length > 0 ? "text-red-500 fill-red-500" : ""}`} />
                             Wishlist
                             {wishlist.length > 0 && (
                                 <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
@@ -1060,25 +1063,25 @@ export function Navbar() {
                                 <Link
                                     href="/account/profile"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm transition-all"
+                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-base font-semibold text-gray-700 hover:bg-white/50 hover:backdrop-blur-sm transition-all"
                                 >
-                                    <User className="h-4 w-4" />
+                                    <User className="h-5 w-5" />
                                     My Account
                                 </Link>
                                 <Link
                                     href="/account/profile?tab=orders"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
                                 >
-                                    <Package className="h-4 w-4" />
+                                    <Package className="h-5 w-5" />
                                     My Orders
                                 </Link>
                                 <Link
                                     href="/account/profile?tab=membership"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
                                 >
-                                    <Crown className="h-4 w-4" />
+                                    <Crown className="h-5 w-5" />
                                     Membership
                                 </Link>
                                 <button
@@ -1086,9 +1089,9 @@ export function Navbar() {
                                         handleLogout();
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50/50 hover:backdrop-blur-sm transition-all"
+                                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-base font-semibold text-red-600 hover:bg-red-50/50 hover:backdrop-blur-sm transition-all"
                                 >
-                                    <LogOut className="h-4 w-4" />
+                                    <LogOut className="h-5 w-5" />
                                     Logout
                                 </button>
                             </>
@@ -1096,10 +1099,10 @@ export function Navbar() {
                             <Link
                                 href="/signin"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold bg-[#005000]/90 backdrop-blur-sm text-white hover:bg-[#006600]/90 hover:backdrop-blur-sm transition-all justify-center shadow-lg"
+                                className="flex items-center gap-2 px-4 py-3 rounded-lg text-base font-semibold bg-[#005000]/90 backdrop-blur-sm text-white hover:bg-[#006600]/90 hover:backdrop-blur-sm transition-all justify-center shadow-lg"
                             >
-                                <User className="h-4 w-4" />
-                                Sign In
+                                <User className="h-5 w-5" />
+                                Login
                             </Link>
                         )}
                     </div>

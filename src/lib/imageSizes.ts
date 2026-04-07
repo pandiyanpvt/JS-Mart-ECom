@@ -4,17 +4,17 @@
  */
 
 export const IMAGE_SIZES = {
-  /** Hero / header carousel (homepage). HeroSection: aspect-[16/5], max-h 600px */
+  /** Hero / header carousel (homepage). HeroSection: aspect-[16/5], max-h 85vh, object-contain */
   heroBanner: { width: 1920, height: 600, aspect: "16:5" },
 
   /** Page headers (shop, offers, about, contact, membership). aspect-[16/5], min-h 180px max-h 360px */
   pageHeader: { width: 1920, height: 600, aspect: "16:5" },
 
-  /** Mid-page promo strip cards (Level 3 & 4). MiddleBannerSection: aspect-[3/2], same as category strip */
+  /** Mid-page promo strip cards (Level 3). MiddleBannerSection: aspect-[12/5] cards */
   midPageBanner: { width: 600, height: 400, aspect: "3:2" },
 
-  /** Footer promotional strip (Level 5). FooterBannerSection: h 200–350px, full width */
-  footerBanner: { width: 1920, height: 420, aspect: "~32:7" },
+  /** Home wide strip banners (Level 4 & Level 5). aspect-[32/5] */
+  footerBanner: { width: 1920, height: 300, aspect: "32:5" },
 
   /** Category banner (category strip & category-banners-section). aspect-[3/2], card 280–320px wide */
   categoryBanner: { width: 600, height: 400, aspect: "3:2" },

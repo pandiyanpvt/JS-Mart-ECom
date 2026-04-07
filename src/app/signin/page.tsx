@@ -10,7 +10,8 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { authService } from "@/services";
 import toast from "react-hot-toast";
-import Cookies from "js-cookie";
+import { AuthFormCornerLogo, AuthHeroCornerLogo } from "@/components/layout/auth-page-logo";
+import { AuthSplitLayout } from "@/components/layout/auth-split-layout";
 
 export default function SignInPage() {
     const router = useRouter();
@@ -81,19 +82,20 @@ export default function SignInPage() {
                 prompt: "select_account"
             });
         } catch (error) {
-            console.error("Google sign in error:", error);
-            toast.error("Failed to sign in with Google");
+            console.error("Google login error:", error);
+            toast.error("Failed to log in with Google");
         }
     };
 
     return (
-        <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+        <AuthSplitLayout>
             {/* Left Side - Image */}
-            <div className="relative hidden md:block w-full h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+            <div className="relative hidden md:block w-full min-h-[280px] md:min-h-screen h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+                <AuthHeroCornerLogo />
                 <div className="absolute inset-0 flex items-center justify-center">
                     <Image
-                        src="/auth-image.png"
-                        alt="Shopping Illustration"
+                        src="/Loginnew.png"
+                        alt="Fresh groceries in a shopping cart"
                         fill
                         className="object-cover object-center hover:scale-105 transition-transform duration-700"
                         priority
@@ -103,34 +105,47 @@ export default function SignInPage() {
 
             {/* Right Side - Form */}
             <div
-                className="flex flex-col justify-center px-8 md:px-24 py-12 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+                className="flex flex-col justify-center px-8 py-12 md:px-10 lg:px-14 xl:px-16 2xl:px-20 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+                <AuthFormCornerLogo />
                 <Button
                     variant="ghost"
-                    className="absolute top-8 left-8 md:top-12 md:left-12 hover:bg-gray-100/80 transition-all duration-300"
+                    className="absolute top-8 left-6 md:top-12 md:left-12 text-slate-600 hover:bg-gray-100/80 md:hover:bg-slate-100/90 transition-all duration-300 text-sm font-medium gap-2 md:hover:text-[#253D4E]"
                     asChild
                 >
-                    <Link href="/">
-                        <ArrowLeft />
-                        Back
+                    <Link href="/" aria-label="Back" title="Back">
+                        <ArrowLeft className="h-4 w-4" />
                     </Link>
                 </Button>
-                <div className="w-full max-w-md mx-auto space-y-8">
-                    <div className="space-y-2">
-                        <h1 className="text-3xl md:text-4xl font-medium tracking-wide text-black">
+                <div className="w-full max-w-md xl:max-w-lg mx-auto space-y-8">
+                    {/* Small screens: original title + subtitle */}
+                    <header className="space-y-2 pt-14 md:hidden">
+                        <h1 className="text-3xl font-medium tracking-wide text-black">
                             Log in to JS Mart
                         </h1>
-                        <p className="text-black/60 text-base">
-                            Enter your details below
+                        <p className="text-black/60 text-base">Enter your details below</p>
+                    </header>
+                    {/* md+: refreshed typography */}
+                    <header className="hidden md:block space-y-3 pt-0">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#005000]">
+                            Welcome back
                         </p>
-                    </div>
+                        <h1 className="text-4xl font-bold tracking-tight text-[#253D4E] leading-[1.15]">
+                            Sign in to your account
+                        </h1>
+                    </header>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+                            <div
+                                role="alert"
+                                className="bg-red-50 md:bg-rose-50 border border-red-200 md:border-rose-100 text-red-600 md:text-rose-700 px-4 py-3 rounded-md md:rounded-xl text-sm font-medium md:leading-snug"
+                            >
                                 {error}
                             </div>
                         )}
-                        <div className="space-y-6">
+
+                        {/* Small screens: underline inputs (original style) */}
+                        <div className="space-y-6 md:hidden">
                             <Input
                                 type="text"
                                 placeholder="Email or Phone Number"
@@ -152,6 +167,7 @@ export default function SignInPage() {
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
                                 >
                                     {showPassword ? (
                                         <EyeOff className="h-5 w-5" />
@@ -160,43 +176,97 @@ export default function SignInPage() {
                                     )}
                                 </button>
                             </div>
+                            <div className="flex items-center justify-end -mt-2">
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-[#DB4444] text-sm font-light hover:underline transition-all"
+                                >
+                                    Forgot Password?
+                                </Link>
+                            </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            {/* Placeholder for alignment or remember me if needed */}
-                            <div></div>
-                            <Link
-                                href="/forgot-password"
-                                className="text-[#DB4444] text-sm font-light hover:underline transition-all"
-                            >
-                                Forgot Password?
-                            </Link>
+                        {/* md+: labeled rounded fields */}
+                        <div className="hidden md:block space-y-5">
+                            <div className="space-y-2">
+                                <label htmlFor="signin-email" className="text-sm font-semibold text-[#253D4E]">
+                                    Email or phone
+                                </label>
+                                <Input
+                                    id="signin-email"
+                                    type="text"
+                                    placeholder="you@example.com or 07xxxxxxxx"
+                                    value={formData.emailOrPhone}
+                                    onChange={(e) => setFormData({ ...formData, emailOrPhone: e.target.value })}
+                                    className="h-12 rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-[15px] text-[#253D4E] placeholder:text-slate-400 shadow-sm transition-all focus-visible:border-[#005000] focus-visible:ring-[3px] focus-visible:ring-[#005000]/15 focus-visible:bg-white"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-baseline gap-2">
+                                    <label htmlFor="signin-password" className="text-sm font-semibold text-[#253D4E]">
+                                        Password
+                                    </label>
+                                    <Link
+                                        href="/forgot-password"
+                                        className="text-sm font-semibold text-[#005000] hover:text-[#006600] underline-offset-4 hover:underline transition-colors"
+                                    >
+                                        Forgot password?
+                                    </Link>
+                                </div>
+                                <div className="relative">
+                                    <Input
+                                        id="signin-password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Enter your password"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        className="h-12 rounded-xl border border-slate-200 bg-slate-50/50 pr-11 pl-4 text-[15px] text-[#253D4E] placeholder:text-slate-400 shadow-sm transition-all focus-visible:border-[#005000] focus-visible:ring-[3px] focus-visible:ring-[#005000]/15 focus-visible:bg-white w-full"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#253D4E] focus:outline-none rounded-md p-1"
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-5 w-5" />
+                                        ) : (
+                                            <Eye className="h-5 w-5" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="space-y-4 pt-2">
+                        <div className="space-y-4 pt-2 md:pt-1">
                             <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                                className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] md:bg-[#005000] md:hover:bg-[#006600] text-white font-medium md:font-semibold text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 md:hover:translate-y-0 md:rounded-xl md:shadow-[#005000]/20 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                             >
-                                {loading ? "Logging in..." : "Log In"}
+                                <span className="md:hidden">{loading ? "Logging in..." : "Log In"}</span>
+                                <span className="hidden md:inline">{loading ? "Signing in…" : "Sign in"}</span>
                             </Button>
                         </div>
 
-                        <div className="flex items-center justify-center gap-2 text-gray-600">
-                            <span>Don't have an account?</span>
+                        <p className="flex flex-wrap items-center justify-center gap-1 text-center text-sm text-gray-600 md:text-slate-600">
+                            <span>Don&apos;t have an account?</span>
                             <Link
                                 href="/signup"
-                                className="text-black font-medium border-b border-black/50 hover:border-black pb-0.5 leading-none transition-colors"
+                                className="text-black font-medium border-b border-black/50 hover:border-black pb-0.5 leading-none transition-colors md:border-0 md:pb-0 md:font-semibold md:text-[#005000] md:hover:text-[#006600] md:underline-offset-4 md:hover:underline"
                             >
                                 Sign Up
                             </Link>
-                        </div>
-                        {/* Divider */}
-                        <div className="flex items-center gap-4 py-4">
-                            <div className="h-px flex-1 bg-gray-200" />
-                            <span className="text-sm text-gray-400">Or, login with</span>
-                            <div className="h-px flex-1 bg-gray-200" />
+                        </p>
+                        <div className="flex items-center gap-4 py-2 md:py-2">
+                            <div className="h-px flex-1 bg-gray-200 md:bg-slate-200" />
+                            <span className="text-sm text-gray-400 md:text-[11px] md:font-semibold md:uppercase md:tracking-[0.18em] md:text-slate-400">
+                                <span className="md:hidden">Or, login with</span>
+                                <span className="hidden md:inline">Or continue with</span>
+                            </span>
+                            <div className="h-px flex-1 bg-gray-200 md:bg-slate-200" />
                         </div>
 
                         {/* Social Login */}
@@ -205,7 +275,7 @@ export default function SignInPage() {
                                 onClick={() => handleGoogleLogin()}
                                 type="button"
                                 variant="outline"
-                                className="w-full h-12 border border-gray-300 text-gray-700 font-medium text-base rounded flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors duration-300"
+                                className="w-full h-12 border border-gray-300 md:border-slate-200 bg-white text-gray-700 md:text-[#253D4E] font-medium md:font-semibold text-base md:text-[15px] rounded md:rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 md:hover:bg-slate-50 md:hover:border-slate-300 transition-colors duration-300 md:shadow-sm"
                             >
                                 <svg className="w-6 h-6" viewBox="0 0 24 24">
                                     <path
@@ -225,13 +295,14 @@ export default function SignInPage() {
                                         fill="#EA4335"
                                     />
                                 </svg>
-                                Sign in with Google
+                                <span className="md:hidden">Login with Google</span>
+                                <span className="hidden md:inline">Continue with Google</span>
                             </Button>
                         </div>
 
                     </form>
                 </div>
             </div>
-        </div>
+        </AuthSplitLayout>
     );
 }

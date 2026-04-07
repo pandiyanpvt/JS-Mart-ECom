@@ -122,12 +122,16 @@
     @apply border-border outline-ring/50;
   }
 
+  /* Single base font scale on all viewports (consistent laptop / desktop; no rem “zoom” on wide screens). */
   html {
     overflow-x: hidden;
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-base;
     overflow-x: hidden;
     min-width: 0;
   }
@@ -201,4 +205,41 @@
 }
 .animate-pulse-slow {
   animation: pulse-slow 3s infinite;
+}
+
+/* animate.css style helpers used by banner carousels */
+.animate__animated {
+  animation-duration: 700ms;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+@keyframes animateSlideInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(8%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes animateSlideInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-8%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate__slideInRight {
+  animation-name: animateSlideInRight;
+}
+
+.animate__slideInLeft {
+  animation-name: animateSlideInLeft;
 }

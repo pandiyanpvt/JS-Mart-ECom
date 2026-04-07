@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ErrorMessage, Field } from "@/components/ui/fieldset";
 import { Heading } from "@/components/ui/heading";
+import { resolveImageSrc } from "@/lib/images";
 
 interface CartItem {
   id: string;
@@ -79,7 +80,7 @@ const OrderSummary = ({
               <div className="relative shrink-0">
                 <div className="size-24 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
                   <img
-                    src={item.image || "/placeholder.png"}
+                    src={resolveImageSrc(item.image)}
                     alt={item.name}
                     className="h-full w-full object-cover"
                   />

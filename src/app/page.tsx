@@ -7,12 +7,13 @@ import HeroSection from "@/components/hero-section";
 import PopularProducts from "@/components/popular-products";
 import MiddleBannerSection from "@/components/middle-banner-section";
 import OfferCardSection from "@/components/offer-card-section";
-import CategoryBannersSection from "@/components/category-banners-section";
 import FooterBannerSection from "@/components/footer-banner-section";
 import PromoStatsStrip from "@/components/promo/PromoStatsStrip";
 import FlashSaleBanner from "@/components/promo/FlashSaleBanner";
 import CouponDealsStrip from "@/components/promo/CouponDealsStrip";
 import { offerService } from "@/services/offer.service";
+import Level2BannerSection from "@/components/level2-banner-section";
+import Level4BannerSection from "@/components/level4-banner-section";
 
 export default function HomePage() {
   const [activeOffersCount, setActiveOffersCount] = useState(0);
@@ -59,33 +60,41 @@ export default function HomePage() {
       {/* Flash Sale / Flash Offers - before Featured Categories */}
       <FlashSaleBanner />
 
+      {/* Level 2: Category Hero banners */}
+      <Level2BannerSection />
+
+      {/* Level 3: Curated picks / Mid-Page cards */}
+      <MiddleBannerSection />
+
       {/* Featured Categories */}
       <section className="bg-white">
         <FeaturedCategories />
       </section>
 
-      {/* Shop by Category banners - before Popular Products */}
-      <CategoryBannersSection />
+      
 
       {/* Popular Products */}
       <section className="bg-slate-50">
         <PopularProducts />
       </section>
+       {/* Seasonal Highlights / Level 4 banners below Best Deals */}
+       <Level4BannerSection />
+
 
       {/* Coupon Codes Strip - Ticket-style cards */}
       <CouponDealsStrip />
 
-      {/* Mid-Page Banners - Level 3 */}
-      <MiddleBannerSection />
+      
 
+     
       {/* Best Deals / Offer Cards - with images from admin (bannerImg or product) */}
       <OfferCardSection />
 
+      {/* Footer Promotional Banners - Level 5 */}
+      <FooterBannerSection />
       {/* Brand Section */}
       <BrandSection />
 
-      {/* Footer Promotional Banners - Level 5 */}
-      <FooterBannerSection />
     </main>
   );
 }

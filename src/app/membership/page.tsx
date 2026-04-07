@@ -21,7 +21,7 @@ export default function MembershipPage() {
             </div>
 
             <section className="w-full py-16 md:py-24 bg-white">
-                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h3 className="text-3xl md:text-4xl font-black text-[#253D4E] mb-4">
                             Why Choose JS Mart Membership?

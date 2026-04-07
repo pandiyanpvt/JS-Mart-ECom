@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Search, ArrowRight, ShoppingBag, HelpCircle, Truck, CreditCard, RefreshCcw } from "lucide-react";
+import { ChevronDown, Search, ArrowRight, HelpCircle, Truck, CreditCard, RefreshCcw } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -14,7 +15,7 @@ export default function FAQPage() {
         { icon: <Truck className="h-5 w-5" />, label: "Delivery" },
         { icon: <CreditCard className="h-5 w-5" />, label: "Orders & Payment" },
         { icon: <RefreshCcw className="h-5 w-5" />, label: "Returns" },
-        { icon: <ShoppingBag className="h-5 w-5" />, label: "Product Info" },
+        { icon: <CartOutlineIcon className="h-5 w-5" />, label: "Product Info" },
     ];
 
     const faqs = [
