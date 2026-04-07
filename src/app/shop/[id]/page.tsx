@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, use } from "react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { calculateProductDiscount, formatOfferValidity, type Offer } from "@/uti
 import { ProductCard } from "@/components/product-card";
 import { ProductReviews } from "./_components/ProductReviews";
 import { membershipService, UserSubscription } from "@/services/membership.service";
+import { authService } from "@/services/auth.service";
 import { cn } from "@/lib/utils";
 
 function adaptToLibProduct(p: BackendProduct): LibProduct {
@@ -46,6 +48,7 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
     const router = useRouter();
     const { addToCart } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+    const { data: session } = useSession();
 
     const [product, setProduct] = useState<BackendProduct | null>(null);
     const [offers, setOffers] = useState<Offer[]>([]);
@@ -129,6 +132,12 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
     };
 
     const handleBuyNow = () => {
+        const isAuth = !!session || authService.isAuthenticated();
+        if (!isAuth) {
+            toast.error("Please sign in to buy now");
+            router.push(`/signin?callbackUrl=/shop/${id}`);
+            return;
+        }
         if (!product) return;
         router.push(`/checkout?productId=${product.id}&qty=${quantity}`);
     };
@@ -430,11 +439,11 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                                 </div>
 
                                 {/* Actions: Add to Cart, Buy Now, Wishlist */}
-                                < div className="flex flex-col sm:flex-row gap-3" >
+                                <div className="flex flex-col sm:flex-row gap-3">
                                     <Button
                                         type="button"
                                         onClick={handleAddToCart}
-                                        disabled={Number(product.quantity) === 0}
+                                        disabled={product.quantity !== null && product.quantity !== undefined && Number(product.quantity) <= 0}
                                         variant="outline"
                                         className="flex-1 h-12 sm:h-12 border-2 border-[#005000] text-[#005000] hover:bg-[#005000] hover:text-white font-bold rounded-xl disabled:opacity-60 transition-colors text-sm sm:text-base"
                                     >
@@ -443,15 +452,15 @@ export default function ProductViewPage(props: { params: Promise<{ id: string }>
                                     <Button
                                         type="button"
                                         onClick={handleBuyNow}
-                                        disabled={Number(product.quantity) === 0}
+                                        disabled={product.quantity !== null && product.quantity !== undefined && Number(product.quantity) <= 0}
                                         className="flex-1 h-12 sm:h-12 bg-[#005000] hover:bg-[#006600] text-white font-bold rounded-xl disabled:opacity-60 transition-colors cursor-pointer text-sm sm:text-base"
                                     >
                                         Buy Now
                                     </Button>
-                                </div >
-                            </div >
-                        </div >
-                    </div >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Related Products Section */}
                     {

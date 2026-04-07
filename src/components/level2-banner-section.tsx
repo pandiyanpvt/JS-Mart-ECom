@@ -59,7 +59,7 @@ export default function Level2BannerSection() {
   return (
     <section className="w-full bg-white py-3 md:py-4">
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8">
-        <div className="relative group w-full h-[96px] sm:h-[118px] md:h-[132px] lg:h-[146px] xl:h-[156px] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
+        <div className="relative group w-full aspect-[32/5] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
           {banners.map((banner, index) => (
             <Link
               key={banner.id}

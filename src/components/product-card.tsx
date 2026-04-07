@@ -58,7 +58,7 @@ export function ProductCard({ product, compact }: ProductCardProps) {
     };
 
     return (
-        <div className="group w-full cursor-pointer" onClick={handleCardClick}>
+        <Link href={`/shop/${product.id}`} className="group w-full block">
             <div className="bg-white border border-gray-200 transition-all duration-300 hover:shadow-xl relative overflow-hidden h-full">
                 {/* Top Section with Image and Icons */}
                 <div className={`relative bg-gray-50 ${compact ? "p-2" : "p-4"}`}>
@@ -98,11 +98,11 @@ export function ProductCard({ product, compact }: ProductCardProps) {
                         >
                             <Heart className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"} ${inWishlist ? "fill-white text-white" : "text-gray-700 group-hover/icon:text-white"}`} />
                         </button>
-                        <Link href={`/shop/${product.id}`} onClick={(e) => e.stopPropagation()} className={compact ? "min-w-[44px] min-h-[44px] flex items-center justify-center" : ""}>
+                        <div className={compact ? "min-w-[44px] min-h-[44px] flex items-center justify-center" : ""}>
                             <button type="button" className={`bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#005000] hover:text-white transition-all group/icon touch-manipulation ${compact ? "min-w-[44px] min-h-[44px] w-9 h-9" : "w-9 h-9"}`} aria-label="View product">
                                 <Eye className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"} text-gray-700 group-hover/icon:text-white`} />
                             </button>
-                        </Link>
+                        </div>
                     </div>
 
                     {/* Product Image */}
@@ -159,6 +159,6 @@ export function ProductCard({ product, compact }: ProductCardProps) {
                     )}
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }

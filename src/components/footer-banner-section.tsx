@@ -62,7 +62,7 @@ export default function FooterBannerSection() {
                         target={banners[0].redirectLink?.startsWith('http') ? "_blank" : undefined}
                         className="block group"
                     >
-                        <div className="relative w-full h-[96px] sm:h-[118px] md:h-[132px] lg:h-[146px] xl:h-[156px] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
+                        <div className="relative w-full aspect-[32/5] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
                             <Image
                                 src={resolveImageSrc(banners[0].promotionImg)}
                                 alt="Promotional Banner"
@@ -106,7 +106,7 @@ function FooterBannerCarousel({ banners }: { banners: Promotion[] }) {
     return (
         <section className="w-full bg-white py-3 md:py-4">
             <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-                <div className="relative group w-full h-[96px] sm:h-[118px] md:h-[132px] lg:h-[146px] xl:h-[156px] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
+                <div className="relative group w-full aspect-[32/5] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
                     {banners.map((banner, index) => (
                         <Link
                             key={banner.id}
