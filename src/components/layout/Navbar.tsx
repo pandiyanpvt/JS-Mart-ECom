@@ -639,27 +639,32 @@ export function Navbar() {
                         {isLoggedIn ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <button className="flex items-center gap-1 md:gap-2 hover:opacity-90 transition-opacity p-1 rounded-full outline-none ring-2 ring-transparent hover:ring-[#005000]/30 focus:ring-2 focus:ring-[#005000]/50 shrink-0">
-                                        {userProfileImg ? (
-                                            <span className="relative h-8 w-8 md:h-9 md:w-9 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                                                <img
-                                                    src={userProfileImg}
-                                                    alt={userName}
-                                                    className="h-full w-full object-cover"
-                                                />
+                                    <button className="flex items-center gap-2 md:gap-3 hover:opacity-90 transition-opacity p-1.5 px-2 md:px-3 rounded-full outline-none border border-gray-100 hover:border-gray-200 bg-gray-50/50 hover:bg-gray-100/50 transition-all shadow-sm ring-2 ring-transparent focus:ring-[#005000]/50 shrink-0">
+                                        <div className="flex items-center gap-2">
+                                            {userProfileImg ? (
+                                                <span className="relative h-7 w-7 md:h-8 md:w-8 rounded-full overflow-hidden bg-white flex-shrink-0 ring-1 ring-gray-100">
+                                                    <img
+                                                        src={userProfileImg}
+                                                        alt={userName}
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                </span>
+                                            ) : (
+                                                <span className="relative h-7 w-7 md:h-8 md:w-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden ring-1 ring-gray-100">
+                                                    <Image
+                                                        src="/logo.png"
+                                                        alt="JS Mart"
+                                                        fill
+                                                        sizes="32px"
+                                                        className="object-contain p-1"
+                                                    />
+                                                </span>
+                                            )}
+                                            <span className="hidden sm:inline-block text-xs md:text-sm font-bold text-[#253D4E] whitespace-nowrap max-w-[120px] truncate">
+                                                {userName}
                                             </span>
-                                        ) : (
-                                            <span className="relative h-8 w-8 md:h-9 md:w-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
-                                                <Image
-                                                    src="/logo/Web_Logo_Mart-01%20(1).png"
-                                                    alt="JS Mart"
-                                                    fill
-                                                    sizes="36px"
-                                                    className="object-contain"
-                                                />
-                                            </span>
-                                        )}
-                                        <ChevronDown className="hidden md:block h-3.5 w-3.5 text-gray-600" />
+                                        </div>
+                                        <ChevronDown className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-64 p-2">

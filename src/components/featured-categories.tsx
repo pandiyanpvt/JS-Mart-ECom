@@ -61,12 +61,12 @@ export default function FeaturedCategories() {
                             href={`/shop?category=${category.id}`}
                             className="flex flex-col items-center gap-3 xl:gap-3.5 w-full max-w-[140px] xl:max-w-[160px] 2xl:max-w-[180px] group transition-opacity hover:opacity-90"
                         >
-                            <div className="relative w-24 h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 transform group-hover:scale-105 transition-transform duration-300 rounded-full border border-slate-200 bg-white p-3 lg:p-3.5 xl:p-4 2xl:p-4.5 shadow-sm">
+                            <div className="relative w-24 h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 transform group-hover:scale-105 transition-transform duration-300 rounded-full border border-slate-200 bg-white overflow-hidden shadow-sm">
                                 <Image
                                     src={resolveImageSrc(category.categoryImg)}
                                     alt={category.category}
                                     fill
-                                    className="object-contain p-3 lg:p-4"
+                                    className="object-cover"
                                     sizes="(max-width: 1024px) 96px, (max-width: 1280px) 112px, (max-width: 1536px) 128px, 144px"
                                 />
                             </div>
@@ -88,12 +88,12 @@ export default function FeaturedCategories() {
                             href={`/shop?category=${category.id}`}
                             className="flex-shrink-0 flex flex-col items-center gap-2 group transition-opacity hover:opacity-90 w-[92px]"
                         >
-                            <div className="relative w-16 h-16 rounded-full border border-slate-200 bg-white p-2 shadow-sm transform group-hover:scale-105 transition-transform duration-300">
+                            <div className="relative w-16 h-16 rounded-full border border-slate-200 bg-white overflow-hidden shadow-sm transform group-hover:scale-105 transition-transform duration-300">
                                 <Image
                                     src={resolveImageSrc(category.categoryImg)}
                                     alt={category.category}
                                     fill
-                                    className="object-contain p-2"
+                                    className="object-cover"
                                     sizes="64px"
                                 />
                             </div>

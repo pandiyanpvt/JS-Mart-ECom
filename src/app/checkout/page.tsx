@@ -870,6 +870,8 @@ const CheckoutContent = () => {
                                         </div>
                                     </div>
                                 </label>
+                                {/* Card Payment (Hidden for now) */}
+                                {/* 
                                 <label className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${paymentMethod === "card" ? "border-[#635bff] bg-indigo-50" : "border-gray-200 hover:border-gray-300"
                                     }`}>
                                     <input
@@ -892,13 +894,17 @@ const CheckoutContent = () => {
                                         </div>
                                     </div>
                                 </label>
+                                */}
                             </div>
+                            {/* Card Payment Message (Hidden for now) */}
+                            {/* 
                             {paymentMethod === "card" && (
                                 <div className="mt-3 p-3 bg-indigo-50 border border-indigo-100 rounded-lg flex items-start gap-2">
                                     <ShieldCheck className="w-4 h-4 text-indigo-600 mt-0.5 shrink-0" />
                                     <p className="text-xs text-indigo-700">You&apos;ll be redirected to Stripe&apos;s secure payment page to complete your purchase. Your card details are never stored on our servers.</p>
                                 </div>
                             )}
+                            */}
                         </div>
 
                         {/* Place Order Button */}
