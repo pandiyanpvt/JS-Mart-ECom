@@ -8,22 +8,11 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Tag, Percent } from "lucide-react";
 import { offerService } from "@/services/offer.service";
-import HeroSection, { HeroSlide } from "@/components/hero-section";
+import PageHero from "@/components/page-hero";
 import { membershipService, UserSubscription } from "@/services/membership.service";
 import { Crown, Gem, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const offersHeroSlides: HeroSlide[] = [
-  {
-    id: 1,
-    title: "Special Offers",
-    subtitle: "Discover Amazing Deals",
-    description: "Save big on your favorite products today.",
-    buttonText: "Shop Now",
-    buttonLink: "/shop",
-    image: "/images/headers/offers-header.png"
-  }
-];
+import { resolveImageSrc } from "@/lib/images";
 
 export default function OffersPage() {
   const [offers, setOffers] = useState([]);
@@ -108,11 +97,11 @@ export default function OffersPage() {
         offerName: offer.name, // Added offer name for banner title
         price: discountedPrice,
         originalPrice: originalPrice,
-        image: offer.bannerImg || product?.productImage || "/images/placeholder.png", // Prioritize Offer Banner
+        image: resolveImageSrc(offer.bannerImg || product?.productImage),
         description: product?.productDescription || offer.description || "Limited time storewide promotion",
         category: "Offers",
         badges: badges,
-        weight: "1kg", // Default
+        weight: "Per unit",
         inStock: true,
         brand: "JS Mart",
         offerTypeId: offer.offerTypeId, // Added for button logic
@@ -140,11 +129,17 @@ export default function OffersPage() {
 
   return (
     <main className="flex flex-col w-full min-w-0 overflow-x-hidden pb-[max(4rem,env(safe-area-inset-bottom))] bg-white">
-      <HeroSection slides={offersHeroSlides} />
+      <PageHero
+        image="/images/headers/offers-header.png"
+        imageAlt="Special offers"
+        title="Special Offers"
+        subtitle="Discover amazing deals and save big on your favorite products today."
+        align="center"
+      />
 
 
       {/* Offers Section */}
-      <section className="w-full max-w-[1600px] mx-auto py-12 px-4 md:px-6 lg:px-8">
+      <section className="w-full mx-auto py-12 px-4 md:px-6 lg:px-8">
 
 
         <div className="flex items-center justify-between mb-8">
@@ -164,7 +159,7 @@ export default function OffersPage() {
                 {/* Banner Image - match home card sizing */}
                 <div className="relative w-full bg-gray-50 flex items-center justify-center h-[140px] md:h-[180px]">
                   <Image
-                    src={item.image || "/images/placeholder.png"}
+                    src={item.image}
                     alt={item.offerName || item.name}
                     fill
                     className="object-contain group-hover:scale-105 transition-transform duration-500"

@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     User,
-    ShoppingBag,
     MessageSquare,
     MapPin,
     Star,
@@ -20,6 +19,7 @@ import Cookies from "js-cookie";
 import { userService } from "@/services";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 
 // Sub-components
 import { ProfileDetails } from "./_components/ProfileDetails";
@@ -39,7 +39,7 @@ function ProfileContent() {
 
     const menuItems = [
         { id: "profile", label: "My Profile", icon: User },
-        { id: "orders", label: "My Orders", icon: ShoppingBag },
+        { id: "orders", label: "My Orders", icon: CartOutlineIcon },
         { id: "reviews", label: "My Reviews", icon: MessageSquare },
         { id: "addresses", label: "Shipping Address", icon: MapPin },
         { id: "points", label: "My Points", icon: Star },
@@ -109,7 +109,7 @@ function ProfileContent() {
         <div className="min-h-screen bg-gray-50/50 pb-12 sm:pb-16 md:pb-20">
             {/* Top Banner / Header Area */}
             <div className="bg-[#005000] text-white pt-6 sm:pt-8 md:pt-12 pb-16 sm:pb-20 md:pb-24 px-3 sm:px-4 md:px-8 lg:px-12">
-                <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+                <div className="w-full mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
                     <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
                         <div className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 rounded-full border-2 sm:border-3 md:border-4 border-white/20 overflow-hidden bg-white flex items-center justify-center shadow-xl flex-shrink-0">
                             {user?.profileImg ? (
@@ -157,7 +157,7 @@ function ProfileContent() {
             </div>
 
             {/* Main Content Grid */}
-            <div className="max-w-[1700px] mx-auto px-3 sm:px-4 md:px-8 lg:px-12 -mt-8 sm:-mt-10 md:-mt-12">
+            <div className="w-full mx-auto px-3 sm:px-4 md:px-8 lg:px-12 -mt-8 sm:-mt-10 md:-mt-12">
                 <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-10">
                     {/* Left Sidebar */}
                     <aside className="w-full lg:w-[350px] shrink-0">

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { resolveImageSrc } from "@/lib/images";
 
 interface Promotion {
     id: number;
@@ -38,7 +39,7 @@ export default function FooterBannerSection() {
     if (loading) {
         return (
             <section className="w-full py-8 md:py-12 bg-slate-50">
-                <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                     <div className="flex items-center justify-center py-8">
                         <Loader2 className="w-8 h-8 animate-spin text-[#005000]" />
                     </div>
@@ -54,20 +55,20 @@ export default function FooterBannerSection() {
     // Single banner: no heading
     if (banners.length === 1) {
         return (
-            <section className="w-full py-6 md:py-12 bg-slate-50">
-                <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+            <section className="w-full bg-white py-3 md:py-4">
+                <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
                     <Link
                         href={banners[0].redirectLink || "/shop"}
                         target={banners[0].redirectLink?.startsWith('http') ? "_blank" : undefined}
                         className="block group"
                     >
-                        <div className="relative w-full h-[180px] sm:h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100 hover:shadow-xl transition-all rounded-lg md:rounded-none">
+                        <div className="relative w-full h-[96px] sm:h-[118px] md:h-[132px] lg:h-[146px] xl:h-[156px] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
                             <Image
-                                src={banners[0].promotionImg}
+                                src={resolveImageSrc(banners[0].promotionImg)}
                                 alt="Promotional Banner"
                                 fill
-                                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"
+                                className="object-cover object-center"
+                                sizes="100vw"
                             />
                         </div>
                     </Link>
@@ -94,26 +95,54 @@ function FooterBannerCarousel({ banners }: { banners: Promotion[] }) {
         return () => clearInterval(timer);
     }, [banners.length]);
 
+    const nextSlide = () => {
+        setCurrentIndex((prev) => (prev + 1) % banners.length);
+    };
+
+    const prevSlide = () => {
+        setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
+    };
+
     return (
-        <section className="w-full py-6 md:py-12 bg-slate-50">
-            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
-                <div className="relative w-full h-[180px] sm:h-[200px] md:h-[300px] lg:h-[350px] overflow-hidden shadow-md border border-slate-100 rounded-lg md:rounded-none">
+        <section className="w-full bg-white py-3 md:py-4">
+            <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+                <div className="relative group w-full h-[96px] sm:h-[118px] md:h-[132px] lg:h-[146px] xl:h-[156px] overflow-hidden rounded-xl md:rounded-2xl bg-slate-200">
                     {banners.map((banner, index) => (
                         <Link
                             key={banner.id}
                             href={banner.redirectLink || "/shop"}
                             target={banner.redirectLink?.startsWith('http') ? "_blank" : undefined}
-                            className={`absolute inset-0 block transition-opacity duration-500 ${index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"}`}
+                            className={`absolute inset-0 block transition-opacity duration-500 ${
+                                index === currentIndex
+                                    ? "opacity-100 z-10 animate__animated animate__slideInLeft"
+                                    : "opacity-0 z-0 pointer-events-none"
+                            }`}
                         >
                             <Image
-                                src={banner.promotionImg}
+                                src={resolveImageSrc(banner.promotionImg)}
                                 alt="Promotional Banner"
                                 fill
-                                className="object-cover"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"
+                                className="object-cover object-center"
+                                sizes="100vw"
                             />
                         </Link>
                     ))}
+                    <button
+                        type="button"
+                        onClick={prevSlide}
+                        className="absolute left-1.5 top-1/2 z-20 flex min-h-[40px] min-w-[40px] -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 md:left-2 md:opacity-0 md:group-hover:opacity-100"
+                        aria-label="Previous banner"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={nextSlide}
+                        className="absolute right-1.5 top-1/2 z-20 flex min-h-[40px] min-w-[40px] -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 md:right-2 md:opacity-0 md:group-hover:opacity-100"
+                        aria-label="Next banner"
+                    >
+                        <ChevronRight className="h-5 w-5" />
+                    </button>
                 </div>
             </div>
         </section>

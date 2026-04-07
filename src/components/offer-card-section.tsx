@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Tag } from "lucide-react";
 import { offerService } from "@/services/offer.service";
 import { Offer, getOfferImageUrl } from "@/utils/offerUtils";
 
@@ -40,19 +39,19 @@ export default function OfferCardSection() {
 
     return (
         <section className="w-full py-10 md:py-12 bg-white">
-            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                 <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 mb-4 md:mb-8">
-                    <h2 className="text-lg md:text-2xl font-extrabold text-[#253D4E] leading-tight">Best Deals</h2>
+                    <h2 className="text-lg md:text-2xl xl:text-3xl font-extrabold text-[#253D4E] leading-tight">Best Deals</h2>
                     <Link
                         href="/offers"
-                        className="shrink-0 px-3 py-2 md:px-5 md:py-3 md:min-h-[44px] flex items-center bg-[#005000] hover:bg-[#006600] text-white text-xs md:text-sm font-semibold transition-colors touch-manipulation rounded"
+                        className="shrink-0 px-3 py-2 md:px-5 md:py-3 md:min-h-[44px] xl:px-6 xl:py-3.5 flex items-center text-[#005000] hover:text-[#006600] text-xs md:text-sm xl:text-base font-bold transition-colors touch-manipulation rounded whitespace-nowrap"
                     >
                         View More
                     </Link>
                 </div>
                 {/* Mobile: horizontal scroll - smaller cards */}
                 <div
-                    className="flex md:hidden gap-3 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-4 px-4"
+                    className="flex md:hidden gap-3 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-4 px-4 snap-x snap-mandatory"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {offers.map((offer) => {
@@ -61,16 +60,10 @@ export default function OfferCardSection() {
                             <Link
                                 key={offer.id}
                                 href={offer.productId ? `/shop/${offer.productId}` : "/shop"}
-                                className="flex-shrink-0 w-[56vw] max-w-[200px] block bg-white overflow-hidden rounded-lg border border-slate-200 shadow-sm active:shadow-md active:scale-[0.98] transition-all"
+                                className="flex-shrink-0 w-[72vw] min-w-[220px] max-w-[280px] snap-start block bg-white overflow-hidden rounded-lg border border-slate-200 shadow-sm active:shadow-md active:scale-[0.98] transition-all"
                             >
                                 <div className="border-t-4 border-[#005000] relative h-24 w-full bg-slate-50 overflow-hidden">
-                                    {imgUrl ? (
-                                        <Image src={imgUrl} alt={offer.name || "Offer"} fill className="object-cover" sizes="(max-width: 768px) 56vw, 200px" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-[#005000]/5">
-                                            <Tag className="w-10 h-10 text-[#005000]/40" strokeWidth={1.5} />
-                                        </div>
-                                    )}
+                                    <Image src={imgUrl} alt={offer.name || "Offer"} fill className="object-cover" sizes="(max-width: 768px) 56vw, 200px" />
                                     <span className="absolute top-1 right-1 px-1.5 py-0.5 bg-[#005000] text-white text-[9px] font-bold rounded">
                                         {offer.discountPercentage ? `−${offer.discountPercentage}%` : "DEAL"}
                                     </span>
@@ -101,13 +94,7 @@ export default function OfferCardSection() {
                                 className="group bg-white flex flex-col h-full rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-[#005000]/30 transition-all duration-200 overflow-hidden"
                             >
                                 <div className="border-t-4 border-[#005000] relative h-40 w-full bg-slate-50 overflow-hidden">
-                                    {imgUrl ? (
-                                        <Image src={imgUrl} alt={offer.name || "Offer"} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 1024px) 50vw, 25vw" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-[#005000]/5">
-                                            <Tag className="w-12 h-12 text-[#005000]/40" strokeWidth={1.5} />
-                                        </div>
-                                    )}
+                                    <Image src={imgUrl} alt={offer.name || "Offer"} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 1024px) 50vw, 25vw" />
                                     <span className="absolute top-3 right-3 px-2.5 py-1 bg-[#005000] text-white text-[10px] font-bold rounded">
                                         {offer.discountPercentage ? `−${offer.discountPercentage}%` : "DEAL"}
                                     </span>

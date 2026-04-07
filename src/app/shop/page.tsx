@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { ChevronDown, Filter, Grid, List, SlidersHorizontal, ShoppingCart, Package, Loader2 } from "lucide-react";
+import { ChevronDown, Filter, Grid, List, SlidersHorizontal, Package, Loader2 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { ProductListCard } from "@/components/product-list-card";
 import { Input } from "@/components/ui/input";
@@ -23,8 +23,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { resolveImageSrc } from "@/lib/images";
 
 const ITEMS_PER_PAGE = 12;
+
+const flattenCategories = (items: Category[]): Category[] => {
+  const out: Category[] = [];
+  const walk = (nodes: Category[]) => {
+    nodes.forEach((node) => {
+      out.push(node);
+      if (node.subCategories?.length) walk(node.subCategories);
+    });
+  };
+  walk(items);
+  return out;
+};
 
 // Helper to get all category IDs including subcategories
 const getAllCategoryIds = (category: Category): number[] => {
@@ -285,6 +298,7 @@ function ShopContent() {
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState<string>(searchQuery || "");
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
 
   useEffect(() => {
@@ -308,7 +322,12 @@ function ShopContent() {
           offerService.getAllOffers()
         ]);
 
-        setProducts(productsData);
+        const activeCategoryIds = new Set(categoriesData.map((cat) => cat.id));
+        const visibleProducts = productsData.filter(
+          (product) => Boolean(product.isActive) && activeCategoryIds.has(product.productCategoryId)
+        );
+
+        setProducts(visibleProducts);
         setCategories(categoriesData);
         setBrands(brandsData);
         setOffers(offersData);
@@ -326,8 +345,8 @@ function ShopContent() {
         });
         setProductOffers(offersMap);
 
-        if (productsData.length > 0) {
-          const maxProductPrice = Math.max(...productsData.map(p => Number(p.price)));
+        if (visibleProducts.length > 0) {
+          const maxProductPrice = Math.max(...visibleProducts.map(p => Number(p.price)));
           setPriceRange([0, maxProductPrice]);
         }
       } catch (error) {
@@ -468,6 +487,36 @@ function ShopContent() {
   }, [products, selectedBrands, categories]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const selectedCategoryBanners = useMemo(() => {
+    if (selectedCategories.length === 0) return [];
+    const categoryMap = new Map(flattenCategories(categories).map((cat) => [String(cat.id), cat]));
+    return selectedCategories
+      .map((id) => categoryMap.get(id))
+      .filter((cat): cat is Category => Boolean(cat))
+      .map((cat) => {
+        const desktopSrc = cat.bannerImg?.trim() ? resolveImageSrc(cat.bannerImg) : resolveImageSrc(cat.categoryImg);
+        const mobileSrc = cat.categoryImg?.trim() ? resolveImageSrc(cat.categoryImg) : desktopSrc;
+        return {
+          id: cat.id,
+          name: cat.category,
+          desktopSrc,
+          mobileSrc
+        };
+      })
+      .filter((banner) => Boolean(banner.desktopSrc));
+  }, [categories, selectedCategories]);
+
+  useEffect(() => {
+    setCurrentBannerIndex(0);
+  }, [selectedCategoryBanners.length]);
+
+  useEffect(() => {
+    if (selectedCategoryBanners.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % selectedCategoryBanners.length);
+    }, 2800);
+    return () => clearInterval(timer);
+  }, [selectedCategoryBanners.length]);
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -481,7 +530,7 @@ function ShopContent() {
   const adaptProduct = (backendProduct: Product) => {
     const imgs = getProductImages(backendProduct);
     const primary = imgs.find(img => img.isPrimary) || imgs[0];
-    const primaryImage = primary ? getProductImageUrl(primary) : '/images/products/placeholder.png';
+    const primaryImage = getProductImageUrl(primary);
 
     // Get offers for this product
     const productOffersArray = productOffers.get(backendProduct.id) || [];
@@ -524,9 +573,7 @@ function ShopContent() {
       reviews: 45,
       description: backendProduct.description || '',
       stock: backendProduct.quantity,
-      weight: backendProduct.product_category?.isWeightBased && backendProduct.weight
-        ? `${backendProduct.weight}kg`
-        : (backendProduct.weight ? `${backendProduct.weight}g` : '1kg'),
+      weight: 'Per unit',
       brand: (backendProduct.brand as { brand?: string; brandName?: string } | undefined)?.brand ?? (backendProduct.brand as { brand?: string; brandName?: string } | undefined)?.brandName ?? '',
       offerValidity: offerInfo.offer ? formatOfferValidity(offerInfo.offer.endDate) : undefined,
       badges: badges
@@ -535,26 +582,56 @@ function ShopContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Shop default header image */}
-      <section className="w-full bg-white">
-        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="relative w-full aspect-[16/5] min-h-[180px] max-h-[360px] overflow-hidden rounded-none md:rounded-xl">
-            <Image
-              src="/images/headers/shop-header.png"
-              alt="Shop header"
-              fill
-              sizes="100vw"
-              className="object-cover object-center"
-              priority
-            />
+      {/* Category header slider for selected categories */}
+      {selectedCategoryBanners.length > 0 && (
+        <section className="w-full bg-neutral-900">
+          <div className="relative w-full min-h-[180px] sm:min-h-[200px] h-[min(31.25vw,85vh)] overflow-hidden bg-slate-200">
+            <div
+              className="flex h-full w-full transition-transform duration-700 ease-in-out"
+              style={{ transform: `translateX(-${currentBannerIndex * 100}%)` }}
+            >
+              {selectedCategoryBanners.map((banner, index) => (
+                <div key={banner.id} className="relative h-full w-full shrink-0">
+                  <Image
+                    src={banner.desktopSrc}
+                    alt={`${banner.name} header`}
+                    fill
+                    sizes="100vw"
+                    className="hidden object-contain object-center sm:block"
+                    priority={index === 0}
+                  />
+                  <Image
+                    src={banner.mobileSrc}
+                    alt={`${banner.name} header mobile`}
+                    fill
+                    sizes="100vw"
+                    className="object-cover object-center sm:hidden"
+                    priority={index === 0}
+                  />
+                </div>
+              ))}
+            </div>
+            {selectedCategoryBanners.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5">
+                {selectedCategoryBanners.map((banner, index) => (
+                  <button
+                    key={`dot-${banner.id}`}
+                    type="button"
+                    onClick={() => setCurrentBannerIndex(index)}
+                    className={`h-2 w-2 rounded-full transition-all ${index === currentBannerIndex ? 'w-5 bg-white' : 'bg-white/60 hover:bg-white/80'}`}
+                    aria-label={`Show banner ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Search Results Header */}
       {searchQuery && (
         <div className="w-full bg-white border-b border-gray-200 py-4">
-          <div className="max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-[#253D4E]">
@@ -579,7 +656,7 @@ function ShopContent() {
         </div>
       )}
 
-      <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+      <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
         <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">

@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { Product } from "@/lib/data";
+import { resolveImageSrc } from "@/lib/images";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Eye, Star, ShoppingCart } from "lucide-react";
+import { Heart, Eye, Star } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { Button } from "@/components/ui/button";
 
 interface ProductListCardProps {
@@ -102,7 +104,7 @@ export function ProductListCard({ product }: ProductListCardProps) {
                         {/* Product Image */}
                         <div className="relative w-full h-[140px] flex items-center justify-center">
                             <Image
-                                src={product.image}
+                                src={resolveImageSrc(product.image)}
                                 alt={product.name}
                                 fill
                                 className="object-contain group-hover:scale-110 transition-transform duration-500"
@@ -189,7 +191,7 @@ export function ProductListCard({ product }: ProductListCardProps) {
                                     onClick={handleAddToCart}
                                     className="bg-[#005000] hover:bg-[#006600] text-white px-6 h-10"
                                 >
-                                    <ShoppingCart className="w-4 h-4 mr-2" />
+                                    <CartOutlineIcon className="w-4 h-4 mr-2" />
                                     Add to Cart
                                 </Button>
                             </div>

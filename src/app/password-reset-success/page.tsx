@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
+import { AuthFormCornerLogo, AuthHeroCornerLogo } from "@/components/layout/auth-page-logo";
+import { AuthSplitLayout } from "@/components/layout/auth-split-layout";
 
 export default function PasswordResetSuccessPage() {
     const router = useRouter();
@@ -20,13 +22,14 @@ export default function PasswordResetSuccessPage() {
     }, [router]);
 
     return (
-        <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+        <AuthSplitLayout>
             {/* Left Side - Image */}
-            <div className="relative hidden md:block w-full h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+            <div className="relative hidden md:block w-full min-h-[280px] md:min-h-screen h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+                <AuthHeroCornerLogo />
                 <div className="absolute inset-0 flex items-center justify-center">
                     <Image
-                        src="/auth-image.png"
-                        alt="Shopping Illustration"
+                        src="/Loginnew.png"
+                        alt="Fresh groceries in a shopping cart"
                         fill
                         className="object-cover object-center hover:scale-105 transition-transform duration-700"
                         priority
@@ -35,8 +38,9 @@ export default function PasswordResetSuccessPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="flex flex-col justify-center px-8 md:px-24 py-12 bg-white relative animate-[slideInRight_0.8s_ease-out]">
-                <div className="w-full max-w-md mx-auto space-y-8">
+            <div className="flex flex-col justify-center px-8 py-12 md:px-10 lg:px-14 xl:px-16 2xl:px-20 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+                <AuthFormCornerLogo />
+                <div className="w-full max-w-md xl:max-w-lg mx-auto space-y-8">
                     {/* Success Icon */}
                     <div className="flex justify-center">
                         <div className="relative">
@@ -51,7 +55,7 @@ export default function PasswordResetSuccessPage() {
                     <div className="text-center space-y-3">
                         <h1 className="text-2xl font-bold text-black">Password Reset Successful!</h1>
                         <p className="text-black/60">
-                            Your password has been successfully reset. You can now sign in with your new
+                            Your password has been successfully reset. You can now log in with your new
                             password.
                         </p>
                     </div>
@@ -62,7 +66,7 @@ export default function PasswordResetSuccessPage() {
                             onClick={() => router.push("/signin")}
                             className="w-full h-12 bg-[#DB4444] hover:bg-[#c93f3f] text-white font-medium text-base rounded shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                         >
-                            Continue to Sign In
+                            Continue to Login
                         </Button>
                         <Button
                             onClick={() => router.push("/")}
@@ -75,10 +79,10 @@ export default function PasswordResetSuccessPage() {
 
                     {/* Auto Redirect Notice */}
                     <p className="text-center text-sm text-gray-500">
-                        Redirecting to sign in page in 5 seconds...
+                        Redirecting to login page in 5 seconds...
                     </p>
                 </div>
             </div>
-        </div>
+        </AuthSplitLayout>
     );
 }

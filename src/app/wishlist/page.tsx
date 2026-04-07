@@ -3,7 +3,8 @@
 import { useWishlist } from "@/context/WishlistContext";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
-import { Heart, ShoppingBag, Trash2 } from "lucide-react";
+import { Heart, Trash2 } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 
@@ -17,21 +18,20 @@ export default function WishlistPage() {
             name: product.name,
             price: product.price,
             image: product.image,
-            weight: product.weight,
             tag: product.tag,
         });
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 flex items-center gap-3">
                     <Heart className="w-8 h-8 md:w-10 md:h-10 text-red-500 fill-red-500" />
                     My Wishlist
                 </h1>
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-12">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8 py-12">
                 {wishlist.length === 0 ? (
                     // Empty State
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 md:p-16 text-center">
@@ -48,7 +48,7 @@ export default function WishlistPage() {
                         </p>
                         <Link href="/shop">
                             <Button className="bg-[#005000] hover:bg-[#006600] text-white px-8 py-6 text-lg font-semibold">
-                                <ShoppingBag className="w-5 h-5 mr-2" />
+                                <CartOutlineIcon className="w-5 h-5 mr-2" />
                                 Start Shopping
                             </Button>
                         </Link>
@@ -85,7 +85,7 @@ export default function WishlistPage() {
                                             onClick={() => handleAddToCart(product)}
                                             className="flex-1 bg-[#005000] hover:bg-[#006600] text-white text-sm font-semibold"
                                         >
-                                            <ShoppingBag className="w-4 h-4 mr-2" />
+                                            <CartOutlineIcon className="w-4 h-4 mr-2" />
                                             Add to Cart
                                         </Button>
                                         <Button

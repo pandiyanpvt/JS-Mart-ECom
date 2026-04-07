@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { Heading } from "@/components/ui/heading";
 import Image from "next/image";
+import { resolveImageSrc } from "@/lib/images";
 
 type Item = {
   id: number;
@@ -37,10 +38,10 @@ export default function ShopGridSection({
   return (
     <section
       aria-labelledby={`${title}-heading`}
-      className="pt-8 sm:pt-24 xl:mx-auto xl:max-w-7xl xl:px-8 w-full"
+      className="pt-8 sm:pt-24 w-full px-4 sm:px-6 lg:px-8"
     >
       {/* Heading */}
-      <div className="px-4 sm:px-6 lg:px-8 xl:px-0 flex items-center justify-between">
+      <div className="px-0 sm:px-0 flex items-center justify-between">
         <Heading id={`${title}-heading`} className="tracking-tight">
           {title}
         </Heading>
@@ -57,7 +58,7 @@ export default function ShopGridSection({
 
       {/* Grid */}
       <div
-        className={`mt-6 grid ${gridCols} gap-6 place-items-center mx-auto px-4 sm:px-6 lg:px-8 xl:px-0`}
+        className={`mt-6 grid ${gridCols} gap-6 place-items-center mx-auto px-0`}
       >
         {displayedItems.map((item) => (
           <Link
@@ -74,7 +75,7 @@ export default function ShopGridSection({
                 className="w-full h-full object-cover"
               /> */}
                <Image
-                src={item.image}
+                src={resolveImageSrc(item.image)}
                 alt={item.name}
                 width={200}
                 height={200}

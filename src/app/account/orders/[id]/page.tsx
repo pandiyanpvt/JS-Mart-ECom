@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { refundService, settingsService, reviewService } from "@/services";
 import type { Refund } from "@/services/refund.service";
 import type { UserReview } from "@/services/review.service";
+import { resolveImageSrc } from "@/lib/images";
 
 export default function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
@@ -343,7 +344,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-[120px] flex justify-center items-center bg-gray-50">
+            <div className="min-h-screen pt-0 flex justify-center items-center bg-gray-50">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005000]"></div>
             </div>
         );
@@ -351,7 +352,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
     if (!order) {
         return (
-            <div className="min-h-screen pt-[120px] flex flex-col justify-center items-center bg-gray-50 gap-4">
+            <div className="min-h-screen pt-0 flex flex-col justify-center items-center bg-gray-50 gap-4">
                 <h2 className="text-xl font-bold text-gray-900">Order not found</h2>
                 <Button onClick={() => router.push('/account/orders')} className="bg-[#00028C]">
                     Back to Orders
@@ -387,8 +388,8 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
     const trackingSteps = getSteps(order.status || 'PENDING');
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-[120px] pb-12">
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 pt-0 pb-12">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                 {/* Header */}
                 <div className="bg-white rounded-xl shadow-md p-8 mb-6">
                     <button
@@ -630,9 +631,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                             const product = detail.Product || detail.product;
                             const primaryImage = product?.images?.find((img: any) => img.isPrimary) || product?.images?.[0];
                             const imgRaw = primaryImage?.productImg || product?.productImage || product?.image;
-                            const imgSrc = imgRaw
-                                ? (imgRaw.startsWith("http") ? imgRaw : (imgRaw.startsWith("/") ? imgRaw : `/${imgRaw}`))
-                                : "/placeholder.png";
+                            const imgSrc = resolveImageSrc(imgRaw);
 
                             const refundStatus = getRefundStatusForDetail(detail);
                             const isFreeItem = Number(detail.pricePerUnit || 0) <= 0;

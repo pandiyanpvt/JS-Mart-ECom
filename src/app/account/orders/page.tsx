@@ -86,14 +86,14 @@ export default function OrdersPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pt-8">
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-[#253D4E]">
                     Order summary
                 </h1>
                 <p className="text-gray-600 mt-1">Your order history — only your orders are shown here</p>
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pb-12">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8 pb-12">
                 <div className="space-y-6">
                     {/* Header */}
                     <div className="bg-white rounded-xl shadow-md p-8">

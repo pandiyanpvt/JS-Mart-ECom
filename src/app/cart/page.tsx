@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, Percent, ShieldCheck, Gem, Zap, Loader2, X } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowRight, Tag, Percent, ShieldCheck, Gem, Zap, Loader2, X } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { offerService } from "@/services/offer.service";
 import { couponService } from "@/services/coupon.service";
 import { calculateCartTotals } from "@/utils/offerUtils";
@@ -15,6 +16,7 @@ import { membershipService, type UserSubscription } from "@/services/membership.
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useModal } from "@/components/providers/ModalProvider";
+import { resolveImageSrc } from "@/lib/images";
 
 export default function ShoppingCart() {
     const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -80,7 +82,7 @@ export default function ShoppingCart() {
 
     return (
         <div className="min-h-screen bg-gray-50 pt-8 pb-16">
-            <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+            <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-black text-[#253D4E] tracking-tight text-center md:text-left">Shopping Cart</h1>
@@ -109,7 +111,7 @@ export default function ShoppingCart() {
                 {cart.length === 0 ? (
                     <div className="bg-white rounded-[2rem] border border-dashed border-gray-200 py-20 px-4 text-center shadow-sm">
                         <div className="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <ShoppingBag className="w-12 h-12 text-gray-300" />
+                            <CartOutlineIcon className="w-12 h-12 text-gray-300" />
                         </div>
                         <h2 className="text-2xl font-bold text-[#253D4E] mb-3">Your cart is currently empty</h2>
                         <p className="text-gray-500 max-w-md mx-auto mb-8">
@@ -146,7 +148,7 @@ export default function ShoppingCart() {
                                                 <div className="flex items-center gap-6">
                                                     <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 bg-white rounded-2xl p-2 border border-gray-100 shadow-sm overflow-hidden group-hover:scale-105 transition-transform duration-300">
                                                         <Image
-                                                            src={item.image?.startsWith("http") ? item.image : item.image ? `/${item.image}` : "/placeholder.png"}
+                                                            src={resolveImageSrc(item.image)}
                                                             alt={item.name}
                                                             fill
                                                             className="object-contain"
@@ -160,7 +162,6 @@ export default function ShoppingCart() {
                                                         <h3 className="text-lg font-bold text-[#253D4E] group-hover:text-[#005000] transition-colors line-clamp-2">
                                                             {item.name}
                                                         </h3>
-                                                        <p className="text-xs text-gray-400 font-semibold mt-1 uppercase tracking-widest">{item.weight || "1kg"}</p>
 
                                                         {/* Applied Offers below product */}
                                                         {item.appliedOffer && (

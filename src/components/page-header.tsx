@@ -18,7 +18,7 @@ export default function PageHeader({
     gradient = "from-emerald-500 via-teal-500 to-cyan-500"
 }: PageHeaderProps) {
     return (
-        <section className="w-full pt-[100px]">
+        <section className="w-full pt-0">
             <div className="w-full">
                 <div className="relative overflow-hidden min-h-[300px] md:min-h-[400px]">
                     {/* Background Image */}

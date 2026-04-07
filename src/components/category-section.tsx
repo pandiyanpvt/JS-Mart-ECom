@@ -29,7 +29,7 @@ export default function CategorySection() {
 
   if (loading) {
     return (
-      <section className="pt-8 sm:pt-24 xl:mx-auto xl:max-w-7xl xl:px-8 w-full px-4">
+      <section className="pt-8 sm:pt-24 w-full px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold tracking-tight">Shop by Category</h2>
         <div className="mt-6 flex justify-center py-12">
           <Loader2 className="w-10 h-10 animate-spin text-[#005000]" />

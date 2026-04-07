@@ -1,5 +1,7 @@
 // Utility functions for handling product offers and discounts
 
+import { resolveImageSrc } from "@/lib/images";
+
 export interface Offer {
     id: number;
     name: string;
@@ -35,13 +37,18 @@ export interface Offer {
     };
 }
 
-/** Get display image for an offer: admin banner first, then product image, then null (use placeholder) */
-export function getOfferImageUrl(offer: Offer): string | null {
-    if (offer.bannerImg) return offer.bannerImg;
+/** Get display image for an offer: admin banner first, then product image, then empty placeholder */
+export function getOfferImageUrl(offer: Offer): string {
+    if (offer.bannerImg?.trim()) return resolveImageSrc(offer.bannerImg);
     const p = offer.product;
-    if (!p) return null;
-    const first = (p.images && p.images[0]?.productImg) ? p.images[0].productImg : (p.productImages && p.productImages[0]?.image) ? p.productImages[0].image : null;
-    return first || null;
+    if (!p) return resolveImageSrc(null);
+    const first =
+        p.images && p.images[0]?.productImg
+            ? p.images[0].productImg
+            : p.productImages && p.productImages[0]?.image
+              ? p.productImages[0].image
+              : null;
+    return resolveImageSrc(first);
 }
 
 export interface ProductWithOffer {
@@ -334,7 +341,7 @@ export function calculateCartTotals(
                 if (!orderItemsMap[freeId]) {
                     orderItemsMap[freeId] = {
                         paidQty: 0, freeQty: 0, price: Number(offer.freeProduct.price || 0),
-                        appliedOffers: [], item: { id: freeId, name: offer.freeProduct.productName, price: Number(offer.freeProduct.price || 0), image: (offer.freeProduct as any).productImg || '/placeholder.png' } as any,
+                        appliedOffers: [], item: { id: freeId, name: offer.freeProduct.productName, price: Number(offer.freeProduct.price || 0), image: resolveImageSrc((offer.freeProduct as any).productImg) } as any,
                         percentageDiscount: 0
                     };
                 }

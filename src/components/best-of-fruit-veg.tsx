@@ -3,10 +3,12 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Star, Heart, Eye, ShoppingCart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, Heart, Eye } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart, type Product as CartProduct } from "@/context/CartContext"; // ✅ Import cart context and type
 import { type Product as DataProduct } from "@/lib/data";
+import { resolveImageSrc } from "@/lib/images";
 
 type LocalProduct = {
     id: number;
@@ -89,7 +91,7 @@ export default function BestOfFruitVeg() {
     };
 
     return (
-        <section className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-12">
+        <section className="w-full mx-auto px-4 md:px-6 lg:px-8 py-12">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h2 className="text-4xl font-extrabold text-[#253D4E]">Best Of Fruit & Veg</h2>
@@ -163,7 +165,7 @@ export default function BestOfFruitVeg() {
                                 {/* Product Image */}
                                 <div className="relative w-full h-[180px] flex items-center justify-center">
                                     <Image
-                                        src={product.image}
+                                        src={resolveImageSrc(product.image)}
                                         alt={product.name}
                                         fill
                                         className="object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
@@ -175,7 +177,7 @@ export default function BestOfFruitVeg() {
                                     onClick={() => handleAddToCart(product)}
                                     className="w-full bg-[#0F1111] text-white py-3 rounded font-medium hover:bg-[#232F3E] transition-all flex items-center justify-center gap-2 mt-4 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300"
                                 >
-                                    <ShoppingCart className="w-4 h-4" />
+                                    <CartOutlineIcon className="w-4 h-4" />
                                     Add To Cart
                                 </button>
                             </div>

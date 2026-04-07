@@ -24,7 +24,7 @@ export default function PageHero({
     <section className="w-full pt-0">
       <div className="w-full">
         <div className="relative overflow-hidden min-h-[400px] md:min-h-[500px] group">
-          {/* Background Image - same as home hero */}
+          {/* Background Image - same as original home hero: cover to fill header */}
           <div className="absolute inset-0 z-0">
             <Image
               src={image}
@@ -35,8 +35,11 @@ export default function PageHero({
             />
           </div>
 
-          {/* Dark overlay for text readability - same as home hero */}
-          <div className="absolute top-1/3 left-0 right-0 bottom-0 bg-black/30" />
+          {/* Dark overlay — full area so top/bottom match (readable text, even tone) */}
+          <div
+            className="absolute inset-0 z-[1] bg-black/35 pointer-events-none"
+            aria-hidden
+          />
 
           {/* Navigation Arrows - same style as home hero */}
           <button
@@ -66,7 +69,7 @@ export default function PageHero({
             }`}
           >
             <div
-              className={`w-full max-w-[1600px] ${align === "center" ? "max-w-4xl mx-auto" : ""}`}
+              className={`w-full ${align === "center" ? "max-w-4xl mx-auto" : ""}`}
             >
               <h1 className="text-4xl md:text-7xl font-black text-white leading-tight drop-shadow-lg mb-4">
                 {title}

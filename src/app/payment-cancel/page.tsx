@@ -3,7 +3,8 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { XCircle, RefreshCw, ShoppingCart, ArrowLeft } from "lucide-react";
+import { XCircle, RefreshCw, ArrowLeft } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { Loader2 } from "lucide-react";
 
 const PaymentCancelContent = () => {
@@ -78,7 +79,7 @@ const PaymentCancelContent = () => {
                                 href="/account/orders"
                                 className="flex items-center justify-center gap-2 py-3.5 px-4 border-2 border-gray-100 hover:border-gray-200 text-gray-600 font-bold rounded-xl transition-all hover:bg-gray-50"
                             >
-                                <ShoppingCart className="w-4 h-4" />
+                                <CartOutlineIcon className="w-4 h-4" />
                                 <span className="text-sm">My Orders</span>
                             </Link>
                             <Link

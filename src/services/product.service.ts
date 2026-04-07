@@ -1,4 +1,5 @@
 import api from './apiClient';
+import { EMPTY_IMAGE_SRC, resolveImageSrc } from '@/lib/images';
 
 export interface Product {
     id: number;
@@ -7,7 +8,6 @@ export interface Product {
     brandId: number;
     description?: string;
     quantity: number;
-    weight?: number;
     price: number;
     isActive: boolean;
     isFeatured: boolean;
@@ -32,9 +32,10 @@ export interface ProductImage {
     updatedAt?: string;
 }
 
-/** Get image URL from backend (productImg) or frontend (imageUrl) */
-export function getProductImageUrl(img: ProductImage): string {
-    return img?.productImg ?? img?.imageUrl ?? "";
+/** Get image URL from backend (productImg) or frontend (imageUrl); missing → empty placeholder */
+export function getProductImageUrl(img: ProductImage | null | undefined): string {
+    if (!img) return EMPTY_IMAGE_SRC;
+    return resolveImageSrc(img.productImg ?? img.imageUrl);
 }
 
 /** Get images array (backend uses "images" alias) */
@@ -49,7 +50,6 @@ export interface ProductCategory {
     bannerImg?: string;
     level: number;
     parentId?: number;
-    isWeightBased: boolean;
     isActive: boolean;
     subCategories?: ProductCategory[];
 }

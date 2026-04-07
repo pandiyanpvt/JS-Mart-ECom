@@ -9,10 +9,12 @@ import orderService, { type ShippingAddressBackend } from "@/services/order.serv
 import toast from "react-hot-toast";
 import userService from "@/services/user.service";
 import Cookies from "js-cookie";
-import { ShoppingBag, Loader2, MapPin, Plus, X, AlertCircle, ShieldCheck } from "lucide-react";
+import { Loader2, MapPin, Plus, X, AlertCircle, ShieldCheck } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import productService, { getProductImageUrl, getProductImages } from "@/services/product.service";
+import { resolveImageSrc } from "@/lib/images";
 import { offerService } from "@/services/offer.service";
 import { couponService } from "@/services/coupon.service";
 import { calculateProductDiscount, calculateLineItemTotal, calculateCartTotals } from "@/utils/offerUtils";
@@ -158,7 +160,7 @@ const CheckoutContent = () => {
     useEffect(() => {
         const token = Cookies.get("token");
         if (!token) {
-            toast.error("Please sign in to complete checkout");
+            toast.error("Please log in to complete checkout");
             router.replace("/signin?redirect=/checkout");
             return;
         }
@@ -407,14 +409,14 @@ const CheckoutContent = () => {
         return (
             <div className="min-h-screen bg-gray-50">
                 <div className="pt-8 pb-8">
-                    <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                    <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                         <h1 className="text-3xl md:text-4xl font-bold text-[#253D4E]">Checkout</h1>
                         <p className="text-gray-600 mt-1">Your cart is empty</p>
                     </div>
                 </div>
-                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-8">
+                <div className="w-full mx-auto px-4 md:px-6 lg:px-8 py-8">
                     <div className="bg-white rounded-xl border border-gray-200 p-8 max-w-lg mx-auto text-center">
-                        <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <CartOutlineIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                         <h2 className="text-xl font-bold text-[#253D4E] mb-2">No items to checkout</h2>
                         <p className="text-gray-600 mb-6">Add items from the shop to continue.</p>
                         <Link href="/shop">
@@ -431,13 +433,13 @@ const CheckoutContent = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="pt-8 pb-4">
-                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+                <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
                     <h1 className="text-3xl md:text-4xl font-bold text-[#253D4E]">Checkout</h1>
                     <p className="text-gray-600 mt-1">Complete your order and we&apos;ll deliver to your door</p>
                 </div>
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Left Side: Product List with Totals */}
                     <div className="space-y-6">
@@ -448,7 +450,7 @@ const CheckoutContent = () => {
                                     <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-100 last:border-0">
                                         <div className="relative w-20 h-20 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
                                             <Image
-                                                src={item.image?.startsWith("http") ? item.image : item.image ? `/${item.image}` : "/placeholder.png"}
+                                                src={resolveImageSrc(item.image)}
                                                 alt={item.name}
                                                 fill
                                                 className="object-contain"
@@ -529,13 +531,13 @@ const CheckoutContent = () => {
                                                             const product = await productService.getById(freeProduct.productId);
                                                             const imgs = getProductImages(product);
                                                             const img = imgs.find(i => i.isPrimary) || imgs[0];
-                                                            const imageUrl = img ? getProductImageUrl(img) : null;
+                                                            const imageUrl = getProductImageUrl(img);
 
                                                             const newItem = {
                                                                 id: String(product.id),
                                                                 name: product.productName,
                                                                 price: Number(product.price || 0),
-                                                                image: imageUrl || "/placeholder.png",
+                                                                image: imageUrl,
                                                             };
 
                                                             if (buyNowId && buyNowItem) {

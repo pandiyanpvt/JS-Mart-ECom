@@ -8,6 +8,8 @@ import { ArrowLeft, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authService } from "@/services";
+import { AuthFormCornerLogo, AuthHeroCornerLogo } from "@/components/layout/auth-page-logo";
+import { AuthSplitLayout } from "@/components/layout/auth-split-layout";
 
 function VerifyOTPContent() {
     const router = useRouter();
@@ -103,13 +105,14 @@ function VerifyOTPContent() {
     };
 
     return (
-        <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+        <AuthSplitLayout>
             {/* Left Side - Image */}
-            <div className="relative hidden md:block w-full h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+            <div className="relative hidden md:block w-full min-h-[280px] md:min-h-screen h-full bg-[#CBE4E8] animate-[fadeIn_1s_ease-out]">
+                <AuthHeroCornerLogo />
                 <div className="absolute inset-0 flex items-center justify-center">
                     <Image
-                        src="/auth-image.png"
-                        alt="Shopping Illustration"
+                        src="/Loginnew.png"
+                        alt="Fresh groceries in a shopping cart"
                         fill
                         className="object-cover object-center hover:scale-105 transition-transform duration-700"
                         priority
@@ -118,7 +121,8 @@ function VerifyOTPContent() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="flex flex-col justify-center px-8 md:px-24 py-12 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+            <div className="flex flex-col justify-center px-8 py-12 md:px-10 lg:px-14 xl:px-16 2xl:px-20 bg-white relative animate-[slideInRight_0.8s_ease-out]">
+                <AuthFormCornerLogo />
                 <Button
                     variant="ghost"
                     className="absolute top-8 left-8 md:top-12 md:left-12 hover:bg-gray-100/80 transition-all duration-300"
@@ -129,7 +133,7 @@ function VerifyOTPContent() {
                         Back
                     </Link>
                 </Button>
-                <div className="w-full max-w-md mx-auto space-y-8">
+                <div className="w-full max-w-md xl:max-w-lg mx-auto space-y-8">
                     <div className="space-y-2">
                         <h1 className="text-3xl md:text-4xl font-medium tracking-wide text-black">
                             Verify Your Email
@@ -224,7 +228,7 @@ function VerifyOTPContent() {
                     </form>
                 </div>
             </div>
-        </div>
+        </AuthSplitLayout>
     );
 }
 

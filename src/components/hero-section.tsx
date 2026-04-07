@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { resolveImageSrc } from "@/lib/images";
 
 export interface HeroSlide {
     id: number;
@@ -84,7 +85,7 @@ export default function HeroSection({
                             description: "",
                             buttonText: "",
                             buttonLink: p.redirectLink || "/shop",
-                            image: p.promotionImg
+                            image: resolveImageSrc(p.promotionImg)
                         }));
                     setSlides(mappedSlides);
                 }
@@ -124,14 +125,16 @@ export default function HeroSection({
     return (
         <section className="w-full">
             <div className="w-full">
-                {/* 16:5 aspect; on phone min height for readability. Recommended image: 1920×600. */}
-                <div className={`relative overflow-hidden group w-full aspect-[16/5] min-h-[180px] sm:min-h-[200px] max-h-[600px] ${className ?? ""}`.trim()}>
+                {/* Full banner visible: object-contain; height = min(16:5 for viewport, 85vh) so ultrawide doesn’t crop. */}
+                <div
+                    className={`relative overflow-hidden group w-full min-h-[180px] sm:min-h-[200px] h-[min(31.25vw,85vh)] bg-slate-200 ${className ?? ""}`.trim()}
+                >
                     {/* Slides */}
                     {slides.map((slide, index) => (
                         <div
                             key={slide.id}
                             className={`absolute top-0 left-0 right-0 bottom-0 w-full ${index === currentSlide
-                                ? "opacity-100 z-10"
+                                ? "opacity-100 z-10 animate__animated animate__slideInLeft"
                                 : "opacity-0 z-0 pointer-events-none"
                                 }`}
                         >
@@ -145,7 +148,7 @@ export default function HeroSection({
                                     src={slide.image}
                                     alt={slide.title}
                                     fill
-                                    className="object-cover object-bottom"
+                                    className="object-contain object-center"
                                     priority={index === 0}
                                     sizes="100vw"
                                 />

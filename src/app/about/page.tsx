@@ -3,19 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Star, ShieldCheck, Zap, Heart, ArrowRight } from "lucide-react";
-import HeroSection, { HeroSlide } from "@/components/hero-section";
-
-const aboutHeroSlides: HeroSlide[] = [
-  {
-    id: 1,
-    title: "Freshness Delivered To Your Doorstep",
-    subtitle: "About JS Mart",
-    description: "We're on a mission to provide the freshest groceries and a seamless shopping experience for every household.",
-    buttonText: "Start Shopping",
-    buttonLink: "/shop",
-    image: "/images/headers/about-header.png"
-  }
-];
+import PageHero from "@/components/page-hero";
 
 export default function AboutPage() {
   const values = [
@@ -50,11 +38,17 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <HeroSection slides={aboutHeroSlides} />
+      <PageHero
+        image="/images/headers/about-header.png"
+        imageAlt="About JS Mart"
+        title="About JS Mart"
+        subtitle="We're on a mission to provide the freshest groceries and a seamless shopping experience for every household."
+        align="center"
+      />
 
       {/* Stats */}
       <section className="py-6 sm:py-8 md:py-12 bg-slate-50 border-b border-slate-100">
-        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
@@ -72,7 +66,7 @@ export default function AboutPage() {
 
       {/* Our Story */}
       <section className="py-6 sm:py-8 md:py-16 bg-white">
-        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-16">
             <div className="flex-1 space-y-4 sm:space-y-5">
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
@@ -115,7 +109,7 @@ export default function AboutPage() {
 
       {/* Values */}
       <section className="py-10 md:py-16 bg-slate-50">
-        <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-8 md:mb-10">
             <h2 className="text-xl md:text-2xl font-extrabold text-[#253D4E]">
               Our core values
@@ -148,7 +142,7 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="py-6 sm:py-8 md:py-12 bg-white border-t border-slate-100">
-        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+        <div className="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center">
           <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#253D4E] mb-1.5 sm:mb-2">
             Ready to shop?
           </h2>

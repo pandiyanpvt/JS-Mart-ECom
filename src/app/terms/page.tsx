@@ -1,12 +1,13 @@
 "use client";
 
-import { ScrollText, Gavel, Scale, AlertCircle, ShoppingCart, Ban, ArrowLeft } from "lucide-react";
+import { ScrollText, Gavel, Scale, AlertCircle, Ban, ArrowLeft } from "lucide-react";
+import { CartOutlineIcon } from "@/components/icons/CartOutlineIcon";
 import Link from "next/link";
 
 export default function TermsConditions() {
     const terms = [
         {
-            icon: <ShoppingCart className="h-6 w-6" />,
+            icon: <CartOutlineIcon className="h-6 w-6" />,
             title: "Acceptance of Terms",
             content: "By accessing and using JS Mart, you agree to be bound by these Terms and Conditions. If you do not agree, please refrain from using our services."
         },
@@ -39,7 +40,7 @@ export default function TermsConditions() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-4">
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-4">
                 <Link href="/" className="inline-flex items-center gap-2 text-[#005000] font-semibold mb-6 hover:text-[#006600] transition-colors">
                     <ArrowLeft className="h-5 w-5" /> Back to Store
                 </Link>

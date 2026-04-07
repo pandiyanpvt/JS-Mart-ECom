@@ -7,22 +7,11 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Tag } from "lucide-react";
 import { offerService } from "@/services/offer.service";
-import HeroSection, { HeroSlide } from "@/components/hero-section";
+import PageHero from "@/components/page-hero";
 import { membershipService, UserSubscription } from "@/services/membership.service";
 import { Gem, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const productOffersHeroSlides: HeroSlide[] = [
-  {
-    id: 1,
-    title: "Product Offers",
-    subtitle: "Deals on Products",
-    description: "Save on individual products with these exclusive offers.",
-    buttonText: "Shop Now",
-    buttonLink: "/shop",
-    image: "/images/headers/offers-header.png"
-  }
-];
+import { resolveImageSrc } from "@/lib/images";
 
 // Product-based offer types: 1 = BOGO, 2 = Discount, 4 = Free Gift. Exclude 3 = Cart Level.
 const PRODUCT_OFFER_TYPE_IDS = [1, 2, 4];
@@ -92,11 +81,11 @@ export default function ProductOffersPage() {
           offerName: offer.name,
           price: discountedPrice,
           originalPrice: originalPrice,
-          image: offer.bannerImg || product.productImage || "/images/placeholder.png",
+          image: resolveImageSrc(offer.bannerImg || product.productImage),
           description: product.productDescription || offer.description || "",
           category: "Offers",
           badges,
-          weight: "1kg",
+          weight: "Per unit",
           inStock: true,
           brand: "JS Mart",
           offerTypeId: offer.offerTypeId,
@@ -123,10 +112,16 @@ export default function ProductOffersPage() {
   }, [offers, subscription]);
 
   return (
-    <main className="flex flex-col w-full pb-16 bg-white">
-      <HeroSection slides={productOffersHeroSlides} />
+    <main className="flex flex-col w-full min-w-0 overflow-x-hidden pb-[max(4rem,env(safe-area-inset-bottom))] bg-white">
+      <PageHero
+        image="/images/headers/offers-header.png"
+        imageAlt="Product offers"
+        title="Product Offers"
+        subtitle="Save on individual products with exclusive BOGO, discounts, and free gift deals."
+        align="center"
+      />
 
-      <section className="w-full max-w-[1600px] mx-auto py-12 px-4 md:px-6 lg:px-8">
+      <section className="w-full mx-auto py-12 px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl md:text-4xl font-extrabold text-[#253D4E]">Product Deals</h2>
@@ -140,7 +135,7 @@ export default function ProductOffersPage() {
               <div key={item.offerId || item.id} className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-full">
                 <div className="relative w-full bg-gray-50 flex items-center justify-center h-[140px] md:h-[180px]">
                   <Image
-                    src={item.image || "/images/placeholder.png"}
+                    src={item.image}
                     alt={item.offerName || item.name}
                     fill
                     className="object-contain group-hover:scale-105 transition-transform duration-500"

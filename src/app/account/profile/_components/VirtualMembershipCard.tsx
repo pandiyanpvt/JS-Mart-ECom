@@ -18,7 +18,7 @@ export function VirtualMembershipCard({ user }: VirtualMembershipCardProps) {
     const isPlus = subscription?.plan?.level === 2;
     const planName = subscription?.plan?.name || "Free Tier";
 
-    // Generate a mock card number from User ID
+    // Display card number derived from user id (not a payment card)
     const userIdStr = String(user?.id || 0).padStart(6, '0');
     const cardNumber = `JSM ${userIdStr.slice(0, 3)} ${userIdStr.slice(3, 6)} ${new Date(user?.createdAt || Date.now()).getFullYear()}`;
 

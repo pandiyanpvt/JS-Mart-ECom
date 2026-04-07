@@ -10,8 +10,8 @@ export const IMAGE_SPECS = {
     height: 600,
     minWidth: 800,
     minHeight: 250,
-    maxFileSizeBytes: 2 * 1024 * 1024, // 2 MB
-    maxFileSizeLabel: "2 MB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     aspectRatio: "16:5 (e.g. 1920×600)",
     formats: "JPG, PNG, JPEG, WebP",
   },
@@ -22,8 +22,8 @@ export const IMAGE_SPECS = {
     height: 800,
     minWidth: 400,
     minHeight: 400,
-    maxFileSizeBytes: 1 * 1024 * 1024, // 1 MB
-    maxFileSizeLabel: "1 MB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     aspectRatio: "1:1 (square, e.g. 800×800)",
     formats: "JPG, PNG, JPEG, WebP",
   },
@@ -34,8 +34,8 @@ export const IMAGE_SPECS = {
     height: 400,
     minWidth: 200,
     minHeight: 200,
-    maxFileSizeBytes: 512 * 1024, // 500 KB
-    maxFileSizeLabel: "500 KB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     aspectRatio: "1:1 (e.g. 400×400)",
     formats: "JPG, PNG, JPEG, WebP",
   },
@@ -46,8 +46,8 @@ export const IMAGE_SPECS = {
     height: 200,
     minWidth: 200,
     minHeight: 100,
-    maxFileSizeBytes: 512 * 1024, // 500 KB
-    maxFileSizeLabel: "500 KB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     aspectRatio: "2:1 (e.g. 400×200)",
     formats: "JPG, PNG, JPEG, WebP",
   },
@@ -58,8 +58,8 @@ export const IMAGE_SPECS = {
     height: 400,
     minWidth: 100,
     minHeight: 100,
-    maxFileSizeBytes: 512 * 1024, // 500 KB
-    maxFileSizeLabel: "500 KB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     aspectRatio: "1:1 (e.g. 400×400)",
     formats: "JPG, PNG, JPEG, WebP",
   },
@@ -70,8 +70,8 @@ export const IMAGE_SPECS = {
     height: 150,
     minWidth: 200,
     minHeight: 80,
-    maxFileSizeBytes: 512 * 1024, // 500 KB
-    maxFileSizeLabel: "500 KB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     aspectRatio: "~2.6:1 (e.g. 400×150)",
     formats: "JPG, PNG, JPEG, WebP",
   },
@@ -82,8 +82,8 @@ export const IMAGE_SPECS = {
     height: 400,
     minWidth: 400,
     minHeight: 200,
-    maxFileSizeBytes: 1 * 1024 * 1024, // 1 MB
-    maxFileSizeLabel: "1 MB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     aspectRatio: "2:1 (e.g. 800×400)",
     formats: "JPG, PNG, JPEG, WebP",
   },
@@ -92,8 +92,8 @@ export const IMAGE_SPECS = {
   evidencePhoto: {
     width: 1200,
     height: 800,
-    maxFileSizeBytes: 2 * 1024 * 1024, // 2 MB
-    maxFileSizeLabel: "2 MB",
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+    maxFileSizeLabel: "10 MB",
     formats: "JPG, PNG, JPEG, WebP",
   },
 } as const;

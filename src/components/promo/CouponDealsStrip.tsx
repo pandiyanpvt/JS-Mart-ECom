@@ -50,7 +50,7 @@ export default function CouponDealsStrip() {
     if (loading) {
         return (
             <section className="w-full py-8 bg-white">
-                <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 flex justify-center">
+                <div className="w-full mx-auto px-4 md:px-6 lg:px-8 flex justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
                 </div>
             </section>
@@ -61,8 +61,8 @@ export default function CouponDealsStrip() {
 
     return (
         <section className="w-full py-10 md:py-12 bg-white">
-            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8">
-                <div className="flex items-center justify-between mb-6">
+            <div className="w-full mx-auto px-4 md:px-6 lg:px-8">
+                <div className="flex items-start justify-between gap-3 mb-6">
                     <div>
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">
                             At Checkout
@@ -76,18 +76,18 @@ export default function CouponDealsStrip() {
                     </div>
                     <Link
                         href="/offers"
-                        className="text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                        className="text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 whitespace-nowrap pt-1"
                     >
                         View All
                         <ChevronRight size={18} />
                     </Link>
                 </div>
 
-                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+                <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory">
                     {offers.map((offer) => (
                         <div
                             key={offer.id}
-                            className="flex-shrink-0 w-[280px] md:w-[320px] border-2 border-slate-100 overflow-hidden bg-white shadow-sm hover:shadow-md hover:border-emerald-100 transition-all group"
+                            className="flex-shrink-0 w-[84vw] min-w-[260px] max-w-[320px] md:w-[320px] border-2 border-slate-100 overflow-hidden bg-white shadow-sm hover:shadow-md hover:border-emerald-100 transition-all group snap-start"
                         >
                             <div className="p-5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-24 h-24 opacity-10">
